@@ -16,35 +16,12 @@
     margin-top: 20px;
   }
 
-  table {
-    margin: 20px auto;
-    border-collapse: collapse;
-    width: 90%;
-    background: #1e293b;
+  iframe {
+    margin-top: 20px;
+    width: 95%;
+    height: 600px;
+    border: none;
     border-radius: 10px;
-    overflow: hidden;
-  }
-
-  th, td {
-    padding: 10px;
-    border-bottom: 1px solid #334155;
-  }
-
-  th {
-    background: #020617;
-    font-weight: bold;
-  }
-
-  tr:hover {
-    background: #334155;
-  }
-
-  .top {
-    background: #14532d; /* verde top 4 */
-  }
-
-  .bottom {
-    background: #7f1d1d; /* rojo últimos */
   }
 </style>
 </head>
@@ -53,41 +30,7 @@
 
 <h1>🏀 Standings</h1>
 
-<table id="tabla"></table>
-
-<script>
-const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
-
-fetch(url)
-  .then(response => response.text())
-  .then(data => {
-    const rows = data.trim().split("\n");
-    const table = document.getElementById("tabla");
-
-    rows.forEach((row, i) => {
-      const tr = document.createElement("tr");
-      const cols = row.split(",");
-
-      cols.forEach(col => {
-        const cell = document.createElement(i === 0 ? "th" : "td");
-        cell.innerText = col;
-        tr.appendChild(cell);
-      });
-
-      // TOP 4 en verde
-      if (i > 0 && i <= 4) {
-        tr.classList.add("top");
-      }
-
-      // Últimos 3 en rojo
-      if (i >= rows.length - 3) {
-        tr.classList.add("bottom");
-      }
-
-      table.appendChild(tr);
-    });
-  });
-</script>
+<iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pubhtml?gid=1380606206&single=true"></iframe>
 
 </body>
 </html>
