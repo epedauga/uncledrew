@@ -2,12 +2,12 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Standings</title>
+<title>🏀 Standings</title>
 
 <style>
   body {
     font-family: Arial, sans-serif;
-    background: #111;
+    background: #0f172a;
     color: white;
     text-align: center;
   }
@@ -19,25 +19,32 @@
   table {
     margin: 20px auto;
     border-collapse: collapse;
-    width: 80%;
-    background: #1c1c1c;
+    width: 90%;
+    background: #1e293b;
+    border-radius: 10px;
+    overflow: hidden;
   }
 
   th, td {
     padding: 10px;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid #334155;
   }
 
   th {
-    background: #222;
+    background: #020617;
+    font-weight: bold;
   }
 
   tr:hover {
-    background: #2a2a2a;
+    background: #334155;
   }
 
   .top {
-    background: #1f4d2b;
+    background: #14532d; /* verde top 4 */
+  }
+
+  .bottom {
+    background: #7f1d1d; /* rojo últimos */
   }
 </style>
 </head>
@@ -49,12 +56,12 @@
 <table id="tabla"></table>
 
 <script>
-const url = "PEGÁ_ACÁ_TU_LINK_CSV";
+const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
 fetch(url)
   .then(response => response.text())
   .then(data => {
-    const rows = data.split("\n");
+    const rows = data.trim().split("\n");
     const table = document.getElementById("tabla");
 
     rows.forEach((row, i) => {
@@ -67,8 +74,14 @@ fetch(url)
         tr.appendChild(cell);
       });
 
+      // TOP 4 en verde
       if (i > 0 && i <= 4) {
-        tr.classList.add("top"); // top 4 en verde
+        tr.classList.add("top");
+      }
+
+      // Últimos 3 en rojo
+      if (i >= rows.length - 3) {
+        tr.classList.add("bottom");
       }
 
       table.appendChild(tr);
