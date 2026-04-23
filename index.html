@@ -36,7 +36,6 @@
     margin: auto;
   }
 
-  /* TABLE WRAPPER */
   .table-wrap {
     overflow-x: auto;
     border-radius: 12px;
@@ -75,20 +74,23 @@
     background: rgba(255,255,255,0.06);
   }
 
-  /* POS highlight */
   td:first-child {
     font-weight: bold;
     color: #60a5fa;
   }
 
-  /* TOP 1 */
   .top1 {
     background: rgba(34,197,94,0.08);
   }
 
-  /* PLAYOFF ZONE */
   .playoff {
     border-left: 3px solid #3b82f6;
+  }
+
+  /* 🟡 UNCLE DREW */
+  .highlight-team {
+    background: rgba(245, 158, 11, 0.18) !important;
+    border: 1px solid #f59e0b !important;
   }
 
   .loading {
@@ -142,27 +144,37 @@ function render(headers, data) {
 
   let html = "<table>";
 
-  // HEADER
   html += "<thead><tr>";
-  headers.forEach(h => {
-    html += `<th>${h}</th>`;
-  });
+  headers.forEach(h => html += `<th>${h}</th>`);
   html += "</tr></thead>";
 
-  // BODY
   html += "<tbody>";
 
   data.forEach((row, i) => {
 
     let cls = "";
 
-    if (i === 0) cls = "top1";
+    // 🟢 top 1
+    if (i === 0) cls += " top1";
+
+    // 🔵 top 10 (sin pisar top1 visualmente)
     if (i < 10) cls += " playoff";
+
+    // 🟡 Uncle Drew highlight
+    const isUncleDrew = Object.values(row).includes("Uncle Drew");
+    if (isUncleDrew) cls += " highlight-team";
 
     html += `<tr class="${cls}">`;
 
     headers.forEach(h => {
-      html += `<td>${row[h]}</td>`;
+      let value = row[h];
+
+      // ⭐ estrella si es Uncle Drew
+      if (value === "Uncle Drew") {
+        value = "⭐ " + value;
+      }
+
+      html += `<td>${value}</td>`;
     });
 
     html += "</tr>";
