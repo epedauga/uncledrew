@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Standings</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+    text-align: center;
+  }
+
+  h1 {
+    margin-top: 20px;
+  }
+
+  table {
+    margin: 20px auto;
+    border-collapse: collapse;
+    width: 80%;
+    background: #1c1c1c;
+  }
+
+  th, td {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+  }
+
+  th {
+    background: #222;
+  }
+
+  tr:hover {
+    background: #2a2a2a;
+  }
+
+  .top {
+    background: #1f4d2b;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>🏀 Standings</h1>
+
+<table id="tabla"></table>
+
+<script>
+const url = "PEGÁ_ACÁ_TU_LINK_CSV";
+
+fetch(url)
+  .then(response => response.text())
+  .then(data => {
+    const rows = data.split("\n");
+    const table = document.getElementById("tabla");
+
+    rows.forEach((row, i) => {
+      const tr = document.createElement("tr");
+      const cols = row.split(",");
+
+      cols.forEach(col => {
+        const cell = document.createElement(i === 0 ? "th" : "td");
+        cell.innerText = col;
+        tr.appendChild(cell);
+      });
+
+      if (i > 0 && i <= 4) {
+        tr.classList.add("top"); // top 4 en verde
+      }
+
+      table.appendChild(tr);
+    });
+  });
+</script>
+
+</body>
+</html>
