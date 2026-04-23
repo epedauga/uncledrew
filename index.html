@@ -118,6 +118,14 @@
 
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
+/* 🧠 Emoji según posición */
+function getStatusEmoji(i) {
+  if (i === 0) return "🏆";
+  if (i < 3) return "🔥";
+  if (i < 10) return "🟦";
+  return "⚠️";
+}
+
 async function load() {
   const res = await fetch(URL);
   const text = await res.text();
@@ -150,6 +158,10 @@ function render(headers, data) {
 
   html += "<tbody>";
 
+  const teamKey = headers.find(h =>
+    h.toLowerCase().includes("team")
+  );
+
   data.forEach((row, i) => {
 
     let cls = "";
@@ -157,15 +169,11 @@ function render(headers, data) {
     // 🟢 top 10
     if (i < 10) cls += " top10";
 
-    // 🔎 detectar columna TEAM automáticamente
-    const teamKey = headers.find(h =>
-      h.toLowerCase().includes("team")
-    );
+    const teamName = teamKey ? row[teamKey] : "";
 
     const isUncleDrew =
-      teamKey &&
-      row[teamKey] &&
-      row[teamKey].toString().trim().toLowerCase() === "uncle drew";
+      teamName &&
+      teamName.toString().trim().toLowerCase() === "uncle drew";
 
     if (isUncleDrew) cls += " highlight-team";
 
@@ -174,14 +182,9 @@ function render(headers, data) {
     headers.forEach(h => {
       let value = row[h];
 
-      // ⭐ estrella si es Uncle Drew
-      if (
-        teamKey &&
-        h === teamKey &&
-        value &&
-        value.toString().trim().toLowerCase() === "uncle drew"
-      ) {
-        value = "⭐ " + value;
+      // ⭐ + emoji dinámico SOLO para Uncle Drew
+      if (teamKey && h === teamKey && isUncleDrew) {
+        value = `${getStatusEmoji(i)} ${value}`;
       }
 
       html += `<td>${value}</td>`;
