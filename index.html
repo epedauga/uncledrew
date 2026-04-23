@@ -36,38 +36,57 @@
     margin: auto;
   }
 
-  /* 🏀 GRID TABLE */
-  .row {
-    display: grid;
-    grid-template-columns: 140px repeat(auto-fit, minmax(50px, 1fr));
-    align-items: center;
-    padding: 6px 8px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    font-size: 13px;
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
   }
 
-  .header-row {
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 520px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  thead {
     background: rgba(255,255,255,0.08);
+  }
+
+  th {
+    padding: 6px 8px;
     font-size: 12px;
+    text-align: center;
     text-transform: uppercase;
+    letter-spacing: 1px;
     color: #93c5fd;
   }
 
-  .team {
+  td {
+    padding: 6px 8px;
+    font-size: 14px; /* 💻 desktop */
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  tr:hover {
+    background: rgba(255,255,255,0.03);
+  }
+
+  td:first-child {
     font-weight: bold;
     color: #60a5fa;
   }
 
-  .row:hover {
-    background: rgba(255,255,255,0.03);
-  }
-
   .top10 {
     background: rgba(34,197,94,0.10);
+    border-left: 3px solid #324ade;
   }
 
   .highlight-team {
-    background: rgba(245, 158, 11, 0.22);
+    background: rgba(245, 158, 11, 0.22) !important;
+    border: 1px solid #f59e0b !important;
     box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
   }
 
@@ -78,10 +97,19 @@
   }
 
   /* 📱 MOBILE */
-  @media (max-width: 600px) {
-    .row {
-      font-size: 11px;
-      grid-template-columns: 120px repeat(auto-fit, minmax(45px, 1fr));
+  @media (max-width: 300px) {
+    td {
+      font-size: 10px;
+      padding: 4px 4px;
+    }
+
+    th {
+      font-size: 10px;
+      padding: 4px 4px;
+    }
+
+    table {
+      min-width: 100%;
     }
   }
 
@@ -95,14 +123,17 @@
   <div class="sub">Live data • Google Sheets</div>
 </div>
 
-<div class="container" id="app">
-  <div class="loading">Cargando standings...</div>
+<div class="container">
+  <div class="table-wrap" id="app">
+    <div class="loading">Cargando standings...</div>
+  </div>
 </div>
 
 <script>
 
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
+/* 🧠 EMOJIS POR POSICIÓN */
 function getStatusEmoji(i) {
   if (i === 0) return "🏆";
   if (i < 10) return "🟢";
@@ -133,49 +164,49 @@ async function load() {
 function render(headers, data) {
   const app = document.getElementById("app");
 
+  let html = "<table>";
+
+  html += "<thead><tr>";
+  headers.forEach(h => html += <th>${h}</th>);
+  html += "</tr></thead>";
+
+  html += "<tbody>";
+
   const teamKey = headers.find(h =>
     h.toLowerCase().includes("team")
   );
 
-  let html = "";
-
-  /* HEADER */
-  html += `<div class="row header-row">`;
-  headers.forEach(h => html += `<div>${h}</div>`);
-  html += `</div>`;
-
-  /* ROWS */
   data.forEach((row, i) => {
 
-    const teamName = row[teamKey];
+    let cls = "";
+
+    if (i < 10) cls += " top10";
+
+    const teamName = teamKey ? row[teamKey] : "";
 
     const isUncleDrew =
       teamName &&
-      teamName.toLowerCase() === "uncle drew";
+      teamName.toString().trim().toLowerCase() === "uncle drew";
 
-    let cls = "row";
-
-    if (i < 10) cls += " top10";
     if (isUncleDrew) cls += " highlight-team";
 
-    html += `<div class="${cls}">`;
+    html += <tr class="${cls}">;
 
     headers.forEach(h => {
       let value = row[h];
 
+      // ⭐ EMOJI SOLO UNCLE DREW
       if (teamKey && h === teamKey && isUncleDrew) {
-        value = `${getStatusEmoji(i)} ${value}`;
+        value = ${getStatusEmoji(i)} ${value};
       }
 
-      if (h === teamKey) {
-        html += `<div class="team">${value}</div>`;
-      } else {
-        html += `<div>${value}</div>`;
-      }
+      html += <td>${value}</td>;
     });
 
-    html += `</div>`;
+    html += "</tr>";
   });
+
+  html += "</tbody></table>";
 
   app.innerHTML = html;
 }
