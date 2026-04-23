@@ -65,7 +65,7 @@
 
   td {
     padding: 6px 8px;
-    font-size: 13px; /* 💻 desktop */
+    font-size: 14px; /* 💻 desktop */
     text-align: center;
     border-top: 1px solid rgba(255,255,255,0.06);
   }
@@ -99,7 +99,7 @@
   /* 📱 MOBILE */
   @media (max-width: 600px) {
     td {
-      font-size: 11px;
+      font-size: 10px;
       padding: 5px 6px;
     }
 
@@ -136,9 +136,9 @@ const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOi
 /* 🧠 EMOJIS POR POSICIÓN */
 function getStatusEmoji(i) {
   if (i === 0) return "🏆";
-  if (i < 10) return "▲";
-  if (i < 15) return "▼";
-  return "🔻";
+  if (i < 10) return "🟢";
+  if (i < 15) return "🔴";
+  return "☠️";
 }
 
 async function load() {
