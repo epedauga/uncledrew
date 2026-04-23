@@ -79,18 +79,21 @@
     color: #60a5fa;
   }
 
+  /* 🟢 TOP 1 */
   .top1 {
-    background: rgba(34,197,94,0.08);
+    background: rgba(34,197,94,0.10);
   }
 
+  /* 🔵 TOP 10 */
   .playoff {
     border-left: 3px solid #3b82f6;
   }
 
   /* 🟡 UNCLE DREW */
   .highlight-team {
-    background: rgba(245, 158, 11, 0.18) !important;
+    background: rgba(245, 158, 11, 0.22) !important;
     border: 1px solid #f59e0b !important;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
   }
 
   .loading {
@@ -144,6 +147,7 @@ function render(headers, data) {
 
   let html = "<table>";
 
+  // HEADER
   html += "<thead><tr>";
   headers.forEach(h => html += `<th>${h}</th>`);
   html += "</tr></thead>";
@@ -157,11 +161,19 @@ function render(headers, data) {
     // 🟢 top 1
     if (i === 0) cls += " top1";
 
-    // 🔵 top 10 (sin pisar top1 visualmente)
+    // 🔵 top 10
     if (i < 10) cls += " playoff";
 
-    // 🟡 Uncle Drew highlight
-    const isUncleDrew = Object.values(row).includes("Uncle Drew");
+    // 🔎 detectar columna TEAM automáticamente
+    const teamKey = headers.find(h =>
+      h.toLowerCase().includes("team")
+    );
+
+    const isUncleDrew =
+      teamKey &&
+      row[teamKey] &&
+      row[teamKey].toString().trim().toLowerCase() === "uncle drew";
+
     if (isUncleDrew) cls += " highlight-team";
 
     html += `<tr class="${cls}">`;
@@ -170,7 +182,12 @@ function render(headers, data) {
       let value = row[h];
 
       // ⭐ estrella si es Uncle Drew
-      if (value === "Uncle Drew") {
+      if (
+        teamKey &&
+        h === teamKey &&
+        value &&
+        value.toString().trim().toLowerCase() === "uncle drew"
+      ) {
         value = "⭐ " + value;
       }
 
