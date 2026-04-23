@@ -32,7 +32,7 @@
   }
 
   .container {
-    max-width: 600px;
+    max-width: 700px;
     margin: auto;
     padding: 12px;
   }
@@ -41,39 +41,41 @@
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 16px;
-    padding: 12px 14px;
+    padding: 12px;
     margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     backdrop-filter: blur(10px);
   }
 
-  .left {
+  .rowTop {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    margin-bottom: 10px;
   }
 
   .rank {
-    width: 28px;
-    text-align: center;
     font-weight: bold;
     color: #60a5fa;
   }
 
-  .team {
-    font-weight: 600;
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 12px;
   }
 
-  .record {
+  .field {
     font-size: 12px;
-    opacity: 0.75;
+    opacity: 0.7;
+  }
+
+  .value {
+    font-size: 13px;
+    font-weight: 500;
   }
 
   .top {
     border: 1px solid #22c55e;
-    box-shadow: 0 0 12px rgba(34,197,94,0.2);
   }
 
   .playoff {
@@ -92,71 +94,74 @@
 
 <div class="header">
   <h1>🏀 LEAGUE STANDINGS</h1>
-  <div class="sub">Live Ranking • Season 2026</div>
+  <div class="sub">Live data from Google Sheets</div>
 </div>
 
 <div class="container" id="app">
-  <div class="loading">Cargando standings...</div>
+  <div class="loading">Cargando data...</div>
 </div>
 
 <script>
+
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
-async function loadData() {
+async function load() {
   const res = await fetch(URL);
   const text = await res.text();
 
   const rows = text.trim().split("\n").map(r => r.split(","));
 
-  // asumimos:
-  // col 0 = team
-  // col 1 = wins
-  // col 2 = losses
+  const headers = rows[0];
+  const dataRows = rows.slice(1);
 
-  const data = rows.slice(1).map(r => ({
-    team: r[0],
-    wins: parseInt(r[1]) || 0,
-    losses: parseInt(r[2]) || 0
-  }));
+  const data = dataRows.map(row => {
+    let obj = {};
+    headers.forEach((h, i) => {
+      obj[h.trim()] = row[i] ? row[i].trim() : "";
+    });
+    return obj;
+  });
 
-  data.sort((a,b) => b.wins - a.wins);
-
-  render(data);
+  render(data, headers);
 }
 
-function render(data) {
+function render(data, headers) {
   const app = document.getElementById("app");
   app.innerHTML = "";
 
-  data.forEach((t, i) => {
-    const div = document.createElement("div");
+  data.forEach((item, i) => {
+    const card = document.createElement("div");
 
     let cls = "card";
     if (i === 0) cls += " top";
     if (i < 4) cls += " playoff";
 
-    const pct = (t.wins / (t.wins + t.losses)).toFixed(2);
+    let gridHTML = "";
 
-    div.className = cls;
+    headers.forEach(h => {
+      gridHTML += `
+        <div class="field">${h}</div>
+        <div class="value">${item[h]}</div>
+      `;
+    });
 
-    div.innerHTML = `
-      <div class="left">
-        <div class="rank">${i + 1}</div>
-        <div>
-          <div class="team">${t.team}</div>
-          <div class="record">${t.wins}W - ${t.losses}L</div>
-        </div>
+    card.className = cls;
+
+    card.innerHTML = `
+      <div class="rowTop">
+        <div class="rank">#${i + 1}</div>
       </div>
-      <div style="font-size:12px; opacity:.7;">
-        ${pct}
+      <div class="grid">
+        ${gridHTML}
       </div>
     `;
 
-    app.appendChild(div);
+    app.appendChild(card);
   });
 }
 
-loadData();
+load();
+
 </script>
 
 </body>
