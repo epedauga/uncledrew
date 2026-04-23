@@ -36,19 +36,21 @@
     margin: auto;
   }
 
-  /* 🏀 SCROLL CONTAINER */
+  /* 🏀 SCROLL WRAP */
   .scroll {
     overflow-x: auto;
     border-radius: 12px;
   }
 
-  /* 🏀 ROWS */
+  /* 🏀 ROW BASE (mantiene look de tabla) */
   .row {
-    display: flex;
-    min-width: 600px;
-    border-top: 1px solid rgba(255,255,255,0.06);
+    display: grid;
+    grid-template-columns: 140px repeat(auto-fit, minmax(60px, 1fr));
     align-items: center;
+    font-size: 13px;
+    border-top: 1px solid rgba(255,255,255,0.06);
     padding: 6px 0;
+    min-width: 600px;
   }
 
   .header-row {
@@ -59,25 +61,24 @@
     font-weight: bold;
   }
 
-  /* 📌 TEAM FIXED COLUMN */
+  /* 📌 TEAM FIX REAL (NO SE MUEVE MÁS) */
   .team {
-    width: 120px;
-    min-width: 120px;
-    max-width: 120px;
     position: sticky;
     left: 0;
+    z-index: 5;
+
     background: rgba(11, 16, 32, 0.98);
-    z-index: 2;
     padding-left: 8px;
+
     font-weight: bold;
     color: #60a5fa;
+
+    width: 140px;
+    min-width: 140px;
   }
 
-  /* stats */
   .cell {
-    flex: 1;
     text-align: center;
-    font-size: 13px;
   }
 
   .row:hover {
@@ -95,14 +96,14 @@
 
   /* 📱 MOBILE */
   @media (max-width: 600px) {
-    .cell {
+    .row {
       font-size: 11px;
+      grid-template-columns: 120px repeat(auto-fit, minmax(50px, 1fr));
     }
 
     .team {
-      width: 100px;
-      min-width: 100px;
-      max-width: 100px;
+      width: 120px;
+      min-width: 120px;
     }
   }
 
@@ -165,11 +166,7 @@ function render(headers, data) {
   /* HEADER */
   html += `<div class="row header-row">`;
   headers.forEach(h => {
-    if (h === teamKey) {
-      html += `<div class="team">${h}</div>`;
-    } else {
-      html += `<div class="cell">${h}</div>`;
-    }
+    html += `<div>${h}</div>`;
   });
   html += `</div>`;
 
