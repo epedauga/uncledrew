@@ -79,33 +79,11 @@
     color: #60a5fa;
   }
 
-  /* 🏆 TOP 1 */
-  .rank1 {
-    background: rgba(34, 197, 94, 0.15);
+  .top10 {
+    background: rgba(34,197,94,0.10);
+    border-left: 3px solid #324ade;
   }
 
-  /* 🔥 2–3 */
-  .rank2 {
-    background: rgba(59, 130, 246, 0.18);
-  }
-
-  /* 🟦 4–10 */
-  .rank10 {
-    background: rgba(59, 130, 246, 0.10);
-  }
-
-  /* ⚠️ 11–15 */
-  .risk {
-    background: rgba(245, 158, 11, 0.10);
-  }
-
-  /* 💀 16–20 */
-  .critical {
-    background: rgba(239, 68, 68, 0.14);
-    border-left: 3px solid #ef4444;
-  }
-
-  /* 🟡 UNCLE DREW */
   .highlight-team {
     background: rgba(245, 158, 11, 0.22) !important;
     border: 1px solid #f59e0b !important;
@@ -138,14 +116,13 @@
 
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
-/* 🧠 estado emocional por posición */
+/* 🧠 SOLO EMOJIS POR POSICIÓN */
 function getStatusEmoji(i) {
   if (i === 0) return "🏆";
   if (i < 3) return "🔥";
   if (i < 10) return "🟦";
   if (i < 15) return "⚠️";
-  if (i < 20) return "💀";
-  return "☠️";
+  return "💀";
 }
 
 async function load() {
@@ -187,12 +164,7 @@ function render(headers, data) {
 
     let cls = "";
 
-    // 🏀 ranking zones
-    if (i === 0) cls += " rank1";
-    else if (i < 3) cls += " rank2";
-    else if (i < 10) cls += " rank10";
-    else if (i < 15) cls += " risk";
-    else if (i < 20) cls += " critical";
+    if (i < 10) cls += " top10";
 
     const teamName = teamKey ? row[teamKey] : "";
 
@@ -207,7 +179,7 @@ function render(headers, data) {
     headers.forEach(h => {
       let value = row[h];
 
-      // ⭐ + emoji dinámico SOLO para Uncle Drew
+      // ⭐ SOLO EMOJI PARA UNCLE DREW
       if (teamKey && h === teamKey && isUncleDrew) {
         value = `${getStatusEmoji(i)} ${value}`;
       }
