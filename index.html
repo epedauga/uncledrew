@@ -79,15 +79,10 @@
     color: #60a5fa;
   }
 
-  /* 🟢 TOP 1 */
-  .top1 {
+  /* 🟢 TOP 10 */
+  .top10 {
     background: rgba(34,197,94,0.10);
-  }
-
-  /* 🔵 TOP 10 */
-  .playoff {
     border-left: 3px solid #324ade;
-    background: rgb(53, 102, 171);
   }
 
   /* 🟡 UNCLE DREW */
@@ -159,11 +154,8 @@ function render(headers, data) {
 
     let cls = "";
 
-    // 🟢 top 1
-    if (i === 0) cls += " top1";
-
-    // 🔵 top 10
-    if (i < 10) cls += " playoff";
+    // 🟢 top 10
+    if (i < 10) cls += " top10";
 
     // 🔎 detectar columna TEAM automáticamente
     const teamKey = headers.find(h =>
