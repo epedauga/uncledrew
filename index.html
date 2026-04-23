@@ -44,9 +44,9 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 280px;
+    min-width: 520px;
     background: rgba(255,255,255,0.03);
-    border-radius: 13px;
+    border-radius: 12px;
     overflow: hidden;
   }
 
@@ -65,13 +65,13 @@
 
   td {
     padding: 6px 8px;
-    font-size: 11px;
+    font-size: 13px; /* 💻 desktop */
     text-align: center;
     border-top: 1px solid rgba(255,255,255,0.06);
   }
 
   tr:hover {
-  background: rgba(255,255,255,0.03);
+    background: rgba(255,255,255,0.03);
   }
 
   td:first-child {
@@ -96,6 +96,23 @@
     margin-top: 40px;
   }
 
+  /* 📱 MOBILE */
+  @media (max-width: 600px) {
+    td {
+      font-size: 11px;
+      padding: 5px 6px;
+    }
+
+    th {
+      font-size: 10px;
+      padding: 5px 6px;
+    }
+
+    table {
+      min-width: 420px;
+    }
+  }
+
 </style>
 </head>
 
@@ -116,13 +133,12 @@
 
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
-/* 🧠 SOLO EMOJIS POR POSICIÓN */
+/* 🧠 EMOJIS POR POSICIÓN */
 function getStatusEmoji(i) {
   if (i === 0) return "🏆";
-  if (i < 3) return "🔥";
-  if (i < 10) return "⭐";
-  if (i < 15) return "⚠️";
-  return "💀";
+  if (i < 10) return "▲";
+  if (i < 15) return "▼";
+  return "🔻";
 }
 
 async function load() {
@@ -179,7 +195,7 @@ function render(headers, data) {
     headers.forEach(h => {
       let value = row[h];
 
-      // ⭐ SOLO EMOJI PARA UNCLE DREW
+      // ⭐ EMOJI SOLO UNCLE DREW
       if (teamKey && h === teamKey && isUncleDrew) {
         value = `${getStatusEmoji(i)} ${value}`;
       }
