@@ -65,13 +65,13 @@
 
   td {
     padding: 6px 8px;
-    font-size: 14px; /* 💻 desktop */
+    font-size: 14px;
     text-align: center;
     border-top: 1px solid rgba(255,255,255,0.06);
   }
 
   tr:hover {
-    background: rgba(255,255,255,0.03);
+    background: rgba(59,130,246,0.08);
   }
 
   td:first-child {
@@ -90,6 +90,11 @@
     box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
   }
 
+  /* 🏀 PLAYOFF LINE */
+  tr:nth-child(10) {
+    border-bottom: 2px solid #3b82f6;
+  }
+
   .loading {
     text-align: center;
     opacity: 0.7;
@@ -97,19 +102,15 @@
   }
 
   /* 📱 MOBILE */
-  @media (max-width: 300px) {
+  @media (max-width: 600px) {
     td {
-      font-size: 10px;
-      padding: 4px 4px;
+      font-size: 12px;
+      padding: 5px 6px;
     }
 
     th {
       font-size: 10px;
-      padding: 4px 4px;
-    }
-
-    table {
-      min-width: 100%;
+      padding: 5px 6px;
     }
   }
 
@@ -148,9 +149,9 @@ async function load() {
   const rows = text.trim().split("\n").map(r => r.split(","));
 
   const headers = rows[0].map(h => h.trim());
-  const dataRows = rows.slice(1);
+  let dataRows = rows.slice(1);
 
-  const data = dataRows.map(row => {
+  let data = dataRows.map(row => {
     let obj = {};
     headers.forEach((h, i) => {
       obj[h] = row[i] ? row[i].trim() : "";
@@ -158,23 +159,27 @@ async function load() {
     return obj;
   });
 
+  /* 📊 ordenar por posición (1ra columna) */
+  const posKey = headers[0];
+  data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
+
   render(headers, data);
 }
 
 function render(headers, data) {
   const app = document.getElementById("app");
 
-  let html = "<table>";
-
-  html += "<thead><tr>";
-  headers.forEach(h => html += <th>${h}</th>);
-  html += "</tr></thead>";
-
-  html += "<tbody>";
-
   const teamKey = headers.find(h =>
     h.toLowerCase().includes("team")
   );
+
+  let html = "<table>";
+
+  html += "<thead><tr>";
+  headers.forEach(h => html += `<th>${h}</th>`);
+  html += "</tr></thead>";
+
+  html += "<tbody>";
 
   data.forEach((row, i) => {
 
@@ -186,21 +191,20 @@ function render(headers, data) {
 
     const isUncleDrew =
       teamName &&
-      teamName.toString().trim().toLowerCase() === "uncle drew";
+      teamName.toLowerCase() === "uncle drew";
 
     if (isUncleDrew) cls += " highlight-team";
 
-    html += <tr class="${cls}">;
+    html += `<tr class="${cls}">`;
 
     headers.forEach(h => {
       let value = row[h];
 
-      // ⭐ EMOJI SOLO UNCLE DREW
       if (teamKey && h === teamKey && isUncleDrew) {
-        value = ${getStatusEmoji(i)} ${value};
+        value = `${getStatusEmoji(i)} ${value}`;
       }
 
-      html += <td>${value}</td>;
+      html += `<td>${value}</td>`;
     });
 
     html += "</tr>";
@@ -212,6 +216,9 @@ function render(headers, data) {
 }
 
 load();
+
+/* 🔄 auto refresh */
+setInterval(load, 30000);
 
 </script>
 
