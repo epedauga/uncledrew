@@ -14,7 +14,7 @@
   }
 
   .header {
-    padding: 22px;
+    padding: 20px;
     text-align: center;
     background: linear-gradient(90deg, #1d4ed8, #7c3aed);
   }
@@ -22,7 +22,6 @@
   .header h1 {
     margin: 0;
     font-size: 20px;
-    letter-spacing: 1px;
   }
 
   .sub {
@@ -32,52 +31,62 @@
   }
 
   .container {
-    max-width: 700px;
+    padding: 12px;
+    max-width: 1000px;
     margin: auto;
+  }
+
+  /* TABLE WRAPPER */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  thead {
+    background: rgba(255,255,255,0.08);
+  }
+
+  th {
     padding: 12px;
+    text-align: center;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #93c5fd;
   }
 
-  .card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
-    padding: 12px;
-    margin-bottom: 10px;
-    backdrop-filter: blur(10px);
+  td {
+    padding: 10px;
+    text-align: center;
+    font-size: 13px;
+    border-top: 1px solid rgba(255,255,255,0.06);
   }
 
-  .rowTop {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+  tr:hover {
+    background: rgba(255,255,255,0.06);
   }
 
-  .rank {
+  /* POS highlight */
+  td:first-child {
     font-weight: bold;
     color: #60a5fa;
   }
 
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px 12px;
+  /* TOP 1 */
+  .top1 {
+    background: rgba(34,197,94,0.08);
   }
 
-  .field {
-    font-size: 12px;
-    opacity: 0.7;
-  }
-
-  .value {
-    font-size: 13px;
-    font-weight: 500;
-  }
-
-  .top {
-    border: 1px solid #22c55e;
-  }
-
+  /* PLAYOFF ZONE */
   .playoff {
     border-left: 3px solid #3b82f6;
   }
@@ -87,6 +96,7 @@
     opacity: 0.7;
     margin-top: 40px;
   }
+
 </style>
 </head>
 
@@ -94,11 +104,13 @@
 
 <div class="header">
   <h1>🏀 LEAGUE STANDINGS</h1>
-  <div class="sub">Live data from Google Sheets</div>
+  <div class="sub">Live data • Google Sheets</div>
 </div>
 
-<div class="container" id="app">
-  <div class="loading">Cargando data...</div>
+<div class="container">
+  <div class="table-wrap" id="app">
+    <div class="loading">Cargando standings...</div>
+  </div>
 </div>
 
 <script>
@@ -111,53 +123,54 @@ async function load() {
 
   const rows = text.trim().split("\n").map(r => r.split(","));
 
-  const headers = rows[0];
+  const headers = rows[0].map(h => h.trim());
   const dataRows = rows.slice(1);
 
   const data = dataRows.map(row => {
     let obj = {};
     headers.forEach((h, i) => {
-      obj[h.trim()] = row[i] ? row[i].trim() : "";
+      obj[h] = row[i] ? row[i].trim() : "";
     });
     return obj;
   });
 
-  render(data, headers);
+  render(headers, data);
 }
 
-function render(data, headers) {
+function render(headers, data) {
   const app = document.getElementById("app");
-  app.innerHTML = "";
 
-  data.forEach((item, i) => {
-    const card = document.createElement("div");
+  let html = "<table>";
 
-    let cls = "card";
-    if (i === 0) cls += " top";
+  // HEADER
+  html += "<thead><tr>";
+  headers.forEach(h => {
+    html += `<th>${h}</th>`;
+  });
+  html += "</tr></thead>";
+
+  // BODY
+  html += "<tbody>";
+
+  data.forEach((row, i) => {
+
+    let cls = "";
+
+    if (i === 0) cls = "top1";
     if (i < 4) cls += " playoff";
 
-    let gridHTML = "";
+    html += `<tr class="${cls}">`;
 
     headers.forEach(h => {
-      gridHTML += `
-        <div class="field">${h}</div>
-        <div class="value">${item[h]}</div>
-      `;
+      html += `<td>${row[h]}</td>`;
     });
 
-    card.className = cls;
-
-    card.innerHTML = `
-      <div class="rowTop">
-        <div class="rank">#${i + 1}</div>
-      </div>
-      <div class="grid">
-        ${gridHTML}
-      </div>
-    `;
-
-    app.appendChild(card);
+    html += "</tr>";
   });
+
+  html += "</tbody></table>";
+
+  app.innerHTML = html;
 }
 
 load();
