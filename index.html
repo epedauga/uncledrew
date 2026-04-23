@@ -65,7 +65,7 @@
 
   td {
     padding: 6px 8px;
-    font-size: 14px; /* 💻 desktop */
+    font-size: 14px;
     text-align: center;
     border-top: 1px solid rgba(255,255,255,0.06);
   }
@@ -96,20 +96,34 @@
     margin-top: 40px;
   }
 
-  /* 📱 MOBILE */
-  @media (max-width: 300px) {
+  /* 📱 MOBILE PRO (sticky team + scroll stats) */
+  @media (max-width: 600px) {
+
     td {
-      font-size: 10px;
-      padding: 4px 4px;
+      font-size: 11px;
+      padding: 4px 5px;
     }
 
     th {
       font-size: 10px;
-      padding: 4px 4px;
+      padding: 4px 5px;
     }
 
     table {
-      min-width: 100%;
+      min-width: 600px; /* permite scroll horizontal */
+    }
+
+    /* 📌 TEAM FIJO */
+    th:first-child,
+    td:first-child {
+      position: sticky;
+      left: 0;
+      background: rgba(11, 16, 32, 0.95);
+      z-index: 2;
+    }
+
+    th:first-child {
+      z-index: 3;
     }
   }
 
@@ -195,7 +209,6 @@ function render(headers, data) {
     headers.forEach(h => {
       let value = row[h];
 
-      // ⭐ EMOJI SOLO UNCLE DREW
       if (teamKey && h === teamKey && isUncleDrew) {
         value = `${getStatusEmoji(i)} ${value}`;
       }
