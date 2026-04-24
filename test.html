@@ -2,9 +2,10 @@
 
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
-const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
+/* 🔥 CORREGIDOS */
+const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
 
-const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=868310309&single=true&output=csv";
+const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=868310309&single=true&output=csv";
 
 let sortColumn = null;
 let sortDir = "desc";
@@ -26,6 +27,8 @@ function calculateStreak(team, games) {
     const teamB = g["TEAM B"] || g["Team B"];
     const scoreA = Number(g["SCORE A"] || g["Score A"]);
     const scoreB = Number(g["SCORE B"] || g["Score B"]);
+
+    if (!teamA || !teamB) continue;
 
     let result = null;
 
@@ -78,7 +81,7 @@ async function load() {
     return obj;
   });
 
-  /* 🔥 RESULTS (ticker) */
+  /* 🔥 RESULTS */
   const resR = await fetch(RESULTS_URL);
   const textR = await resR.text();
 
@@ -95,7 +98,7 @@ async function load() {
   const posKey = headers[0];
   const teamKey = headers.find(h => h.toLowerCase().includes("team"));
 
-  /* 🔥 INYECTAR STREAK */
+  /* 🔥 STREAK REAL */
   data.forEach(row => {
     const team = row[teamKey];
     row["STREAK"] = calculateStreak(team, games);
