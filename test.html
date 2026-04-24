@@ -2,8 +2,9 @@
 
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
-const RESULTS_URL = "PEGÁ_LINK_RESULTS";
-const GAMES_URL = "PEGÁ_LINK_GAMESSORTED";
+const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
+
+const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=868310309&single=true&output=csv";
 
 let sortColumn = null;
 let sortDir = "desc";
@@ -15,16 +16,16 @@ function getStatusEmoji(i) {
   return "☠️";
 }
 
-/* 🔥 CALCULAR STREAK */
+/* 🔥 STREAK */
 function calculateStreak(team, games) {
   let streakType = null;
   let count = 0;
 
   for (let g of games) {
-    const teamA = g["TEAM A"];
-    const teamB = g["TEAM B"];
-    const scoreA = Number(g["SCORE A"]);
-    const scoreB = Number(g["SCORE B"]);
+    const teamA = g["TEAM A"] || g["Team A"];
+    const teamB = g["TEAM B"] || g["Team B"];
+    const scoreA = Number(g["SCORE A"] || g["Score A"]);
+    const scoreB = Number(g["SCORE B"] || g["Score B"]);
 
     let result = null;
 
@@ -57,34 +58,31 @@ async function load() {
 
   const rows = text.trim().split("\n").map(r => r.split(","));
   const headers = rows[0].map(h => h.trim());
-  let dataRows = rows.slice(1);
 
-  let data = dataRows.map(row => {
+  let data = rows.slice(1).map(row => {
     let obj = {};
-    headers.forEach((h, i) => {
-      obj[h] = row[i] ? row[i].trim() : "";
-    });
+    headers.forEach((h, i) => obj[h] = row[i]?.trim());
     return obj;
   });
 
-  /* 🔥 GAMES (para streak) */
-  const resGames = await fetch(GAMES_URL);
-  const textGames = await resGames.text();
+  /* 🔥 GAMES */
+  const resG = await fetch(GAMES_URL);
+  const textG = await resG.text();
 
-  const rowsGames = textGames.trim().split("\n").map(r => r.split(","));
-  const headersGames = rowsGames[0];
+  const rowsG = textG.trim().split("\n").map(r => r.split(","));
+  const headersG = rowsG[0];
 
-  const games = rowsGames.slice(1).map(r => {
+  const games = rowsG.slice(1).map(r => {
     let obj = {};
-    headersGames.forEach((h, i) => obj[h.trim()] = r[i]?.trim());
+    headersG.forEach((h, i) => obj[h.trim()] = r[i]?.trim());
     return obj;
   });
 
-  /* 🔥 RESULTADOS (ticker) */
-  const res2 = await fetch(RESULTS_URL);
-  const text2 = await res2.text();
+  /* 🔥 RESULTS (ticker) */
+  const resR = await fetch(RESULTS_URL);
+  const textR = await resR.text();
 
-  const results = text2
+  const results = textR
     .trim()
     .split("\n")
     .slice(1)
@@ -103,22 +101,22 @@ async function load() {
     row["STREAK"] = calculateStreak(team, games);
   });
 
-  /* 📊 ORDENAMIENTO */
+  /* 📊 ORDEN */
   if (sortColumn) {
     data.sort((a, b) => {
-      let valA = a[sortColumn];
-      let valB = b[sortColumn];
+      let A = a[sortColumn];
+      let B = b[sortColumn];
 
-      const numA = Number(valA);
-      const numB = Number(valB);
+      const nA = Number(A);
+      const nB = Number(B);
 
-      if (!isNaN(numA) && !isNaN(numB)) {
-        return sortDir === "asc" ? numA - numB : numB - numA;
+      if (!isNaN(nA) && !isNaN(nB)) {
+        return sortDir === "asc" ? nA - nB : nB - nA;
       }
 
       return sortDir === "asc"
-        ? valA.localeCompare(valB)
-        : valB.localeCompare(valA);
+        ? A.localeCompare(B)
+        : B.localeCompare(A);
     });
   } else {
     data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
@@ -159,33 +157,28 @@ function render(headers, data, teamKey) {
     let cls = "";
     if (i < 10) cls += " top10";
 
-    const teamName = teamKey ? row[teamKey] : "";
+    const teamName = row[teamKey];
 
-    const isUncleDrew =
-      teamName &&
-      teamName.toLowerCase() === "uncle drew";
-
-    if (isUncleDrew) cls += " highlight-team";
+    if (teamName && teamName.toLowerCase() === "uncle drew") {
+      cls += " highlight-team";
+    }
 
     html += `<tr class="${cls}">`;
 
     headers.forEach(h => {
-      let value = row[h];
+      let value = row[h] || "";
 
-      /* 🔥 STREAK VISUAL */
       if (h === "STREAK" && value) {
-        if (value.startsWith("W")) {
-          value = `🔥 ${value}`;
-        } else if (value.startsWith("L")) {
-          value = `❄️ ${value}`;
-        }
+        value = value.startsWith("W")
+          ? `🔥 ${value}`
+          : `❄️ ${value}`;
       }
 
-      if (teamKey && h === teamKey && isUncleDrew) {
+      if (h === teamKey && teamName.toLowerCase() === "uncle drew") {
         value = `${getStatusEmoji(i)} ${value}`;
       }
 
-      html += `<td>${value || ""}</td>`;
+      html += `<td>${value}</td>`;
     });
 
     html += "</tr>";
