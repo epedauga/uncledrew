@@ -164,25 +164,33 @@ function calculateStreak(team, games) {
   let count = 0;
 
   for (let g of games) {
-    const teamA = g["TEAM A"] || g["Team A"];
-    const teamB = g["TEAM B"] || g["Team B"];
-    const scoreA = Number(g["SCORE A"] || g["Score A"]);
-    const scoreB = Number(g["SCORE B"] || g["Score B"]);
+
+    const teamA = g["Team A"];
+    const teamB = g["Team B"];
+
+    const scoreA = Number(g["Resultado A"]);
+    const scoreB = Number(g["Resultado B"]);
 
     if (!teamA || !teamB) continue;
 
     let result = null;
 
-    if (team === teamA) result = scoreA > scoreB ? "W" : "L";
-    else if (team === teamB) result = scoreB > scoreA ? "W" : "L";
+    if (team === teamA) {
+      result = scoreA > scoreB ? "W" : "L";
+    } 
+    else if (team === teamB) {
+      result = scoreB > scoreA ? "W" : "L";
+    } 
     else continue;
 
     if (!type) {
       type = result;
       count = 1;
-    } else if (result === type) {
+    } 
+    else if (result === type) {
       count++;
-    } else break;
+    } 
+    else break;
   }
 
   return type ? `${type}${count}` : "";
