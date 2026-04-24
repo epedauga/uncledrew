@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏀 Standings</title>
+<title>🏀 Standings - Uncle Drew’s season</title>
 
 <style>
   body {
@@ -41,11 +41,9 @@
     border-radius: 12px;
   }
 
-  /* 🔥 FIX IMPORTANTE PARA STICKY */
   table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
+    border-collapse: collapse;
     min-width: 520px;
     background: rgba(255,255,255,0.03);
     border-radius: 12px;
@@ -63,6 +61,11 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #93c5fd;
+    cursor: pointer;
+  }
+
+  th:hover {
+    color: #fff;
   }
 
   td {
@@ -88,6 +91,7 @@
 
   .highlight-team {
     background: rgba(245, 158, 11, 0.22) !important;
+    border: 1px solid #f59e0b !important;
     box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
   }
 
@@ -97,11 +101,9 @@
     margin-top: 40px;
   }
 
-  /* 📱 MOBILE FIX REAL */
-  @media (max-width: 600px) {
-
+  @media (max-width: 300px) {
     td {
-      font-size: 12px;
+      font-size: 10px;
       padding: 5px 6px;
     }
 
@@ -111,31 +113,16 @@
     }
 
     table {
-      min-width: 650px;
-    }
-
-    /* 📌 TEAM FIJO (VERSIÓN ESTABLE EN TABLAS) */
-    th:first-child,
-    td:first-child {
-      position: -webkit-sticky;
-      position: sticky;
-      left: 0;
-      z-index: 10;
-      background: #0b1020;
-    }
-
-    th:first-child {
-      z-index: 11;
+      min-width: 420px;
     }
   }
-
 </style>
 </head>
 
 <body>
 
 <div class="header">
-  <h1>🏀 STANDINGS</h1>
+  <h1>STANDINGS</h1>
   <div class="sub">Live data • Google Sheets</div>
 </div>
 
@@ -149,11 +136,14 @@
 
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
+let sortColumn = null;
+let sortDir = "desc";
+
 /* 🧠 EMOJIS POR POSICIÓN */
 function getStatusEmoji(i) {
   if (i === 0) return "🏆";
-  if (i < 10) return "🟢";
-  if (i < 15) return "🔴";
+  if (i < 7) return "🟢";
+  if (i < 15) return "⚠️";
   return "☠️";
 }
 
@@ -174,11 +164,41 @@ async function load() {
     return obj;
   });
 
-  /* 📊 ordenar por posición */
   const posKey = headers[0];
-  data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
+
+  /* ORDENAMIENTO DINÁMICO */
+  if (sortColumn) {
+    data.sort((a, b) => {
+      let valA = a[sortColumn];
+      let valB = b[sortColumn];
+
+      const numA = Number(valA);
+      const numB = Number(valB);
+
+      if (!isNaN(numA) && !isNaN(numB)) {
+        return sortDir === "asc" ? numA - numB : numB - numA;
+      }
+
+      return sortDir === "asc"
+        ? valA.localeCompare(valB)
+        : valB.localeCompare(valA);
+    });
+  } else {
+    data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
+  }
 
   render(headers, data);
+}
+
+function sortBy(column) {
+  if (sortColumn === column) {
+    sortDir = sortDir === "asc" ? "desc" : "asc";
+  } else {
+    sortColumn = column;
+    sortDir = "desc";
+  }
+
+  load();
 }
 
 function render(headers, data) {
@@ -191,7 +211,13 @@ function render(headers, data) {
   let html = "<table>";
 
   html += "<thead><tr>";
-  headers.forEach(h => html += `<th>${h}</th>`);
+  headers.forEach(h => {
+    let arrow = "";
+    if (h === sortColumn) {
+      arrow = sortDir === "asc" ? " ▲" : " ▼";
+    }
+    html += `<th onclick="sortBy('${h}')">${h}${arrow}</th>`;
+  });
   html += "</tr></thead>";
 
   html += "<tbody>";
