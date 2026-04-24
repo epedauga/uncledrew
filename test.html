@@ -30,56 +30,39 @@
     margin-top: 4px;
   }
 
-  /* 🔥 FEED HORIZONTAL LIMPIO */
+  /* 🔥 FEED CON ANIMACIÓN */
   #ticker-text {
-    margin-top: 12px;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 10px;
+    margin-top: 10px;
+    height: 160px;
+    overflow: hidden;
+    position: relative;
   }
 
   .feed-wrapper {
     display: flex;
-    gap: 12px;
-  }
-
-  /* 🧊 CARD NBA STYLE */
-  .game-card {
-    min-width: 220px;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 14px;
-    padding: 10px;
-    display: flex;
     flex-direction: column;
-    gap: 8px;
-    flex-shrink: 0;
+    gap: 10px;
+    animation: floatFeed 25s linear infinite;
   }
 
-  .match-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  @keyframes floatFeed {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
   }
 
-  .team {
+  .game-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 10px;
     font-size: 12px;
-    font-weight: 600;
+    line-height: 1.4;
   }
 
-  .score {
-    font-size: 20px;
-    font-weight: 800;
-    text-align: center;
-    letter-spacing: 1px;
+  .game-card b {
+    color: #fff;
   }
 
-  .result {
-    font-size: 12px;
-    font-weight: 700;
-  }
-
-  /* TABLE */
   .container {
     padding: 12px;
     max-width: 1000px;
@@ -107,9 +90,14 @@
   th {
     padding: 6px 8px;
     font-size: 12px;
+    text-align: center;
     text-transform: uppercase;
+    letter-spacing: 1px;
     color: #93c5fd;
+    cursor: pointer;
   }
+
+  th:hover { color: white; }
 
   td {
     padding: 6px 8px;
@@ -129,10 +117,12 @@
 
   .top10 {
     background: rgba(34,197,94,0.10);
+    border-left: 3px solid #324ade;
   }
 
   .highlight-team {
     background: rgba(245, 158, 11, 0.22) !important;
+    border: 1px solid #f59e0b !important;
   }
 
 </style>
@@ -144,6 +134,7 @@
   <h1>STANDINGS</h1>
   <div class="sub">Live data • Google Sheets</div>
 
+  <!-- 🔥 FEED -->
   <div id="ticker-text">Cargando resultados...</div>
 </div>
 
@@ -155,6 +146,7 @@
 
 <script>
 
+/* LINKS */
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
 const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
@@ -164,14 +156,24 @@ const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_
 let sortColumn = null;
 let sortDir = "desc";
 
+/* EMOJIS */
+function getStatusEmoji(i) {
+  if (i === 0) return "🏆";
+  if (i < 7) return "🟢";
+  if (i < 15) return "⚠️";
+  return "☠️";
+}
+
 /* STREAK */
 function calculateStreak(team, games) {
   let type = null;
   let count = 0;
 
   for (let g of games) {
+
     const teamA = g["TEAM_A"];
     const teamB = g["TEAM_B"];
+
     const scoreA = Number(g["SCORE_A"]);
     const scoreB = Number(g["SCORE_B"]);
 
@@ -194,10 +196,10 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
-/* LOAD */
 async function load() {
   try {
 
+    /* STANDINGS */
     const text = await (await fetch(URL)).text();
     const rows = text.trim().split("\n").map(r => r.split(","));
 
@@ -209,6 +211,7 @@ async function load() {
       return obj;
     });
 
+    /* GAMES */
     const textG = await (await fetch(GAMES_URL)).text();
     const rowsG = textG.trim().split("\n").map(r => r.split(","));
 
@@ -220,54 +223,51 @@ async function load() {
       return obj;
     });
 
-    /* FEED */
+    /* RESULTS → ANIMATED FEED */
     const textR = await (await fetch(RESULTS_URL)).text();
-    const results = textR.trim().split("\n").slice(1);
+    const results = textR.trim().split("\n").slice(1).filter(r => r.length > 3);
 
     const ticker = document.getElementById("ticker-text");
 
+    const cards = results.map(r => {
+      const p = r.split(",");
+
+      return `
+        <div class="game-card">
+          <div>${p[0] || ""}</div>
+          <div><b>${p[1] || ""}</b> ${p[2] || ""}</div>
+          <div>${p[3] || ""}</div>
+        </div>
+      `;
+    }).join("");
+
     ticker.innerHTML = `
       <div class="feed-wrapper">
-        ${results.map(r => {
-          const p = r.split(",");
-
-          const teamA = p[1];
-          const teamB = p[2];
-          const scoreA = Number(p[3]);
-          const scoreB = Number(p[4]);
-
-          const aWin = scoreA > scoreB;
-          const bWin = scoreB > scoreA;
-
-          return `
-            <div class="game-card">
-
-              <div class="match-row">
-                <div class="team" style="color:${aWin ? '#22c55e' : '#ef4444'}">${teamA}</div>
-                <div class="result">${aWin ? 'W' : 'L'}</div>
-              </div>
-
-              <div class="score">${scoreA} - ${scoreB}</div>
-
-              <div class="match-row">
-                <div class="team" style="color:${bWin ? '#22c55e' : '#ef4444'}">${teamB}</div>
-                <div class="result">${bWin ? 'W' : 'L'}</div>
-              </div>
-
-            </div>
-          `;
-        }).join("")}
+        ${cards}
+        ${cards}
       </div>
     `;
 
     const posKey = headers[0];
     const teamKey = headers.find(h => h.includes("TEAM"));
 
+    /* STREAK */
     data.forEach(row => {
       row["STREAK"] = calculateStreak(row[teamKey], games);
     });
 
-    data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
+    /* SORT */
+    if (sortColumn) {
+      data.sort((a, b) => {
+        let A = a[sortColumn];
+        let B = b[sortColumn];
+        return sortDir === "asc"
+          ? A.localeCompare(B)
+          : B.localeCompare(A);
+      });
+    } else {
+      data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
+    }
 
     render([...headers, "STREAK"], data, teamKey);
 
@@ -276,13 +276,14 @@ async function load() {
   }
 }
 
-/* TABLE */
 function render(headers, data, teamKey) {
   const app = document.getElementById("app");
 
   let html = "<table><thead><tr>";
 
-  headers.forEach(h => html += `<th>${h}</th>`);
+  headers.forEach(h => {
+    html += `<th>${h}</th>`;
+  });
 
   html += "</tr></thead><tbody>";
 
@@ -291,18 +292,28 @@ function render(headers, data, teamKey) {
     let cls = i < 10 ? "top10" : "";
     const team = row[teamKey] || "";
 
-    if (team.toLowerCase() === "uncle drew") cls += " highlight-team";
+    if (team.toLowerCase() === "uncle drew") {
+      cls += " highlight-team";
+    }
 
     html += `<tr class="${cls}">`;
 
     headers.forEach(h => {
-
       let value = row[h] || "";
 
       if (h === "STREAK") {
-        const isWin = value.startsWith("W");
-        value = `<span style="color:${isWin ? '#22c55e' : '#ef4444'}">${value}</span>`;
-      }
+  const isWin = value.startsWith("W");
+  const color = isWin ? "#22c55e" : "#ef4444";
+
+  value = `
+    <span style="
+      color: ${color};
+      font-weight: 400;
+    ">
+      ${value}
+    </span>
+  `;
+}
 
       html += `<td>${value}</td>`;
     });
@@ -311,7 +322,6 @@ function render(headers, data, teamKey) {
   });
 
   html += "</tbody></table>";
-
   app.innerHTML = html;
 }
 
