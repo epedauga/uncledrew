@@ -61,6 +61,11 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #93c5fd;
+    cursor: pointer;
+  }
+
+  th:hover {
+    color: #fff;
   }
 
   td {
@@ -96,7 +101,6 @@
     margin-top: 40px;
   }
 
-  /* 📱 MOBILE */
   @media (max-width: 300px) {
     td {
       font-size: 10px;
@@ -112,8 +116,6 @@
       min-width: 420px;
     }
   }
-
-
 </style>
 </head>
 
@@ -133,6 +135,9 @@
 <script>
 
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
+
+let sortColumn = null;
+let sortDir = "desc";
 
 /* 🧠 EMOJIS POR POSICIÓN */
 function getStatusEmoji(i) {
@@ -159,11 +164,41 @@ async function load() {
     return obj;
   });
 
-  /* 📊 ordenar por posición (1ra columna) */
   const posKey = headers[0];
-  data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
+
+  /* ORDENAMIENTO DINÁMICO */
+  if (sortColumn) {
+    data.sort((a, b) => {
+      let valA = a[sortColumn];
+      let valB = b[sortColumn];
+
+      const numA = Number(valA);
+      const numB = Number(valB);
+
+      if (!isNaN(numA) && !isNaN(numB)) {
+        return sortDir === "asc" ? numA - numB : numB - numA;
+      }
+
+      return sortDir === "asc"
+        ? valA.localeCompare(valB)
+        : valB.localeCompare(valA);
+    });
+  } else {
+    data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
+  }
 
   render(headers, data);
+}
+
+function sortBy(column) {
+  if (sortColumn === column) {
+    sortDir = sortDir === "asc" ? "desc" : "asc";
+  } else {
+    sortColumn = column;
+    sortDir = "desc";
+  }
+
+  load();
 }
 
 function render(headers, data) {
@@ -176,7 +211,13 @@ function render(headers, data) {
   let html = "<table>";
 
   html += "<thead><tr>";
-  headers.forEach(h => html += `<th>${h}</th>`);
+  headers.forEach(h => {
+    let arrow = "";
+    if (h === sortColumn) {
+      arrow = sortDir === "asc" ? " ▲" : " ▼";
+    }
+    html += `<th onclick="sortBy('${h}')">${h}${arrow}</th>`;
+  });
   html += "</tr></thead>";
 
   html += "<tbody>";
