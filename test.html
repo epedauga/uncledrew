@@ -125,7 +125,7 @@
   <h1>STANDINGS</h1>
   <div class="sub">Live data • Google Sheets</div>
   <div class="ticker">
-    <div id="ticker-text">Cargando resultados...</div>
+    <div id="ticker-text" style="display:flex; gap:10px; overflow-x:auto; padding:6px 0;"></div>
   </div>
 </div>
 
@@ -222,8 +222,27 @@ async function load() {
     const textR = await (await fetch(RESULTS_URL)).text();
     const results = textR.trim().split("\n").slice(1).filter(r => r.length > 3);
 
-    document.getElementById("ticker-text").innerText =
-      results.join("   •   ");
+    const ticker = document.getElementById("ticker-text");
+
+ticker.innerHTML = results.map(r => {
+  const parts = r.split(",");
+
+  return `
+    <div style="
+      min-width: 180px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 8px;
+      font-size: 12px;
+      flex-shrink: 0;
+    ">
+      ${parts[0] || ""}<br>
+      <b>${parts[1] || ""}</b> vs <b>${parts[2] || ""}</b><br>
+      ${parts[3] || ""}
+    </div>
+  `;
+}).join("");
 
     const posKey = headers[0];
     const teamKey = headers.find(h => h.includes("TEAM"));
