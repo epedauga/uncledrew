@@ -34,6 +34,23 @@ body {
   margin-top: 4px;
 }
 
+/* RESET BUTTON */
+.reset-btn {
+  margin-top: 10px;
+  background: #151515;
+  color: #aaa;
+  border: 1px solid #222;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.reset-btn:hover {
+  color: #fff;
+  border-color: #333;
+}
+
 /* TICKER */
 #ticker-text {
   margin-top: 10px;
@@ -68,18 +85,13 @@ body {
 }
 
 .game-card:hover {
-  border-color: #C21E56;
-  box-shadow: 0 0 0 1px rgba(194, 30, 86, 0.6);
   background: #1c1c1c;
+  box-shadow: 0 0 0 1px rgba(194, 30, 86, 0.6);
 }
 
 .game-card div:first-child {
   opacity: 0.6;
   font-size: 11px;
-}
-
-.game-card b {
-  color: #fff;
 }
 
 /* CONTAINER */
@@ -167,6 +179,8 @@ tbody tr:hover {
   <h1>STANDINGS</h1>
   <div class="sub">Live data • Google Sheets</div>
 
+  <button class="reset-btn" onclick="resetSort()">Reset order</button>
+
   <div id="ticker-text">Cargando resultados...</div>
 </div>
 
@@ -188,7 +202,14 @@ const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_
 let sortColumn = null;
 let sortDir = "desc";
 
-/* SORT CLICK */
+/* RESET */
+function resetSort() {
+  sortColumn = null;
+  sortDir = "desc";
+  load();
+}
+
+/* CLICK SORT */
 function sortTable(col) {
   if (sortColumn === col) {
     sortDir = sortDir === "asc" ? "desc" : "asc";
@@ -328,7 +349,7 @@ function render(headers, data, teamKey) {
   let html = "<table><thead><tr>";
 
   headers.forEach(h => {
-    html += `<th onclick="sortTable('${h}')">${h}</th>`;
+    html += `<th ondblclick="resetSort()" onclick="sortTable('${h}')">${h}</th>`;
   });
 
   html += "</tr></thead><tbody>";
