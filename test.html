@@ -34,6 +34,28 @@ body {
   margin-top: 4px;
 }
 
+/* 🔴 LIVE INDICATOR (PRO) */
+.live-indicator {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #C21E56;
+  letter-spacing: 0.5px;
+}
+
+.live-indicator::before {
+  content: "●";
+  color: #C21E56;
+  margin-right: 6px;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
 /* RESET BUTTON */
 .reset-btn {
   margin-top: 10px;
@@ -177,7 +199,11 @@ tbody tr:hover {
 
 <div class="header">
   <h1>STANDINGS</h1>
+
   <div class="sub">Live data • Google Sheets</div>
+
+  <!-- 🔴 LIVE INDICATOR -->
+  <div class="live-indicator">LIVE</div>
 
   <button class="reset-btn" onclick="resetSort()">Reset order</button>
 
@@ -209,7 +235,7 @@ function resetSort() {
   load();
 }
 
-/* CLICK SORT */
+/* SORT */
 function sortTable(col) {
   if (sortColumn === col) {
     sortDir = sortDir === "asc" ? "desc" : "asc";
@@ -261,7 +287,6 @@ function smartValue(v) {
 async function load() {
   try {
 
-    /* STANDINGS */
     const text = await (await fetch(URL)).text();
     const rows = text.trim().split("\n").map(r => r.split(","));
 
@@ -273,7 +298,6 @@ async function load() {
       return obj;
     });
 
-    /* GAMES */
     const textG = await (await fetch(GAMES_URL)).text();
     const rowsG = textG.trim().split("\n").map(r => r.split(","));
 
@@ -285,7 +309,6 @@ async function load() {
       return obj;
     });
 
-    /* RESULTS */
     const textR = await (await fetch(RESULTS_URL)).text();
     const results = textR.trim().split("\n").slice(1).filter(r => r.length > 3);
 
@@ -313,12 +336,10 @@ async function load() {
     const posKey = headers[0];
     const teamKey = headers.find(h => h.includes("TEAM"));
 
-    /* STREAK */
     data.forEach(row => {
       row["STREAK"] = calculateStreak(row[teamKey], games);
     });
 
-    /* SORT */
     if (sortColumn) {
       data.sort((a, b) => {
         let A = smartValue(a[sortColumn]);
@@ -349,7 +370,7 @@ function render(headers, data, teamKey) {
   let html = "<table><thead><tr>";
 
   headers.forEach(h => {
-    html += `<th ondblclick="resetSort()" onclick="sortTable('${h}')">${h}</th>`;
+    html += `<th onclick="sortTable('${h}')" ondblclick="resetSort()">${h}</th>`;
   });
 
   html += "</tr></thead><tbody>";
