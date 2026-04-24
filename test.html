@@ -30,10 +30,10 @@
     margin-top: 4px;
   }
 
-  /* 🔥 FEED CON ANIMACIÓN */
+  /* 🔥 FEED PRO */
   #ticker-text {
     margin-top: 10px;
-    height: 160px;
+    height: 170px;
     overflow: hidden;
     position: relative;
   }
@@ -42,7 +42,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    animation: floatFeed 25s linear infinite;
+    animation: floatFeed 28s linear infinite;
   }
 
   @keyframes floatFeed {
@@ -50,28 +50,54 @@
     100% { transform: translateY(-50%); }
   }
 
+  /* 🏀 SCORECARD PRO */
   .game-card {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 12px;
-    padding: 10px;
-    font-size: 12px;
-    line-height: 1.4;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 14px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
-  .game-card b {
-    color: #fff;
+  .game-top {
+    font-size: 10px;
+    opacity: 0.6;
   }
+
+  .matchup {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .team {
+    width: 90px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .score {
+    background: rgba(255,255,255,0.08);
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 12px;
+    min-width: 60px;
+    text-align: center;
+  }
+
+  .win { color: #22c55e; }
+  .loss { color: #ef4444; opacity: 0.7; }
 
   .container {
     padding: 12px;
     max-width: 1000px;
     margin: auto;
-  }
-
-  .table-wrap {
-    overflow-x: auto;
-    border-radius: 12px;
   }
 
   table {
@@ -91,13 +117,8 @@
     padding: 6px 8px;
     font-size: 12px;
     text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 1px;
     color: #93c5fd;
-    cursor: pointer;
   }
-
-  th:hover { color: white; }
 
   td {
     padding: 6px 8px;
@@ -106,23 +127,12 @@
     border-top: 1px solid rgba(255,255,255,0.06);
   }
 
-  tr:hover {
-    background: rgba(88,145,240,0.08);
-  }
-
-  td:first-child {
-    font-weight: bold;
-    color: #60a5fa;
-  }
-
   .top10 {
     background: rgba(34,197,94,0.10);
-    border-left: 3px solid #324ade;
   }
 
   .highlight-team {
     background: rgba(245, 158, 11, 0.22) !important;
-    border: 1px solid #f59e0b !important;
   }
 
 </style>
@@ -134,14 +144,11 @@
   <h1>STANDINGS</h1>
   <div class="sub">Live data • Google Sheets</div>
 
-  <!-- 🔥 FEED -->
   <div id="ticker-text">Cargando resultados...</div>
 </div>
 
 <div class="container">
-  <div class="table-wrap" id="app">
-    <div class="loading">Cargando standings...</div>
-  </div>
+  <div id="app"></div>
 </div>
 
 <script>
@@ -155,14 +162,6 @@ const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_
 
 let sortColumn = null;
 let sortDir = "desc";
-
-/* EMOJIS */
-function getStatusEmoji(i) {
-  if (i === 0) return "🏆";
-  if (i < 7) return "🟢";
-  if (i < 15) return "⚠️";
-  return "☠️";
-}
 
 /* STREAK */
 function calculateStreak(team, games) {
@@ -196,94 +195,94 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
+/* LOAD */
 async function load() {
-  try {
 
-    /* STANDINGS */
-    const text = await (await fetch(URL)).text();
-    const rows = text.trim().split("\n").map(r => r.split(","));
+  const text = await (await fetch(URL)).text();
+  const rows = text.trim().split("\n").map(r => r.split(","));
+  const headers = rows[0].map(h => h.trim());
 
-    const headers = rows[0].map(h => h.trim());
+  let data = rows.slice(1).map(r => {
+    let obj = {};
+    headers.forEach((h, i) => obj[h] = r[i]?.trim());
+    return obj;
+  });
 
-    let data = rows.slice(1).map(r => {
-      let obj = {};
-      headers.forEach((h, i) => obj[h] = r[i]?.trim());
-      return obj;
-    });
+  const textG = await (await fetch(GAMES_URL)).text();
+  const rowsG = textG.trim().split("\n").map(r => r.split(","));
+  const headersG = rowsG[0].map(h => h.trim());
 
-    /* GAMES */
-    const textG = await (await fetch(GAMES_URL)).text();
-    const rowsG = textG.trim().split("\n").map(r => r.split(","));
+  const games = rowsG.slice(1).map(r => {
+    let obj = {};
+    headersG.forEach((h, i) => obj[h] = r[i]?.trim());
+    return obj;
+  });
 
-    const headersG = rowsG[0].map(h => h.trim());
+  /* FEED PRO */
+  const textR = await (await fetch(RESULTS_URL)).text();
+  const results = textR.trim().split("\n").slice(1).filter(r => r.length > 3);
 
-    const games = rowsG.slice(1).map(r => {
-      let obj = {};
-      headersG.forEach((h, i) => obj[h] = r[i]?.trim());
-      return obj;
-    });
+  const ticker = document.getElementById("ticker-text");
 
-    /* RESULTS → ANIMATED FEED */
-    const textR = await (await fetch(RESULTS_URL)).text();
-    const results = textR.trim().split("\n").slice(1).filter(r => r.length > 3);
+  const cards = results.map(r => {
+    const p = r.split(",");
 
-    const ticker = document.getElementById("ticker-text");
+    const date = p[0] || "";
+    const teamA = p[1] || "";
+    const teamB = p[2] || "";
+    const score = p[3] || "0-0";
 
-    const cards = results.map(r => {
-      const p = r.split(",");
+    let [a, b] = score.includes("-") ? score.split("-") : ["0","0"];
 
-      return `
-        <div class="game-card">
-          <div>${p[0] || ""}</div>
-          <div><b>${p[1] || ""}</b> ${p[2] || ""}</div>
-          <div>${p[3] || ""}</div>
+    const aWin = Number(a) > Number(b);
+    const bWin = Number(b) > Number(a);
+
+    return `
+      <div class="game-card">
+
+        <div class="game-top">${date}</div>
+
+        <div class="matchup">
+
+          <div class="team ${aWin ? 'win' : 'loss'}">${teamA}</div>
+
+          <div class="score">${a}-${b}</div>
+
+          <div class="team ${bWin ? 'win' : 'loss'}">${teamB}</div>
+
         </div>
-      `;
-    }).join("");
 
-    ticker.innerHTML = `
-      <div class="feed-wrapper">
-        ${cards}
-        ${cards}
       </div>
     `;
+  }).join("");
 
-    const posKey = headers[0];
-    const teamKey = headers.find(h => h.includes("TEAM"));
+  ticker.innerHTML = `
+    <div class="feed-wrapper">
+      ${cards}
+      ${cards}
+    </div>
+  `;
 
-    /* STREAK */
-    data.forEach(row => {
-      row["STREAK"] = calculateStreak(row[teamKey], games);
-    });
+  const posKey = headers[0];
+  const teamKey = headers.find(h => h.includes("TEAM"));
 
-    /* SORT */
-    if (sortColumn) {
-      data.sort((a, b) => {
-        let A = a[sortColumn];
-        let B = b[sortColumn];
-        return sortDir === "asc"
-          ? A.localeCompare(B)
-          : B.localeCompare(A);
-      });
-    } else {
-      data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
-    }
+  data.forEach(row => {
+    row["STREAK"] = calculateStreak(row[teamKey], games);
+  });
 
-    render([...headers, "STREAK"], data, teamKey);
+  data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
 
-  } catch (e) {
-    console.error(e);
-  }
+  render([...headers, "STREAK"], data, teamKey);
 }
 
+/* RENDER TABLE */
 function render(headers, data, teamKey) {
+
   const app = document.getElementById("app");
 
   let html = "<table><thead><tr>";
 
-  headers.forEach(h => {
-    html += `<th>${h}</th>`;
-  });
+  headers.forEach(h => html += `<th>${h}</th>`);
 
   html += "</tr></thead><tbody>";
 
@@ -299,21 +298,14 @@ function render(headers, data, teamKey) {
     html += `<tr class="${cls}">`;
 
     headers.forEach(h => {
+
       let value = row[h] || "";
 
       if (h === "STREAK") {
-  const isWin = value.startsWith("W");
-  const color = isWin ? "#22c55e" : "#ef4444";
-
-  value = `
-    <span style="
-      color: ${color};
-      font-weight: 400;
-    ">
-      ${value}
-    </span>
-  `;
-}
+        const isWin = value.startsWith("W");
+        const color = isWin ? "#22c55e" : "#ef4444";
+        value = `<span style="color:${color};font-weight:500">${value}</span>`;
+      }
 
       html += `<td>${value}</td>`;
     });
