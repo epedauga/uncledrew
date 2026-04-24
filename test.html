@@ -24,10 +24,23 @@
     font-size: 20px;
   }
 
-  .sub {
-    font-size: 12px;
-    opacity: 0.8;
-    margin-top: 4px;
+  .ticker {
+    overflow: hidden;
+    white-space: nowrap;
+    margin-top: 6px;
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  #ticker-text {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll 18s linear infinite;
+  }
+
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
   }
 
   .container {
@@ -61,7 +74,10 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #93c5fd;
+    cursor: pointer;
   }
+
+  th:hover { color: #fff; }
 
   td {
     padding: 6px 8px;
@@ -95,25 +111,6 @@
     opacity: 0.7;
     margin-top: 40px;
   }
-
-  /* 📱 MOBILE */
-  @media (max-width: 300px) {
-    td {
-      font-size: 10px;
-      padding: 5px 6px;
-    }
-
-    th {
-      font-size: 10px;
-      padding: 5px 6px;
-    }
-
-    table {
-      min-width: 420px;
-    }
-  }
-
-
 </style>
 </head>
 
@@ -121,7 +118,9 @@
 
 <div class="header">
   <h1>STANDINGS</h1>
-  <div class="sub">Live data • Google Sheets</div>
+  <div class="ticker">
+    <div id="ticker-text">Cargando resultados...</div>
+  </div>
 </div>
 
 <div class="container">
@@ -134,7 +133,9 @@
 
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
-/* 🧠 EMOJIS POR POSICIÓN */
+let sortColumn = null;
+let sortDir = "desc";
+
 function getStatusEmoji(i) {
   if (i === 0) return "🏆";
   if (i < 7) return "🟢";
@@ -147,7 +148,6 @@ async function load() {
   const text = await res.text();
 
   const rows = text.trim().split("\n").map(r => r.split(","));
-
   const headers = rows[0].map(h => h.trim());
   let dataRows = rows.slice(1);
 
@@ -159,24 +159,74 @@ async function load() {
     return obj;
   });
 
-  /* 📊 ordenar por posición (1ra columna) */
   const posKey = headers[0];
-  data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
 
-  render(headers, data);
+  /* 🎯 DETECTAR COLUMNAS */
+  const teamKey = headers.find(h => h.toLowerCase().includes("team"));
+  const streakKey = headers.find(h => h.toLowerCase().includes("streak"));
+  const resultsKey = headers.find(h =>
+    h.toLowerCase().includes("result") ||
+    h.toLowerCase().includes("game")
+  );
+
+  /* 🔥 TICKER RESULTADOS */
+  if (resultsKey) {
+    const results = data
+      .map(r => r[resultsKey])
+      .filter(r => r && r.length > 3)
+      .slice(0, 10);
+
+    document.getElementById("ticker-text").innerText =
+      results.join("   •   ");
+  }
+
+  /* 📊 ORDENAMIENTO */
+  if (sortColumn) {
+    data.sort((a, b) => {
+      let valA = a[sortColumn];
+      let valB = b[sortColumn];
+
+      const numA = Number(valA);
+      const numB = Number(valB);
+
+      if (!isNaN(numA) && !isNaN(numB)) {
+        return sortDir === "asc" ? numA - numB : numB - numA;
+      }
+
+      return sortDir === "asc"
+        ? valA.localeCompare(valB)
+        : valB.localeCompare(valA);
+    });
+  } else {
+    data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
+  }
+
+  render(headers, data, teamKey, streakKey);
 }
 
-function render(headers, data) {
-  const app = document.getElementById("app");
+function sortBy(column) {
+  if (sortColumn === column) {
+    sortDir = sortDir === "asc" ? "desc" : "asc";
+  } else {
+    sortColumn = column;
+    sortDir = "desc";
+  }
+  load();
+}
 
-  const teamKey = headers.find(h =>
-    h.toLowerCase().includes("team")
-  );
+function render(headers, data, teamKey, streakKey) {
+  const app = document.getElementById("app");
 
   let html = "<table>";
 
   html += "<thead><tr>";
-  headers.forEach(h => html += `<th>${h}</th>`);
+  headers.forEach(h => {
+    let arrow = "";
+    if (h === sortColumn) {
+      arrow = sortDir === "asc" ? " ▲" : " ▼";
+    }
+    html += `<th onclick="sortBy('${h}')">${h}${arrow}</th>`;
+  });
   html += "</tr></thead>";
 
   html += "<tbody>";
@@ -184,7 +234,6 @@ function render(headers, data) {
   data.forEach((row, i) => {
 
     let cls = "";
-
     if (i < 10) cls += " top10";
 
     const teamName = teamKey ? row[teamKey] : "";
@@ -200,6 +249,16 @@ function render(headers, data) {
     headers.forEach(h => {
       let value = row[h];
 
+      /* 🔥 STREAK */
+      if (streakKey && h === streakKey && value) {
+        if (value.startsWith("W")) {
+          value = `🔥 ${value}`;
+        } else if (value.startsWith("L")) {
+          value = `❄️ ${value}`;
+        }
+      }
+
+      /* 🏀 Uncle Drew */
       if (teamKey && h === teamKey && isUncleDrew) {
         value = `${getStatusEmoji(i)} ${value}`;
       }
@@ -216,12 +275,9 @@ function render(headers, data) {
 }
 
 load();
-
-/* 🔄 auto refresh */
 setInterval(load, 30000);
 
 </script>
 
 </body>
 </html>
-
