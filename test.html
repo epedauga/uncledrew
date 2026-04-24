@@ -14,6 +14,15 @@ body {
   color: #fff;
 }
 
+tbody tr {
+  transition: all 0.2s ease;
+}
+
+tbody tr:hover {
+  outline: 1px solid rgba(194, 30, 86, 0.5);
+  background: rgba(194, 30, 86, 0.05);
+}
+
 /* HEADER */
 .header {
   padding: 18px;
@@ -113,12 +122,12 @@ th {
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #aaa;
+  color: #C21E56;
   cursor: pointer;
 }
 
 th:hover {
-  color: #fff;
+  color: #ffffff;
 }
 
 td {
@@ -139,8 +148,8 @@ td:first-child {
 
 /* TOP 10 */
 .top10 {
-  background: rgba(255,255,255,0.03);
-  border-left: 3px solid #e50914;
+  background: rgba(194, 30, 86, 0.10);
+  border-left: 3px solid #C21E56;
 }
 
 /* TEAM HIGHLIGHT */
@@ -331,7 +340,7 @@ function render(headers, data, teamKey) {
 
       if (h === "STREAK") {
         const isWin = value.startsWith("W");
-        const color = isWin ? "#22c55e" : "#ef4444";
+        const color = isWin ? "#C21E56" : "#7a7a7a";
 
         value = `<span style="color:${color};font-weight:400;">${value}</span>`;
       }
