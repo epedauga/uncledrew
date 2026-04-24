@@ -1,5 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏀 Standings - Uncle Drew’s season</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+    background: radial-gradient(circle at top, #0b1020, #050816);
+    color: white;
+  }
+
+  .header {
+    padding: 20px;
+    text-align: center;
+    background: linear-gradient(90deg, #1d4ed8, #7c3aed);
+  }
+
+  .header h1 {
+    margin: 0;
+    font-size: 20px;
+  }
+
+  .sub {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 4px;
+  }
+
+  /* 🔥 TICKER */
+  .ticker {
+    margin-top: 6px;
+    font-size: 13px;
+    opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  #ticker-text {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll 20s linear infinite;
+  }
+
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+
+  .container {
+    padding: 12px;
+    max-width: 1000px;
+    margin: auto;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 520px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  thead {
+    background: rgba(255,255,255,0.08);
+  }
+
+  th {
+    padding: 6px 8px;
+    font-size: 12px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #93c5fd;
+    cursor: pointer;
+  }
+
+  th:hover { color: #fff; }
+
+  td {
+    padding: 6px 8px;
+    font-size: 14px;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  tr:hover {
+    background: rgba(88,145,240,0.08);
+  }
+
+  td:first-child {
+    font-weight: bold;
+    color: #60a5fa;
+  }
+
+  .top10 {
+    background: rgba(34,197,94,0.10);
+    border-left: 3px solid #324ade;
+  }
+
+  .highlight-team {
+    background: rgba(245, 158, 11, 0.22) !important;
+    border: 1px solid #f59e0b !important;
+  }
+
+  .loading {
+    text-align: center;
+    opacity: 0.7;
+    margin-top: 40px;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>STANDINGS</h1>
+  <div class="sub">Live data • Google Sheets</div>
+
+  <!-- 🔥 TICKER -->
+  <div class="ticker">
+    <div id="ticker-text">Cargando resultados...</div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="table-wrap" id="app">
+    <div class="loading">Cargando standings...</div>
+  </div>
+</div>
+
 <script>
 
+/* 🔗 LINKS */
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
 const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
@@ -9,21 +150,12 @@ const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_
 let sortColumn = null;
 let sortDir = "desc";
 
+/* 🧠 EMOJIS */
 function getStatusEmoji(i) {
   if (i === 0) return "🏆";
   if (i < 7) return "🟢";
   if (i < 15) return "⚠️";
   return "☠️";
-}
-
-/* 🛠 CSV PARSER SEGURO */
-function parseCSV(text) {
-  const rows = text.trim().split("\n");
-  return rows.map(r =>
-    r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c =>
-      c.replace(/^"|"$/g, "").trim()
-    )
-  );
 }
 
 /* 🔥 STREAK */
@@ -41,11 +173,9 @@ function calculateStreak(team, games) {
 
     let result = null;
 
-    if (team === teamA) {
-      result = scoreA > scoreB ? "W" : "L";
-    } else if (team === teamB) {
-      result = scoreB > scoreA ? "W" : "L";
-    } else continue;
+    if (team === teamA) result = scoreA > scoreB ? "W" : "L";
+    else if (team === teamB) result = scoreB > scoreA ? "W" : "L";
+    else continue;
 
     if (!type) {
       type = result;
@@ -63,32 +193,34 @@ async function load() {
 
     /* 🏀 STANDINGS */
     const text = await (await fetch(URL)).text();
-    const rows = parseCSV(text);
+    const rows = text.trim().split("\n").map(r => r.split(","));
 
-    const headers = rows[0];
+    const headers = rows[0].map(h => h.trim());
     let data = rows.slice(1).map(r => {
       let obj = {};
-      headers.forEach((h, i) => obj[h] = r[i] || "");
+      headers.forEach((h, i) => obj[h] = r[i]?.trim());
       return obj;
     });
 
     /* 🔥 GAMES */
     const textG = await (await fetch(GAMES_URL)).text();
-    const rowsG = parseCSV(textG);
+    const rowsG = textG.trim().split("\n").map(r => r.split(","));
 
     const headersG = rowsG[0];
     const games = rowsG.slice(1).map(r => {
       let obj = {};
-      headersG.forEach((h, i) => obj[h] = r[i] || "");
+      headersG.forEach((h, i) => obj[h.trim()] = r[i]?.trim());
       return obj;
     });
 
     /* 🔥 RESULTS */
     const textR = await (await fetch(RESULTS_URL)).text();
-    const results = parseCSV(textR)
+    const results = textR
+      .trim()
+      .split("\n")
       .slice(1)
-      .map(r => r[0])
-      .filter(r => r && r.length > 3);
+      .map(r => r.trim())
+      .filter(r => r.length > 3);
 
     document.getElementById("ticker-text").innerText =
       results.join("   •   ");
@@ -101,19 +233,11 @@ async function load() {
       row["STREAK"] = calculateStreak(row[teamKey], games);
     });
 
-    /* 📊 SORT */
+    /* 📊 ORDEN */
     if (sortColumn) {
       data.sort((a, b) => {
         let A = a[sortColumn];
         let B = b[sortColumn];
-
-        const nA = Number(A);
-        const nB = Number(B);
-
-        if (!isNaN(nA) && !isNaN(nB)) {
-          return sortDir === "asc" ? nA - nB : nB - nA;
-        }
-
         return sortDir === "asc"
           ? A.localeCompare(B)
           : B.localeCompare(A);
@@ -124,8 +248,8 @@ async function load() {
 
     render([...headers, "STREAK"], data, teamKey);
 
-  } catch (err) {
-    console.error(err);
+  } catch (e) {
+    console.error(e);
     document.getElementById("app").innerHTML =
       "<div class='loading'>Error cargando datos</div>";
   }
@@ -154,9 +278,10 @@ function render(headers, data, teamKey) {
   html += "</tr></thead><tbody>";
 
   data.forEach((row, i) => {
-    let cls = i < 10 ? "top10" : "";
 
+    let cls = i < 10 ? "top10" : "";
     const team = row[teamKey] || "";
+
     if (team.toLowerCase() === "uncle drew") {
       cls += " highlight-team";
     }
@@ -188,3 +313,6 @@ load();
 setInterval(load, 30000);
 
 </script>
+
+</body>
+</html>
