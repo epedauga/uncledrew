@@ -19,8 +19,16 @@
     background: linear-gradient(90deg, #1d4ed8, #7c3aed);
   }
 
-  .header h1 { margin: 0; font-size: 20px; }
-  .sub { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+  .header h1 {
+    margin: 0;
+    font-size: 20px;
+  }
+
+  .sub {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 4px;
+  }
 
   .ticker {
     margin-top: 6px;
@@ -41,9 +49,16 @@
     to { transform: translateX(-100%); }
   }
 
-  .container { padding: 12px; max-width: 1000px; margin: auto; }
+  .container {
+    padding: 12px;
+    max-width: 1000px;
+    margin: auto;
+  }
 
-  .table-wrap { overflow-x: auto; border-radius: 12px; }
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
+  }
 
   table {
     width: 100%;
@@ -54,7 +69,9 @@
     overflow: hidden;
   }
 
-  thead { background: rgba(255,255,255,0.08); }
+  thead {
+    background: rgba(255,255,255,0.08);
+  }
 
   th {
     padding: 6px 8px;
@@ -66,7 +83,7 @@
     cursor: pointer;
   }
 
-  th:hover { color: #fff; }
+  th:hover { color: white; }
 
   td {
     padding: 6px 8px;
@@ -75,18 +92,30 @@
     border-top: 1px solid rgba(255,255,255,0.06);
   }
 
-  tr:hover { background: rgba(88,145,240,0.08); }
+  tr:hover {
+    background: rgba(88,145,240,0.08);
+  }
 
-  td:first-child { font-weight: bold; color: #60a5fa; }
+  td:first-child {
+    font-weight: bold;
+    color: #60a5fa;
+  }
 
-  .top10 { background: rgba(34,197,94,0.10); border-left: 3px solid #324ade; }
+  .top10 {
+    background: rgba(34,197,94,0.10);
+    border-left: 3px solid #324ade;
+  }
 
   .highlight-team {
     background: rgba(245, 158, 11, 0.22) !important;
     border: 1px solid #f59e0b !important;
   }
 
-  .loading { text-align: center; opacity: 0.7; margin-top: 40px; }
+  .loading {
+    text-align: center;
+    opacity: 0.7;
+    margin-top: 40px;
+  }
 </style>
 </head>
 
@@ -95,7 +124,9 @@
 <div class="header">
   <h1>STANDINGS</h1>
   <div class="sub">Live data • Google Sheets</div>
-  <div class="ticker"><div id="ticker-text">Cargando resultados...</div></div>
+  <div class="ticker">
+    <div id="ticker-text">Cargando resultados...</div>
+  </div>
 </div>
 
 <div class="container">
@@ -124,7 +155,7 @@ function getStatusEmoji(i) {
   return "☠️";
 }
 
-/* 🔥 STREAK */
+/* STREAK */
 function calculateStreak(team, games) {
   let type = null;
   let count = 0;
@@ -165,9 +196,10 @@ async function load() {
 
     /* STANDINGS */
     const text = await (await fetch(URL)).text();
-    const rows = text.trim().split("\n").map(r => r.split("\t"));
+    const rows = text.trim().split("\n").map(r => r.split(","));
 
     const headers = rows[0].map(h => h.trim());
+
     let data = rows.slice(1).map(r => {
       let obj = {};
       headers.forEach((h, i) => obj[h] = r[i]?.trim());
@@ -176,9 +208,10 @@ async function load() {
 
     /* GAMES */
     const textG = await (await fetch(GAMES_URL)).text();
-    const rowsG = textG.trim().split("\n").map(r => r.split("\t"));
+    const rowsG = textG.trim().split("\n").map(r => r.split(","));
 
     const headersG = rowsG[0].map(h => h.trim());
+
     const games = rowsG.slice(1).map(r => {
       let obj = {};
       headersG.forEach((h, i) => obj[h] = r[i]?.trim());
@@ -189,7 +222,8 @@ async function load() {
     const textR = await (await fetch(RESULTS_URL)).text();
     const results = textR.trim().split("\n").slice(1).filter(r => r.length > 3);
 
-    document.getElementById("ticker-text").innerText = results.join("   •   ");
+    document.getElementById("ticker-text").innerText =
+      results.join("   •   ");
 
     const posKey = headers[0];
     const teamKey = headers.find(h => h.includes("TEAM"));
@@ -216,8 +250,6 @@ async function load() {
 
   } catch (e) {
     console.error(e);
-    document.getElementById("app").innerHTML =
-      "<div class='loading'>Error cargando datos</div>";
   }
 }
 
