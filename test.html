@@ -6,124 +6,148 @@
 <title>🏀 Standings - Uncle Drew’s season</title>
 
 <style>
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
-    background: radial-gradient(circle at top, #0b1020, #050816);
-    color: white;
-  }
 
-  .header {
-    padding: 20px;
-    text-align: center;
-    background: linear-gradient(90deg, #1d4ed8, #7c3aed);
-  }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+  background: #0a0a0a;
+  color: #fff;
+}
 
-  .header h1 {
-    margin: 0;
-    font-size: 20px;
-  }
+/* HEADER */
+.header {
+  padding: 18px;
+  text-align: center;
+  background: #111;
+  border-bottom: 1px solid #222;
+}
 
-  .sub {
-    font-size: 12px;
-    opacity: 0.8;
-    margin-top: 4px;
-  }
+.header h1 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
 
-  /* 🔥 FEED CON ANIMACIÓN */
-  #ticker-text {
-    margin-top: 10px;
-    height: 160px;
-    overflow: hidden;
-    position: relative;
-  }
+.sub {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 4px;
+}
 
-  .feed-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    animation: floatFeed 25s linear infinite;
-  }
+/* TICKER */
+#ticker-text {
+  margin-top: 10px;
+  overflow: hidden;
+  position: relative;
+  padding: 10px 0;
+  border-top: 1px solid #1c1c1c;
+}
 
-  @keyframes floatFeed {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-50%); }
-  }
+.feed-wrapper {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  animation: scrollX 28s linear infinite;
+}
 
-  .game-card {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 12px;
-    padding: 10px;
-    font-size: 12px;
-    line-height: 1.4;
-  }
+@keyframes scrollX {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
 
-  .game-card b {
-    color: #fff;
-  }
+/* GAME CARD */
+.game-card {
+  min-width: 220px;
+  background: #151515;
+  border: 1px solid #222;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.4;
+}
 
-  .container {
-    padding: 12px;
-    max-width: 1000px;
-    margin: auto;
-  }
+.game-card div:first-child {
+  opacity: 0.6;
+  font-size: 11px;
+}
 
-  .table-wrap {
-    overflow-x: auto;
-    border-radius: 12px;
-  }
+.game-card b {
+  color: #fff;
+}
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 520px;
-    background: rgba(255,255,255,0.03);
-    border-radius: 12px;
-    overflow: hidden;
-  }
+.game-card:hover {
+  background: #1c1c1c;
+  border-color: #333;
+}
 
-  thead {
-    background: rgba(255,255,255,0.08);
-  }
+/* CONTAINER */
+.container {
+  padding: 12px;
+  max-width: 1000px;
+  margin: auto;
+}
 
-  th {
-    padding: 6px 8px;
-    font-size: 12px;
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #93c5fd;
-    cursor: pointer;
-  }
+/* TABLE */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+}
 
-  th:hover { color: white; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 520px;
+  background: #0f0f0f;
+  border: 1px solid #222;
+  border-radius: 10px;
+  overflow: hidden;
+}
 
-  td {
-    padding: 6px 8px;
-    font-size: 14px;
-    text-align: center;
-    border-top: 1px solid rgba(255,255,255,0.06);
-  }
+thead {
+  background: #111;
+}
 
-  tr:hover {
-    background: rgba(88,145,240,0.08);
-  }
+th {
+  padding: 6px 8px;
+  font-size: 12px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #aaa;
+  cursor: pointer;
+}
 
-  td:first-child {
-    font-weight: bold;
-    color: #60a5fa;
-  }
+th:hover {
+  color: #fff;
+}
 
-  .top10 {
-    background: rgba(34,197,94,0.10);
-    border-left: 3px solid #324ade;
-  }
+td {
+  padding: 6px 8px;
+  font-size: 14px;
+  text-align: center;
+  border-top: 1px solid #1c1c1c;
+}
 
-  .highlight-team {
-    background: rgba(245, 158, 11, 0.22) !important;
-    border: 1px solid #f59e0b !important;
-  }
+tr:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+td:first-child {
+  font-weight: bold;
+  color: #60a5fa;
+}
+
+/* TOP 10 */
+.top10 {
+  background: rgba(255,255,255,0.03);
+  border-left: 3px solid #e50914;
+}
+
+/* TEAM HIGHLIGHT */
+.highlight-team {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid #333 !important;
+}
 
 </style>
 </head>
@@ -134,7 +158,6 @@
   <h1>STANDINGS</h1>
   <div class="sub">Live data • Google Sheets</div>
 
-  <!-- 🔥 FEED -->
   <div id="ticker-text">Cargando resultados...</div>
 </div>
 
@@ -156,14 +179,6 @@ const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_
 let sortColumn = null;
 let sortDir = "desc";
 
-/* EMOJIS */
-function getStatusEmoji(i) {
-  if (i === 0) return "🏆";
-  if (i < 7) return "🟢";
-  if (i < 15) return "⚠️";
-  return "☠️";
-}
-
 /* STREAK */
 function calculateStreak(team, games) {
   let type = null;
@@ -174,8 +189,8 @@ function calculateStreak(team, games) {
     const teamA = g["TEAM_A"];
     const teamB = g["TEAM_B"];
 
-    const scoreA = Number(g["SCORE_A"]);
-    const scoreB = Number(g["SCORE_B"]);
+    const scoreA = Number(g["SCORE_A"]) || 0;
+    const scoreB = Number(g["SCORE_B"]) || 0;
 
     if (!teamA || !teamB) continue;
 
@@ -223,7 +238,7 @@ async function load() {
       return obj;
     });
 
-    /* RESULTS → ANIMATED FEED */
+    /* RESULTS */
     const textR = await (await fetch(RESULTS_URL)).text();
     const results = textR.trim().split("\n").slice(1).filter(r => r.length > 3);
 
@@ -259,8 +274,8 @@ async function load() {
     /* SORT */
     if (sortColumn) {
       data.sort((a, b) => {
-        let A = a[sortColumn];
-        let B = b[sortColumn];
+        let A = a[sortColumn] || "";
+        let B = b[sortColumn] || "";
         return sortDir === "asc"
           ? A.localeCompare(B)
           : B.localeCompare(A);
@@ -302,18 +317,11 @@ function render(headers, data, teamKey) {
       let value = row[h] || "";
 
       if (h === "STREAK") {
-  const isWin = value.startsWith("W");
-  const color = isWin ? "#22c55e" : "#ef4444";
+        const isWin = value.startsWith("W");
+        const color = isWin ? "#22c55e" : "#ef4444";
 
-  value = `
-    <span style="
-      color: ${color};
-      font-weight: 400;
-    ">
-      ${value}
-    </span>
-  `;
-}
+        value = `<span style="color:${color};font-weight:400;">${value}</span>`;
+      }
 
       html += `<td>${value}</td>`;
     });
