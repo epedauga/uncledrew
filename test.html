@@ -19,7 +19,10 @@
     background: linear-gradient(90deg, #1d4ed8, #7c3aed);
   }
 
-  .header h1 { margin: 0; font-size: 20px; }
+  .header h1 {
+    margin: 0;
+    font-size: 20px;
+  }
 
   .sub {
     font-size: 12px;
@@ -27,12 +30,24 @@
     margin-top: 4px;
   }
 
-  /* 🔥 TICKER AHORA ES GRID */
+  /* 🔥 FEED CON ANIMACIÓN */
   #ticker-text {
     margin-top: 10px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    height: 160px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .feed-wrapper {
+    display: flex;
+    flex-direction: column;
     gap: 10px;
+    animation: floatFeed 25s linear infinite;
+  }
+
+  @keyframes floatFeed {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
   }
 
   .game-card {
@@ -45,7 +60,7 @@
   }
 
   .game-card b {
-    color: #ffffff;
+    color: #fff;
   }
 
   .container {
@@ -68,7 +83,9 @@
     overflow: hidden;
   }
 
-  thead { background: rgba(255,255,255,0.08); }
+  thead {
+    background: rgba(255,255,255,0.08);
+  }
 
   th {
     padding: 6px 8px;
@@ -89,7 +106,9 @@
     border-top: 1px solid rgba(255,255,255,0.06);
   }
 
-  tr:hover { background: rgba(88,145,240,0.08); }
+  tr:hover {
+    background: rgba(88,145,240,0.08);
+  }
 
   td:first-child {
     font-weight: bold;
@@ -115,7 +134,7 @@
   <h1>STANDINGS</h1>
   <div class="sub">Live data • Google Sheets</div>
 
-  <!-- 🔥 RESULTS GRID -->
+  <!-- 🔥 FEED -->
   <div id="ticker-text">Cargando resultados...</div>
 </div>
 
@@ -204,11 +223,13 @@ async function load() {
       return obj;
     });
 
-    /* RESULTS → CARDS */
+    /* RESULTS → ANIMATED FEED */
     const textR = await (await fetch(RESULTS_URL)).text();
     const results = textR.trim().split("\n").slice(1).filter(r => r.length > 3);
 
-    document.getElementById("ticker-text").innerHTML = results.map(r => {
+    const ticker = document.getElementById("ticker-text");
+
+    const cards = results.map(r => {
       const p = r.split(",");
 
       return `
@@ -219,6 +240,13 @@ async function load() {
         </div>
       `;
     }).join("");
+
+    ticker.innerHTML = `
+      <div class="feed-wrapper">
+        ${cards}
+        ${cards}
+      </div>
+    `;
 
     const posKey = headers[0];
     const teamKey = headers.find(h => h.includes("TEAM"));
