@@ -30,63 +30,56 @@
     margin-top: 4px;
   }
 
-  /* 🔥 FEED */
+  /* 🔥 FEED HORIZONTAL LIMPIO */
   #ticker-text {
     margin-top: 12px;
-    height: 170px;
-    overflow: hidden;
-    position: relative;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px;
   }
 
   .feed-wrapper {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    animation: floatFeed 28s linear infinite;
+    gap: 12px;
   }
 
-  @keyframes floatFeed {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-50%); }
-  }
-
-  /* 🧊 CARD MEJORADA */
+  /* 🧊 CARD NBA STYLE */
   .game-card {
+    min-width: 220px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .match-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 10px;
-    padding: 10px 12px;
+  }
+
+  .team {
     font-size: 12px;
-    gap: 10px;
-  }
-
-  .team-col {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    min-width: 120px;
-  }
-
-  .team-name {
     font-weight: 600;
-    font-size: 12px;
   }
 
   .score {
-    font-size: 11px;
-    opacity: 0.9;
+    font-size: 20px;
+    font-weight: 800;
+    text-align: center;
+    letter-spacing: 1px;
   }
 
   .result {
+    font-size: 12px;
     font-weight: 700;
-    font-size: 13px;
-    min-width: 40px;
-    text-align: center;
   }
 
+  /* TABLE */
   .container {
     padding: 12px;
     max-width: 1000px;
@@ -116,7 +109,6 @@
     font-size: 12px;
     text-transform: uppercase;
     color: #93c5fd;
-    cursor: pointer;
   }
 
   td {
@@ -142,6 +134,7 @@
   .highlight-team {
     background: rgba(245, 158, 11, 0.22) !important;
   }
+
 </style>
 </head>
 
@@ -177,10 +170,8 @@ function calculateStreak(team, games) {
   let count = 0;
 
   for (let g of games) {
-
     const teamA = g["TEAM_A"];
     const teamB = g["TEAM_B"];
-
     const scoreA = Number(g["SCORE_A"]);
     const scoreB = Number(g["SCORE_B"]);
 
@@ -229,6 +220,7 @@ async function load() {
       return obj;
     });
 
+    /* FEED */
     const textR = await (await fetch(RESULTS_URL)).text();
     const results = textR.trim().split("\n").slice(1);
 
@@ -239,32 +231,31 @@ async function load() {
         ${results.map(r => {
           const p = r.split(",");
 
-          const a = p[1];
-          const b = p[2];
-          const sa = Number(p[3]);
-          const sb = Number(p[4]);
+          const teamA = p[1];
+          const teamB = p[2];
+          const scoreA = Number(p[3]);
+          const scoreB = Number(p[4]);
 
-          const resultA = sa > sb ? "W" : "L";
-          const resultB = sb > sa ? "W" : "L";
+          const aWin = scoreA > scoreB;
+          const bWin = scoreB > scoreA;
 
           return `
-          <div class="game-card">
+            <div class="game-card">
 
-            <div class="team-col">
-              <div class="team-name">${a}</div>
-              <div class="score">${sa}</div>
-              <div class="result" style="color:${resultA === "W" ? "#22c55e" : "#ef4444"}">${resultA}</div>
+              <div class="match-row">
+                <div class="team" style="color:${aWin ? '#22c55e' : '#ef4444'}">${teamA}</div>
+                <div class="result">${aWin ? 'W' : 'L'}</div>
+              </div>
+
+              <div class="score">${scoreA} - ${scoreB}</div>
+
+              <div class="match-row">
+                <div class="team" style="color:${bWin ? '#22c55e' : '#ef4444'}">${teamB}</div>
+                <div class="result">${bWin ? 'W' : 'L'}</div>
+              </div>
+
             </div>
-
-            <div style="opacity:.6">VS</div>
-
-            <div class="team-col">
-              <div class="team-name">${b}</div>
-              <div class="score">${sb}</div>
-              <div class="result" style="color:${resultB === "W" ? "#22c55e" : "#ef4444"}">${resultB}</div>
-            </div>
-
-          </div>`;
+          `;
         }).join("")}
       </div>
     `;
@@ -285,7 +276,7 @@ async function load() {
   }
 }
 
-/* RENDER TABLE */
+/* TABLE */
 function render(headers, data, teamKey) {
   const app = document.getElementById("app");
 
@@ -310,7 +301,7 @@ function render(headers, data, teamKey) {
 
       if (h === "STREAK") {
         const isWin = value.startsWith("W");
-        value = `<span style="color:${isWin ? "#22c55e" : "#ef4444"}">${value}</span>`;
+        value = `<span style="color:${isWin ? '#22c55e' : '#ef4444'}">${value}</span>`;
       }
 
       html += `<td>${value}</td>`;
