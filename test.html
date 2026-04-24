@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏀 Standings - Uncle Drew’s season</title>
+<title>🏀 ESPN Score Bug</title>
 
 <style>
   body {
@@ -11,143 +11,71 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
     background: radial-gradient(circle at top, #0b1020, #050816);
     color: white;
-  }
-
-  .header {
-    padding: 20px;
-    text-align: center;
-    background: linear-gradient(90deg, #1d4ed8, #7c3aed);
-  }
-
-  .header h1 {
-    margin: 0;
-    font-size: 20px;
-  }
-
-  .sub {
-    font-size: 12px;
-    opacity: 0.8;
-    margin-top: 4px;
-  }
-
-  /* 🔥 SCOREBOARD FEED */
-  #ticker-text {
-    margin-top: 12px;
     overflow: hidden;
-    position: relative;
   }
 
-  .feed-row {
-    display: flex;
-    gap: 12px;
-    animation: scrollX 45s linear infinite;
-    width: max-content;
-  }
-
-  @keyframes scrollX {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-
-  /* 🏀 SCOREBOARD CARD PRO */
-  .game-card {
-    min-width: 240px;
-    background: rgba(255,255,255,0.06);
+  /* 📺 SCORE BUG CONTAINER */
+  .scorebug {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 15, 30, 0.95);
     border: 1px solid rgba(255,255,255,0.12);
     border-radius: 14px;
-    padding: 10px;
+    padding: 10px 18px;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex-shrink: 0;
-  }
-
-  .matchup {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    font-size: 13px;
-    font-weight: 600;
+    gap: 18px;
+    min-width: 320px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
 
   .team {
-    width: 80px;
+    font-weight: 600;
+    font-size: 14px;
+    width: 90px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
   }
 
-  .score-box {
-    background: rgba(255,255,255,0.08);
+  .score {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1px;
     padding: 4px 10px;
     border-radius: 8px;
-    font-size: 12px;
-    font-weight: 700;
+    background: rgba(255,255,255,0.08);
+    min-width: 70px;
     text-align: center;
-    min-width: 50px;
   }
 
-  .date {
-    font-size: 10px;
-    opacity: 0.6;
-  }
-
-  /* 🟢🔴 WIN / LOSS */
   .win {
     color: #22c55e;
   }
 
   .loss {
     color: #ef4444;
-    opacity: 0.7;
+    opacity: 0.6;
   }
 
-  /* TABLE (NO TOCAMOS MUCHO) */
-  .container {
-    padding: 12px;
-    max-width: 1000px;
-    margin: auto;
+  .meta {
+    font-size: 10px;
+    opacity: 0.6;
+    position: absolute;
+    top: -18px;
+    left: 0;
   }
 
-  .table-wrap {
-    overflow-x: auto;
-    border-radius: 12px;
+  /* animación suave cambio */
+  .fade {
+    animation: fadeIn 0.4s ease;
   }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 520px;
-    background: rgba(255,255,255,0.03);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
-  thead {
-    background: rgba(255,255,255,0.08);
-  }
-
-  th {
-    padding: 6px 8px;
-    font-size: 12px;
-    text-align: center;
-    text-transform: uppercase;
-    color: #93c5fd;
-  }
-
-  td {
-    padding: 6px 8px;
-    font-size: 14px;
-    text-align: center;
-    border-top: 1px solid rgba(255,255,255,0.06);
-  }
-
-  .top10 {
-    background: rgba(34,197,94,0.10);
-  }
-
-  .highlight-team {
-    background: rgba(245, 158, 11, 0.22) !important;
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
 </style>
@@ -155,85 +83,64 @@
 
 <body>
 
-<div class="header">
-  <h1>STANDINGS</h1>
-  <div class="sub">Live data • Google Sheets</div>
-
-  <div id="ticker-text">Cargando resultados...</div>
-</div>
-
-<div class="container">
-  <div class="table-wrap" id="app"></div>
-</div>
+<div id="scorebug"></div>
 
 <script>
 
-const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
-
-const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
-
 const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=868310309&single=true&output=csv";
 
-/* FEED */
+let index = 0;
+let games = [];
+
 async function load() {
+  const text = await (await fetch(RESULTS_URL)).text();
+  games = text.trim().split("\n").slice(1).filter(r => r.length > 3);
+  render();
+}
 
-  const textR = await (await fetch(RESULTS_URL)).text();
-  const results = textR.trim().split("\n").slice(1).filter(r => r.length > 3);
+function render() {
 
-  const cards = results.map(r => {
-    const p = r.split(",");
+  if (games.length === 0) return;
 
-    const date = p[0] || "";
-    const teamA = p[1] || "";
-    const teamB = p[2] || "";
-    const score = p[3] || "";
+  const r = games[index % games.length];
+  const p = r.split(",");
 
-    let scoreA = "", scoreB = "";
+  const date = p[0] || "";
+  const teamA = p[1] || "";
+  const teamB = p[2] || "";
+  let score = p[3] || "0-0";
 
-    if (score.includes("-")) {
-      [scoreA, scoreB] = score.split("-");
-    }
+  let [a, b] = score.includes("-") ? score.split("-") : [0,0];
 
-    let aClass = "", bClass = "";
+  let aClass = "", bClass = "";
 
-    if (Number(scoreA) > Number(scoreB)) {
-      aClass = "win";
-      bClass = "loss";
-    } else if (Number(scoreB) > Number(scoreA)) {
-      bClass = "win";
-      aClass = "loss";
-    }
+  if (Number(a) > Number(b)) {
+    aClass = "win";
+    bClass = "loss";
+  } else if (Number(b) > Number(a)) {
+    bClass = "win";
+    aClass = "loss";
+  }
 
-    return `
-      <div class="game-card">
+  document.getElementById("scorebug").innerHTML = `
+    <div class="scorebug fade">
 
-        <div class="date">${date}</div>
+      <div class="meta">${date}</div>
 
-        <div class="matchup">
-          <div class="team ${aClass}">${teamA}</div>
+      <div class="team ${aClass}">${teamA}</div>
 
-          <div class="score-box">
-            ${scoreA || "0"} - ${scoreB || "0"}
-          </div>
+      <div class="score">${a}-${b}</div>
 
-          <div class="team ${bClass}">${teamB}</div>
-        </div>
+      <div class="team ${bClass}">${teamB}</div>
 
-      </div>
-    `;
-  }).join("");
-
-  document.getElementById("ticker-text").innerHTML = `
-    <div class="feed-row">
-      ${cards}
-      ${cards}
     </div>
   `;
 
+  index++;
 }
 
 load();
-setInterval(load, 30000);
+setInterval(render, 4000);   // cambia cada 4s
 
 </script>
 
