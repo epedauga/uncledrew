@@ -230,16 +230,44 @@ async function load() {
     const ticker = document.getElementById("ticker-text");
 
     const cards = results.map(r => {
-      const p = r.split(",");
+  const p = r.split(",");
 
-      return `
-        <div class="game-card">
-          <div>${p[0] || ""}</div>
-          <div><b>${p[1] || ""}</b> ${p[2] || ""}</div>
-          <div>${p[3] || ""}</div>
-        </div>
-      `;
-    }).join("");
+  const date = p[0] || "";
+  const teamA = p[1] || "";
+  const teamB = p[2] || "";
+  const score = p[3] || "";
+
+  return `
+    <div class="game-card">
+      
+      <div style="font-size:10px;opacity:0.7;margin-bottom:4px;">
+        ${date}
+      </div>
+
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        font-weight:600;
+        font-size:13px;
+      ">
+        <span>${teamA}</span>
+        <span style="opacity:0.5;">vs</span>
+        <span>${teamB}</span>
+      </div>
+
+      <div style="
+        margin-top:6px;
+        text-align:center;
+        font-size:12px;
+        opacity:0.9;
+      ">
+        ${score}
+      </div>
+
+    </div>
+  `;
+}).join("");
 
     ticker.innerHTML = `
       <div class="feed-wrapper">
