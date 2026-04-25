@@ -208,13 +208,19 @@ th.sorted-active {
 @media (max-width: 768px) {
 
   /* ========================= */
-  /* STICKY HEADER */
+  /* HEADER (SIEMPRE ARRIBA DE TODO) */
   /* ========================= */
   thead th {
     position: sticky;
     top: 0;
-    z-index: 6;
+    z-index: 10;
     background: #111;
+  }
+
+  /* HEADER DE COLUMNAS FIJAS (más arriba que el resto) */
+  thead th:first-child,
+  thead th:nth-child(2) {
+    z-index: 12;
   }
 
   /* ========================= */
@@ -224,7 +230,7 @@ th.sorted-active {
   td:first-child {
     position: sticky;
     left: 0;
-    z-index: 5;
+    z-index: 8;
     background: #0f0f0f;
   }
 
@@ -234,30 +240,33 @@ th.sorted-active {
   th:nth-child(2),
   td:nth-child(2) {
     position: sticky;
-    left: 48px; /* ajusta si hace falta */
-    z-index: 5;
+    left: 48px;
+    z-index: 8;
     background: #0f0f0f;
   }
 
-  /* evitar transparencia (clave) */
+  /* 🔥 ESTO SOLUCIONA EL “ESPACIO TRANSPARENTE” ENTRE COLUMNAS */
   th:first-child,
+  td:first-child {
+    box-shadow: 3px 0 0 #0f0f0f;
+  }
+
   th:nth-child(2),
-  td:first-child,
   td:nth-child(2) {
-    box-shadow: 2px 0 0 #0f0f0f;
+    box-shadow: 3px 0 0 #0f0f0f;
   }
 
   /* ========================= */
-  /* TOP 10 (SIN FONDO, CON BARRA) */
+  /* TOP 10 */
   /* ========================= */
   .top10 {
     background: transparent !important;
   }
 
   .top10 td:first-child {
-    position: sticky; /* 👈 importante para que siga al hacer scroll */
+    position: sticky;
     left: 0;
-    z-index: 7;
+    z-index: 9;
     background: #0f0f0f;
   }
 
@@ -269,20 +278,24 @@ th.sorted-active {
     bottom: 0;
     width: 3px;
     background: #C21E56;
+    z-index: 11;
   }
 
   /* ========================= */
-  /* UNCLE DREW */
+  /* UNCLE DREW (FIX COMPLETO) */
   /* ========================= */
+
+  /* ❌ eliminamos transparencia */
   .highlight-team td {
     background: transparent !important;
   }
 
+  /* ✅ fondo sólido en columnas sticky */
   .highlight-team td:first-child {
     position: sticky;
     left: 0;
-    z-index: 7;
-    background: #0f0f0f;
+    z-index: 9;
+    background: #0f0f0f; /* 🔥 CLAVE */
   }
 
   .highlight-team td:first-child::before {
@@ -293,15 +306,27 @@ th.sorted-active {
     bottom: 0;
     width: 3px;
     background: #ff8c42;
+    z-index: 11;
   }
 
+  /* 🔥 ESTE ERA TU BUG PRINCIPAL */
   .highlight-team td:nth-child(2) {
     position: sticky;
     left: 48px;
-    z-index: 7;
+    z-index: 9;
+
+    /* fondo sólido + highlight */
+    background: #0f0f0f;
+  }
+
+  /* capa interna para el highlight (sin romper sticky) */
+  .highlight-team td:nth-child(2)::after {
+    content: "";
+    position: absolute;
+    inset: 2px;
     background: rgba(255, 140, 66, 0.15);
     border-radius: 6px;
-    font-weight: 600;
+    z-index: -1;
   }
 
 }
