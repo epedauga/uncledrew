@@ -149,8 +149,27 @@ tbody tr:hover {
 }
 
 /* UNCLE DREW */
+.highlight-team {
+  position: relative;
+}
+
 .highlight-team td {
-  background: rgba(255, 140, 66, 0.14) !important;
+  background: rgba(255, 140, 66, 0.08);
+}
+
+/* BAR LATERAL */
+.highlight-team td:first-child {
+  position: relative;
+}
+
+.highlight-team td:first-child::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #ff8c42;
 }
 
 /* TEAM COLUMN */
