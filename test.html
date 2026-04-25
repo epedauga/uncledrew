@@ -323,7 +323,7 @@ async function load() {
 
   data.forEach(row => {
     row["STREAK"] = calculateStreak(row[teamKey], games);
-    row["LAST5"] = calculateLast5(row[teamKey], games);
+    row["LAST 5"] = calculateLast5(row[teamKey], games);
   });
 
   /* SORT */
@@ -342,7 +342,7 @@ async function load() {
 
   let html = "<table><thead><tr>";
 
-  headers.concat(["STREAK", "LAST5"]).forEach(h => {
+  headers.concat(["STREAK", "LAST 5"]).forEach(h => {
     html += `<th onclick="sortTable('${h}')">${h}</th>`;
   });
 
@@ -357,7 +357,7 @@ async function load() {
 
     html += `<tr class="${cls}">`;
 
-    headers.concat(["STREAK", "LAST5"]).forEach(h => {
+    headers.concat(["STREAK", "LAST 5"]).forEach(h => {
       let value = row[h] || "";
 
       if (h === "STREAK") {
