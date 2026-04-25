@@ -207,14 +207,58 @@ th.sorted-active {
 
 @media (max-width: 768px) {
 
-   /* quitar fondo del top 10 */
+  /* ========================= */
+  /* STICKY HEADER */
+  /* ========================= */
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: #111;
+  }
+
+  /* ========================= */
+  /* COLUMNA POSICIÓN */
+  /* ========================= */
+  th:first-child,
+  td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background: #0f0f0f;
+  }
+
+  /* ========================= */
+  /* COLUMNA TEAM */
+  /* ========================= */
+  th:nth-child(2),
+  td:nth-child(2) {
+    position: sticky;
+    left: 48px; /* ajusta si hace falta */
+    z-index: 5;
+    background: #0f0f0f;
+  }
+
+  /* evitar transparencia (clave) */
+  th:first-child,
+  th:nth-child(2),
+  td:first-child,
+  td:nth-child(2) {
+    box-shadow: 2px 0 0 #0f0f0f;
+  }
+
+  /* ========================= */
+  /* TOP 10 (SIN FONDO, CON BARRA) */
+  /* ========================= */
   .top10 {
     background: transparent !important;
   }
 
-  /* mantener la barra lateral rosa */
   .top10 td:first-child {
-    position: relative;
+    position: sticky; /* 👈 importante para que siga al hacer scroll */
+    left: 0;
+    z-index: 7;
+    background: #0f0f0f;
   }
 
   .top10 td:first-child::before {
@@ -227,13 +271,34 @@ th.sorted-active {
     background: #C21E56;
   }
 
-  /* quitar el fondo de toda la fila */
+  /* ========================= */
+  /* UNCLE DREW */
+  /* ========================= */
   .highlight-team td {
     background: transparent !important;
   }
 
-  /* dejar highlight SOLO en el nombre del equipo (columna 2) */
+  .highlight-team td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 7;
+    background: #0f0f0f;
+  }
+
+  .highlight-team td:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #ff8c42;
+  }
+
   .highlight-team td:nth-child(2) {
+    position: sticky;
+    left: 48px;
+    z-index: 7;
     background: rgba(255, 140, 66, 0.15);
     border-radius: 6px;
     font-weight: 600;
