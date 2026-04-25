@@ -207,34 +207,12 @@ th.sorted-active {
 @media (max-width: 768px) {
 
   /* =========================
-     HEADERS PASAN POR DETRÁS
+     BASE FIX SCROLL
   ========================= */
 
-  thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2; /* BAJAMOS z-index */
-    background: rgba(17,17,17,0.85) !important;
-    backdrop-filter: blur(6px);
+  .table-wrap {
+    overflow-x: auto;
   }
-
-  /* TEAM SIEMPRE ENCIMA */
-  table th:nth-child(2),
-  table td:nth-child(2) {
-    z-index: 20 !important;
-  }
-
-  table th:nth-child(1),
-  table td:nth-child(1) {
-    z-index: 21 !important;
-  }
-
-}
-  
-  
-  /* =========================
-     BASE STABLE PARA SCROLL
-  ========================= */
 
   table {
     border-collapse: separate;
@@ -245,16 +223,18 @@ th.sorted-active {
     background: #0f0f0f;
   }
 
+  /* HEADER STICKY */
   thead th {
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 50;
     background: #111 !important;
   }
 
   /* =========================
-     POSICIÓN (COL 1)
+     COL 1 - POSITION FIJA
   ========================= */
+
   table th:nth-child(1),
   table td:nth-child(1) {
     position: sticky;
@@ -262,18 +242,19 @@ th.sorted-active {
     width: 45px;
     min-width: 45px;
     max-width: 45px;
-    z-index: 5;
+    z-index: 40;
     background: #0f0f0f !important;
   }
 
   /* =========================
-     TEAM (COL 2) ← FIJA
+     COL 2 - TEAM FIJA
   ========================= */
+
   table th:nth-child(2),
   table td:nth-child(2) {
     position: sticky;
     left: 45px;
-    z-index: 6;
+    z-index: 41;
     background: #0f0f0f !important;
 
     min-width: 140px;
@@ -281,15 +262,14 @@ th.sorted-active {
   }
 
   /* =========================
-     FIX TOP 10 VISIBILITY
+     TOP 10 (BARRA ROSA FIX)
   ========================= */
 
   .top10 td:first-child {
     position: relative;
-    overflow: visible;
   }
 
-  .top10 td:first-child::after {
+  .top10 td:first-child::before {
     content: "";
     position: absolute;
     left: 0;
@@ -297,24 +277,30 @@ th.sorted-active {
     bottom: 0;
     width: 3px;
     background: #C21E56;
-    z-index: 999;
+    z-index: 100;
   }
-
-  /* refuerzo visual por si sticky lo pisa */
-  .top10 {
-    background: #0f0f0f !important;
-  }
-}
 
   /* =========================
-     UNCLE DREW SOLO BARRA
+     UNCLE DREW (BARRA NARANJA FIX)
   ========================= */
+
   .highlight-team td {
-    background: #0f0f0f !important;
+    background: #0f0f0f !important; /* elimina sombra naranja */
+  }
+
+  .highlight-team td:first-child {
+    position: relative;
   }
 
   .highlight-team td:first-child::before {
-    z-index: 20;
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #ff8c42;
+    z-index: 100;
   }
 
 }
