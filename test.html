@@ -129,10 +129,7 @@ th {
   color: #aaa;
   cursor: pointer;
   background: rgba(255,255,255,0.04);
-
-  /* 🔥 FIX MOBILE TEXT */
   white-space: nowrap;
-  font-size: 11px;
 }
 
 td {
@@ -165,26 +162,13 @@ table td:nth-child(2) {
   padding: 0 10px;
 }
 
-/* ===================== */
-/* LAST 5 (NEW CLEAN UI) */
-/* ===================== */
-
+/* STATS STYLE */
 .last5 {
   font-weight: 600;
-  letter-spacing: 1px;
-  font-size: 12px;
   white-space: nowrap;
 }
 
-/* badge look (better mobile) */
-.last5 span {
-  display: inline-block;
-  padding: 3px 6px;
-  border-radius: 6px;
-  background: rgba(255,255,255,0.06);
-}
-
-/* SORT VISUAL */
+/* SORT */
 th.sorted-asc {
   border-bottom: 2px solid #ef4444;
   color: #fff;
@@ -223,12 +207,14 @@ const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_
 let sortColumn = null;
 let sortDir = "desc";
 
+/* RESET */
 function resetSort() {
   sortColumn = null;
   sortDir = "desc";
   load();
 }
 
+/* SORT */
 function sortTable(col) {
   if (sortColumn === col) {
     sortDir = sortDir === "asc" ? "desc" : "asc";
@@ -237,6 +223,37 @@ function sortTable(col) {
     sortDir = "desc";
   }
   load();
+}
+
+/* STREAK */
+function calculateStreak(team, games) {
+  let type = null;
+  let count = 0;
+
+  for (let g of games) {
+    const teamA = g["TEAM_A"];
+    const teamB = g["TEAM_B"];
+
+    const scoreA = Number(g["SCORE_A"]) || 0;
+    const scoreB = Number(g["SCORE_B"]) || 0;
+
+    if (!teamA || !teamB) continue;
+
+    let result = null;
+
+    if (team === teamA) result = scoreA > scoreB ? "W" : "L";
+    else if (team === teamB) result = scoreB > scoreA ? "W" : "L";
+    else continue;
+
+    if (!type) {
+      type = result;
+      count = 1;
+    } else if (result === type) {
+      count++;
+    } else break;
+  }
+
+  return type ? `${type}${count}` : "";
 }
 
 /* LAST 5 */
@@ -295,6 +312,7 @@ async function load() {
   const teamKey = headers.find(h => h.includes("TEAM"));
 
   data.forEach(row => {
+    row["STREAK"] = calculateStreak(row[teamKey], games);
     row["LAST5"] = calculateLast5(row[teamKey], games);
   });
 
@@ -312,7 +330,7 @@ async function load() {
 
   let html = "<table><thead><tr>";
 
-  headers.concat(["LAST5"]).forEach(h => {
+  headers.concat(["STREAK", "LAST5"]).forEach(h => {
     const title = h === "LAST5" ? "LAST 5" : h;
     html += `<th onclick="sortTable('${h}')">${title}</th>`;
   });
@@ -328,13 +346,18 @@ async function load() {
 
     html += `<tr class="${cls}">`;
 
-    headers.concat(["LAST5"]).forEach(h => {
+    headers.concat(["STREAK", "LAST5"]).forEach(h => {
       let value = row[h] || "";
+
+      if (h === "STREAK") {
+        const color = value.startsWith("W") ? "#22c55e" : "#ef4444";
+        value = `<span style="color:${color}">${value}</span>`;
+      }
 
       if (h === "LAST5") {
         const wins = Number(value.split("-")[0]);
-
         let color = "#ef4444";
+
         if (wins >= 4) color = "#22c55e";
         else if (wins === 3) color = "#facc15";
 
