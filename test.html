@@ -217,10 +217,10 @@ th.sorted-active {
     background: #111;
   }
 
-  /* HEADER DE COLUMNAS FIJAS (más arriba que el resto) */
+  /* HEADER DE COLUMNAS FIJAS */
   thead th:first-child,
   thead th:nth-child(2) {
-    z-index: 12;
+    z-index: 13;
   }
 
   /* ========================= */
@@ -230,8 +230,11 @@ th.sorted-active {
   td:first-child {
     position: sticky;
     left: 0;
-    z-index: 8;
+    z-index: 10;
     background: #0f0f0f;
+
+    /* 🔥 SELLADO DEL GAP */
+    box-shadow: 8px 0 0 #0f0f0f;
   }
 
   /* ========================= */
@@ -241,19 +244,13 @@ th.sorted-active {
   td:nth-child(2) {
     position: sticky;
     left: 48px;
-    z-index: 8;
+    z-index: 11;
     background: #0f0f0f;
   }
 
-  /* 🔥 ESTO SOLUCIONA EL “ESPACIO TRANSPARENTE” ENTRE COLUMNAS */
-  th:first-child,
-  td:first-child {
-    box-shadow: 3px 0 0 #0f0f0f;
-  }
-
-  th:nth-child(2),
-  td:nth-child(2) {
-    box-shadow: 3px 0 0 #0f0f0f;
+  /* HEADER GAP FIX */
+  th:first-child {
+    box-shadow: 8px 0 0 #111;
   }
 
   /* ========================= */
@@ -266,7 +263,7 @@ th.sorted-active {
   .top10 td:first-child {
     position: sticky;
     left: 0;
-    z-index: 9;
+    z-index: 12;
     background: #0f0f0f;
   }
 
@@ -278,24 +275,22 @@ th.sorted-active {
     bottom: 0;
     width: 3px;
     background: #C21E56;
-    z-index: 11;
+    z-index: 14;
   }
 
   /* ========================= */
-  /* UNCLE DREW (FIX COMPLETO) */
+  /* UNCLE DREW */
   /* ========================= */
 
-  /* ❌ eliminamos transparencia */
   .highlight-team td {
     background: transparent;
   }
 
-  /* ✅ fondo sólido en columnas sticky */
   .highlight-team td:first-child {
     position: sticky;
     left: 0;
-    z-index: 9;
-    background: #0f0f0f; /* 🔥 CLAVE */
+    z-index: 12;
+    background: #0f0f0f;
   }
 
   .highlight-team td:first-child::before {
@@ -306,35 +301,38 @@ th.sorted-active {
     bottom: 0;
     width: 3px;
     background: #ff8c42;
-    z-index: 11;
+    z-index: 14;
   }
 
-.highlight-team td:nth-child(2) {
-  position: sticky;
-  left: 48px;
-  z-index: 9;
+  .highlight-team td:nth-child(2) {
+    position: sticky;
+    left: 48px;
+    z-index: 13;
 
-  background: #0f0f0f;
-  font-weight: 600;
+    background: #0f0f0f;
+    font-weight: 600;
 
-  overflow: hidden; /* 🔥 FIX CLAVE */
+    overflow: hidden;
+  }
+
+  /* capa naranja */
+  .highlight-team td:nth-child(2)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 140, 66, 0.25);
+    z-index: 0;
+  }
+
+  /* texto arriba */
+  .highlight-team td:nth-child(2) * {
+    position: relative;
+    z-index: 1;
+  }
+
 }
 
-/* capa naranja */
-.highlight-team td:nth-child(2)::after {
-  content: "";
-  position: absolute;
-  inset: 0; /* 🔥 cubre todo */
-  background: rgba(255, 140, 66, 0.25);
-  z-index: 0; /* 🔥 debajo del texto pero dentro */
-}
-
-/* texto arriba */
-.highlight-team td:nth-child(2) * {
-  position: relative;
-  z-index: 1;
-}
-
+  
 
 
 </style>
