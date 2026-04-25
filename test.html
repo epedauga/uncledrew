@@ -320,18 +320,17 @@ th.sorted-active {
   }
 
   /* capa interna para el highlight (sin romper sticky) */
-  .highlight-team td:nth-child(2) {
-  position: sticky;
-  left: 48px;
-  z-index: 9;
-
-  /* 🔥 FONDO REAL (sin transparencia) */
-  background: #3a2318; /* naranja premium */
-
-  font-weight: 600;
-}
+  .highlight-team td:nth-child(2)::after {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    background: rgba(255, 140, 66, 0.15);
+    border-radius: 6px;
+    z-index: -1;
+  }
 
 }
+
 
 
 </style>
