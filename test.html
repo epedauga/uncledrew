@@ -356,12 +356,10 @@ async function load() {
 
       if (h === "LAST5") {
         const wins = Number(value.split("-")[0]);
-        let color = "#ef4444";
 
-        if (wins >= 4) color = "#22c55e";
-        else if (wins === 3) color = "#facc15";
+        const color = wins >= 3 ? "#22c55e" : "#ef4444";
 
-        value = `<span class="last5" style="color:${color}">${value}</span>`;
+        value = `<span class="last5" style="color:${color}; font-weight:600;">${value}</span>`;
       }
 
       html += `<td>${value}</td>`;
