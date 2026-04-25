@@ -207,70 +207,58 @@ th.sorted-active {
 @media (max-width: 768px) {
 
   /* =========================
-     BASE PARA STICKY CORRECTO
+     BASE SEGURA
   ========================= */
 
   table {
     border-collapse: separate;
     border-spacing: 0;
-    table-layout: fixed; /* CLAVE para que NO se muevan columnas */
+  }
+
+  th, td {
+    background: #0f0f0f;
   }
 
   thead th {
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 10;
     background: #111 !important;
   }
 
-  td, th {
-    background: #0f0f0f;
-  }
-
   /* =========================
-     COL 1 - POSICIÓN
+     SOLO POSICIÓN FIJA
+     (NO TEAM aún para evitar ruptura)
   ========================= */
+
   table th:nth-child(1),
   table td:nth-child(1) {
     position: sticky;
     left: 0;
+    z-index: 5;
     width: 45px;
-    min-width: 45px;
-    max-width: 45px;
-    z-index: 60;
     background: #0f0f0f !important;
   }
 
   /* =========================
-     COL 2 - TEAM
+     TOP 10 FIX (NO SE PIERDE ROSA)
   ========================= */
-  table th:nth-child(2),
-  table td:nth-child(2) {
-    position: sticky;
-    left: 45px;
-    z-index: 59;
-    background: #0f0f0f !important;
-    min-width: 140px;
-    white-space: nowrap;
-  }
 
-  /* =========================
-     TOP 10 (BARRA ROSA FIJA)
-  ========================= */
   .top10 {
     background: #0f0f0f !important;
     border-left: 3px solid #C21E56 !important;
   }
 
   /* =========================
-     UNCLE DREW (SOLO BARRA)
+     UNCLE DREW SOLO BARRA
   ========================= */
+
   .highlight-team td {
     background: #0f0f0f !important;
   }
 
   .highlight-team td:first-child::before {
-    z-index: 120;
+    z-index: 20;
   }
 
 }
