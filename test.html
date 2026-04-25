@@ -204,6 +204,40 @@ th.sorted-active {
   color: #fff;
 }
 
+/* ========================= */
+/* MOBILE FIXES ONLY         */
+/* ========================= */
+@media (max-width: 768px) {
+
+  /* 1. QUITAR SOMBRA NARANJA DE UNCLE DREW */
+  .highlight-team td {
+    background: transparent !important;
+  }
+
+  /* 2. MANTENER SOLO LA BARRA LATERAL NARANJA */
+  .highlight-team td:first-child {
+    position: relative;
+    background: transparent !important;
+  }
+
+  .highlight-team td:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #ff8c42;
+    z-index: 2;
+  }
+
+  /* 3. ASEGURAR QUE TOP10 ROSA SIGA VISIBLE */
+  .top10 {
+    background: rgba(255,255,255,0.07) !important;
+    border-left: 3px solid #C21E56 !important;
+  }
+}
+
 </style>
 </head>
 
