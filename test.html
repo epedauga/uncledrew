@@ -14,7 +14,6 @@ body {
   color: #fff;
 }
 
-/* HEADER */
 .header {
   padding: 18px;
   text-align: center;
@@ -25,7 +24,6 @@ body {
 .header h1 {
   margin: 0;
   font-size: 22px;
-  letter-spacing: 1px;
 }
 
 .data-source {
@@ -34,7 +32,6 @@ body {
   opacity: 0.4;
 }
 
-/* LIVE */
 .live-indicator {
   margin-top: 6px;
   font-size: 12px;
@@ -42,20 +39,6 @@ body {
   color: #C21E56;
 }
 
-.live-indicator::before {
-  content: "●";
-  color: #C21E56;
-  margin-right: 6px;
-  animation: pulse 1.2s infinite;
-}
-
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.3; }
-  100% { opacity: 1; }
-}
-
-/* RESET */
 .reset-btn {
   margin-top: 10px;
   background: #151515;
@@ -67,7 +50,6 @@ body {
   font-size: 12px;
 }
 
-/* TICKER */
 #ticker-text {
   margin-top: 10px;
   overflow: hidden;
@@ -93,10 +75,8 @@ body {
   border-radius: 10px;
   padding: 10px;
   font-size: 12px;
-  box-shadow: 0 0 0 1px rgba(194, 30, 86, 0.35);
 }
 
-/* TABLE */
 .container {
   padding: 12px;
   max-width: 1000px;
@@ -114,7 +94,6 @@ table {
   min-width: 520px;
   background: #0f0f0f;
   border: 1px solid #222;
-  table-layout: auto;
 }
 
 thead {
@@ -125,7 +104,6 @@ th {
   padding: 6px 8px;
   font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 1px;
   color: #aaa;
   cursor: pointer;
   background: rgba(255,255,255,0.04);
@@ -143,40 +121,25 @@ tbody tr:hover {
   background: rgba(255,255,255,0.03);
 }
 
-/* TOP 10 */
 .top10 {
   background: rgba(255,255,255,0.07);
   border-left: 3px solid #C21E56;
 }
 
-/* UNCLE DREW */
 .highlight-team td {
   background: rgba(255, 140, 66, 0.14) !important;
 }
 
-/* TEAM COLUMN */
 table th:nth-child(2),
 table td:nth-child(2) {
   min-width: 120px;
   white-space: nowrap;
-  padding: 0 10px;
 }
 
-/* STATS STYLE */
+/* LAST5 limpio */
 .last5 {
-  font-weight: 600;
+  font-weight: normal;
   white-space: nowrap;
-}
-
-/* SORT */
-th.sorted-asc {
-  border-bottom: 2px solid #ef4444;
-  color: #fff;
-}
-
-th.sorted-desc {
-  border-top: 2px solid #ef4444;
-  color: #fff;
 }
 
 </style>
@@ -202,10 +165,14 @@ const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOi
 
 const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
 
-const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=868310309&single=true&output=csv";
-
 let sortColumn = null;
 let sortDir = "desc";
+
+/* CSV SAFE PARSER */
+function parseCSV(text) {
+  const lines = text.trim().split("\n");
+  return lines.map(line => line.split(","));
+}
 
 /* RESET */
 function resetSort() {
@@ -233,11 +200,8 @@ function calculateStreak(team, games) {
   for (let g of games) {
     const teamA = g["TEAM_A"];
     const teamB = g["TEAM_B"];
-
     const scoreA = Number(g["SCORE_A"]) || 0;
     const scoreB = Number(g["SCORE_B"]) || 0;
-
-    if (!teamA || !teamB) continue;
 
     let result = null;
 
@@ -256,18 +220,15 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
-/* LAST 5 */
+/* LAST5 */
 function calculateLast5(team, games) {
   let res = [];
 
   for (let g of games) {
     const teamA = g["TEAM_A"];
     const teamB = g["TEAM_B"];
-
     const scoreA = Number(g["SCORE_A"]) || 0;
     const scoreB = Number(g["SCORE_B"]) || 0;
-
-    if (!teamA || !teamB) continue;
 
     let result = null;
 
@@ -279,100 +240,79 @@ function calculateLast5(team, games) {
     if (res.length === 5) break;
   }
 
-  const wins = res.filter(r => r === "W").length;
-  const losses = res.length - wins;
-
-  return `${wins}-${losses}`;
+  return res.join("-");
 }
 
 /* LOAD */
 async function load() {
+  try {
 
-  const text = await (await fetch(URL)).text();
-  const rows = text.trim().split("\n").map(r => r.split(","));
-  const headers = rows[0].map(h => h.trim());
+    const text = await (await fetch(URL)).text();
+    const rows = parseCSV(text);
 
-  let data = rows.slice(1).map(r => {
-    let obj = {};
-    headers.forEach((h, i) => obj[h] = r[i]?.trim());
-    return obj;
-  });
+    const headers = rows[0].map(h => h.trim());
 
-  const textG = await (await fetch(GAMES_URL)).text();
-  const rowsG = textG.trim().split("\n").map(r => r.split(","));
-  const headersG = rowsG[0].map(h => h.trim());
-
-  const games = rowsG.slice(1).map(r => {
-    let obj = {};
-    headersG.forEach((h, i) => obj[h] = r[i]?.trim());
-    return obj;
-  });
-
-  const posKey = headers[0];
-  const teamKey = headers.find(h => h.includes("TEAM"));
-
-  data.forEach(row => {
-    row["STREAK"] = calculateStreak(row[teamKey], games);
-    row["LAST5"] = calculateLast5(row[teamKey], games);
-  });
-
-  if (sortColumn) {
-    data.sort((a, b) => {
-      let A = isNaN(a[sortColumn]) ? a[sortColumn] : Number(a[sortColumn]);
-      let B = isNaN(b[sortColumn]) ? b[sortColumn] : Number(b[sortColumn]);
-      return sortDir === "asc" ? A - B : B - A;
+    let data = rows.slice(1).map(r => {
+      let obj = {};
+      headers.forEach((h, i) => obj[h] = r[i]);
+      return obj;
     });
-  } else {
-    data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
-  }
 
-  const app = document.getElementById("app");
+    const textG = await (await fetch(GAMES_URL)).text();
+    const rowsG = parseCSV(textG);
+    const headersG = rowsG[0];
 
-  let html = "<table><thead><tr>";
+    const games = rowsG.slice(1).map(r => {
+      let obj = {};
+      headersG.forEach((h, i) => obj[h] = r[i]);
+      return obj;
+    });
 
-  headers.concat(["STREAK", "LAST5"]).forEach(h => {
-    const title = h === "LAST5" ? "LAST 5" : h;
-    html += `<th onclick="sortTable('${h}')">${title}</th>`;
-  });
+    const teamKey = headers.find(h => h.includes("TEAM"));
 
-  html += "</tr></thead><tbody>";
+    data.forEach(row => {
+      row["STREAK"] = calculateStreak(row[teamKey], games);
+      row["LAST5"] = calculateLast5(row[teamKey], games);
+    });
 
-  data.forEach((row, i) => {
+    const app = document.getElementById("app");
 
-    const team = row[teamKey];
-    let cls = i < 10 ? "top10" : "";
-
-    if (team?.toLowerCase() === "uncle drew") cls += " highlight-team";
-
-    html += `<tr class="${cls}">`;
+    let html = "<table><thead><tr>";
 
     headers.concat(["STREAK", "LAST5"]).forEach(h => {
-      let value = row[h] || "";
-
-      if (h === "STREAK") {
-        const color = value.startsWith("W") ? "#22c55e" : "#ef4444";
-        value = `<span style="color:${color}">${value}</span>`;
-      }
-
-      if (h === "LAST5") {
-        const wins = Number(value.split("-")[0]);
-        let color = "#ef4444";
-
-        if (wins >= 4) color = "#22c55e";
-        else if (wins === 3) color = "#facc15";
-
-        value = `<span class="last5" style="color:${color}">${value}</span>`;
-      }
-
-      html += `<td>${value}</td>`;
+      const title = h === "LAST5" ? "LAST 5" : h;
+      html += `<th onclick="sortTable('${h}')">${title}</th>`;
     });
 
-    html += "</tr>";
-  });
+    html += "</tr></thead><tbody>";
 
-  html += "</tbody></table>";
+    data.forEach((row, i) => {
 
-  app.innerHTML = html;
+      let cls = i < 10 ? "top10" : "";
+
+      html += `<tr class="${cls}">`;
+
+      headers.concat(["STREAK", "LAST5"]).forEach(h => {
+
+        let value = row[h] || "";
+
+        if (h === "LAST5") {
+          value = `<span class="last5">${value}</span>`;
+        }
+
+        html += `<td>${value}</td>`;
+      });
+
+      html += "</tr>";
+    });
+
+    html += "</tbody></table>";
+
+    app.innerHTML = html;
+
+  } catch (e) {
+    console.log("ERROR LOAD:", e);
+  }
 }
 
 load();
