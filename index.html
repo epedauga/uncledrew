@@ -161,10 +161,16 @@ table td:nth-child(2) {
   padding: 0 10px;
 }
 
-/* ===================== */
-/* SORT VISUAL (NEW)     */
-/* ===================== */
+/* LAST 5 FIX (COMPACTO) */
+table th:last-child,
+table td:last-child {
+  white-space: nowrap;
+  width: 55px;
+  max-width: 55px;
+  padding: 6px 4px;
+}
 
+/* SORT */
 th.sorted-asc {
   color: #fff;
   border-bottom: 2px solid #ef4444;
@@ -224,7 +230,6 @@ function sortTable(col) {
   }
 
   load();
-
   setTimeout(updateSortUI, 50);
 }
 
@@ -273,6 +278,36 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
+/* LAST 5 */
+function calculateLast5(team, games) {
+  let results = [];
+
+  for (let g of games) {
+    const teamA = g["TEAM_A"];
+    const teamB = g["TEAM_B"];
+
+    const scoreA = Number(g["SCORE_A"]) || 0;
+    const scoreB = Number(g["SCORE_B"]) || 0;
+
+    if (!teamA || !teamB) continue;
+
+    let result = null;
+
+    if (team === teamA) result = scoreA > scoreB ? "W" : "L";
+    else if (team === teamB) result = scoreB > scoreA ? "W" : "L";
+    else continue;
+
+    results.push(result);
+
+    if (results.length === 5) break;
+  }
+
+  const wins = results.filter(r => r === "W").length;
+  const losses = results.filter(r => r === "L").length;
+
+  return `${wins}-${losses}`;
+}
+
 /* LOAD */
 async function load() {
 
@@ -315,12 +350,14 @@ async function load() {
 
   ticker.innerHTML = `<div class="feed-wrapper">${cards}${cards}</div>`;
 
-  /* STREAK */
+  /* DATA */
   const posKey = headers[0];
   const teamKey = headers.find(h => h.includes("TEAM"));
 
   data.forEach(row => {
-    row["STREAK"] = calculateStreak(row[teamKey], games);
+    const team = row[teamKey];
+    row["STREAK"] = calculateStreak(team, games);
+    row["LAST 5"] = calculateLast5(team, games);
   });
 
   /* SORT */
@@ -339,7 +376,7 @@ async function load() {
 
   let html = "<table><thead><tr>";
 
-  headers.concat("STREAK").forEach(h => {
+  headers.concat(["STREAK", "LAST 5"]).forEach(h => {
     html += `<th onclick="sortTable('${h}')">${h}</th>`;
   });
 
@@ -356,12 +393,12 @@ async function load() {
 
     html += `<tr class="${cls}">`;
 
-    headers.concat("STREAK").forEach(h => {
+    headers.concat(["STREAK", "LAST 5"]).forEach(h => {
       let value = row[h] || "";
 
       if (h === "STREAK") {
         const color = value.startsWith("W") ? "#22c55e" : "#ef4444";
-        value = `<span style="color:${color}">${value}</span>`;
+        value = `<span style="color:${color}; font-weight:600">${value}</span>`;
       }
 
       html += `<td>${value}</td>`;
