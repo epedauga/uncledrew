@@ -161,11 +161,13 @@ table td:nth-child(2) {
   padding: 0 10px;
 }
 
-/* NO WRAP LAST COLUMN (LAST 5) */
+/* LAST 5 FIX (COMPACTO) */
 table th:last-child,
 table td:last-child {
   white-space: nowrap;
-  min-width: 70px;
+  width: 55px;
+  max-width: 55px;
+  padding: 6px 4px;
 }
 
 /* SORT */
@@ -348,7 +350,7 @@ async function load() {
 
   ticker.innerHTML = `<div class="feed-wrapper">${cards}${cards}</div>`;
 
-  /* STATS */
+  /* DATA */
   const posKey = headers[0];
   const teamKey = headers.find(h => h.includes("TEAM"));
 
@@ -393,6 +395,12 @@ async function load() {
 
     headers.concat(["STREAK", "LAST 5"]).forEach(h => {
       let value = row[h] || "";
+
+      if (h === "STREAK") {
+        const color = value.startsWith("W") ? "#22c55e" : "#ef4444";
+        value = `<span style="color:${color}; font-weight:600">${value}</span>`;
+      }
+
       html += `<td>${value}</td>`;
     });
 
