@@ -129,6 +129,7 @@ th {
   color: #aaa;
   cursor: pointer;
   background: rgba(255,255,255,0.04);
+  white-space: nowrap;
 }
 
 td {
@@ -161,7 +162,13 @@ table td:nth-child(2) {
   padding: 0 10px;
 }
 
-/* SORT VISUAL */
+/* STATS STYLE */
+.last5 {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* SORT */
 th.sorted-asc {
   border-bottom: 2px solid #ef4444;
   color: #fff;
@@ -249,7 +256,7 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
-/* LAST5 */
+/* LAST 5 */
 function calculateLast5(team, games) {
   let res = [];
 
@@ -301,26 +308,6 @@ async function load() {
     return obj;
   });
 
-  const textR = await (await fetch(RESULTS_URL)).text();
-  const results = textR.trim().split("\n").slice(1);
-
-  /* TICKER */
-  const ticker = document.getElementById("ticker-text");
-
-  const cards = results.map(r => {
-    const p = r.split(",");
-    return `
-      <div class="game-card">
-        <div>${p[0] || ""}</div>
-        <div><b>${p[1] || ""}</b> ${p[2] || ""}</div>
-        <div>${p[3] || ""}</div>
-      </div>
-    `;
-  }).join("");
-
-  ticker.innerHTML = `<div class="feed-wrapper">${cards}${cards}</div>`;
-
-  /* STATS */
   const posKey = headers[0];
   const teamKey = headers.find(h => h.includes("TEAM"));
 
@@ -329,7 +316,6 @@ async function load() {
     row["LAST5"] = calculateLast5(row[teamKey], games);
   });
 
-  /* SORT */
   if (sortColumn) {
     data.sort((a, b) => {
       let A = isNaN(a[sortColumn]) ? a[sortColumn] : Number(a[sortColumn]);
@@ -340,18 +326,13 @@ async function load() {
     data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
   }
 
-  /* TABLE */
   const app = document.getElementById("app");
 
   let html = "<table><thead><tr>";
 
   headers.concat(["STREAK", "LAST5"]).forEach(h => {
-
-    let label = h;
-
-    if (h === "LAST5") label = "LAST 5";
-
-    html += `<th onclick="sortTable('${h}')">${label}</th>`;
+    const title = h === "LAST5" ? "LAST 5" : h;
+    html += `<th onclick="sortTable('${h}')">${title}</th>`;
   });
 
   html += "</tr></thead><tbody>";
@@ -366,7 +347,6 @@ async function load() {
     html += `<tr class="${cls}">`;
 
     headers.concat(["STREAK", "LAST5"]).forEach(h => {
-
       let value = row[h] || "";
 
       if (h === "STREAK") {
@@ -381,7 +361,7 @@ async function load() {
         if (wins >= 4) color = "#22c55e";
         else if (wins === 3) color = "#facc15";
 
-        value = `<span style="color:${color}; font-weight:600;">${value}</span>`;
+        value = `<span class="last5" style="color:${color}">${value}</span>`;
       }
 
       html += `<td>${value}</td>`;
