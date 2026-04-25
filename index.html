@@ -129,7 +129,6 @@ th {
   color: #aaa;
   cursor: pointer;
   background: rgba(255,255,255,0.04);
-  white-space: nowrap;
 }
 
 td {
@@ -162,20 +161,21 @@ table td:nth-child(2) {
   padding: 0 10px;
 }
 
-/* STATS STYLE */
-.last5 {
-  font-weight: 600;
-  white-space: nowrap;
-}
+/* ===================== */
+/* SORT VISUAL (NEW)     */
+/* ===================== */
 
-/* SORT */
 th.sorted-asc {
-  border-bottom: 2px solid #ef4444;
   color: #fff;
+  border-bottom: 2px solid #ef4444;
 }
 
 th.sorted-desc {
+  color: #fff;
   border-top: 2px solid #ef4444;
+}
+
+th.sorted-active {
   color: #fff;
 }
 
@@ -222,7 +222,24 @@ function sortTable(col) {
     sortColumn = col;
     sortDir = "desc";
   }
+
   load();
+
+  setTimeout(updateSortUI, 50);
+}
+
+/* SORT UI */
+function updateSortUI() {
+  document.querySelectorAll("th").forEach(th => {
+    th.classList.remove("sorted-asc", "sorted-desc", "sorted-active");
+
+    const key = th.textContent.trim();
+
+    if (key === sortColumn) {
+      th.classList.add("sorted-active");
+      th.classList.add(sortDir === "asc" ? "sorted-asc" : "sorted-desc");
+    }
+  });
 }
 
 /* STREAK */
@@ -256,35 +273,6 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
-/* LAST 5 */
-function calculateLast5(team, games) {
-  let res = [];
-
-  for (let g of games) {
-    const teamA = g["TEAM_A"];
-    const teamB = g["TEAM_B"];
-
-    const scoreA = Number(g["SCORE_A"]) || 0;
-    const scoreB = Number(g["SCORE_B"]) || 0;
-
-    if (!teamA || !teamB) continue;
-
-    let result = null;
-
-    if (team === teamA) result = scoreA > scoreB ? "W" : "L";
-    else if (team === teamB) result = scoreB > scoreA ? "W" : "L";
-    else continue;
-
-    res.push(result);
-    if (res.length === 5) break;
-  }
-
-  const wins = res.filter(r => r === "W").length;
-  const losses = res.length - wins;
-
-  return `${wins}-${losses}`;
-}
-
 /* LOAD */
 async function load() {
 
@@ -308,14 +296,34 @@ async function load() {
     return obj;
   });
 
+  const textR = await (await fetch(RESULTS_URL)).text();
+  const results = textR.trim().split("\n").slice(1);
+
+  /* TICKER */
+  const ticker = document.getElementById("ticker-text");
+
+  const cards = results.map(r => {
+    const p = r.split(",");
+    return `
+      <div class="game-card">
+        <div>${p[0] || ""}</div>
+        <div><b>${p[1] || ""}</b> ${p[2] || ""}</div>
+        <div>${p[3] || ""}</div>
+      </div>
+    `;
+  }).join("");
+
+  ticker.innerHTML = `<div class="feed-wrapper">${cards}${cards}</div>`;
+
+  /* STREAK */
   const posKey = headers[0];
   const teamKey = headers.find(h => h.includes("TEAM"));
 
   data.forEach(row => {
     row["STREAK"] = calculateStreak(row[teamKey], games);
-    row["LAST5"] = calculateLast5(row[teamKey], games);
   });
 
+  /* SORT */
   if (sortColumn) {
     data.sort((a, b) => {
       let A = isNaN(a[sortColumn]) ? a[sortColumn] : Number(a[sortColumn]);
@@ -326,13 +334,13 @@ async function load() {
     data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
   }
 
+  /* TABLE */
   const app = document.getElementById("app");
 
   let html = "<table><thead><tr>";
 
-  headers.concat(["STREAK", "LAST5"]).forEach(h => {
-    const title = h === "LAST5" ? "LAST 5" : h;
-    html += `<th onclick="sortTable('${h}')">${title}</th>`;
+  headers.concat("STREAK").forEach(h => {
+    html += `<th onclick="sortTable('${h}')">${h}</th>`;
   });
 
   html += "</tr></thead><tbody>";
@@ -342,26 +350,18 @@ async function load() {
     const team = row[teamKey];
     let cls = i < 10 ? "top10" : "";
 
-    if (team?.toLowerCase() === "uncle drew") cls += " highlight-team";
+    if (team?.toLowerCase() === "uncle drew") {
+      cls += " highlight-team";
+    }
 
     html += `<tr class="${cls}">`;
 
-    headers.concat(["STREAK", "LAST5"]).forEach(h => {
+    headers.concat("STREAK").forEach(h => {
       let value = row[h] || "";
 
       if (h === "STREAK") {
         const color = value.startsWith("W") ? "#22c55e" : "#ef4444";
         value = `<span style="color:${color}">${value}</span>`;
-      }
-
-      if (h === "LAST5") {
-        const wins = Number(value.split("-")[0]);
-        let color = "#ef4444";
-
-        if (wins >= 4) color = "#22c55e";
-        else if (wins === 3) color = "#facc15";
-
-        value = `<span class="last5" style="color:${color}">${value}</span>`;
       }
 
       html += `<td>${value}</td>`;
@@ -373,13 +373,12 @@ async function load() {
   html += "</tbody></table>";
 
   app.innerHTML = html;
+
+  updateSortUI();
 }
 
 load();
-
-setInterval(() => {
-  load();
-}, 30000);
+setInterval(load, 30000);
 
 </script>
 
