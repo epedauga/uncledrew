@@ -207,49 +207,8 @@ th.sorted-active {
 /* ========================= */
 /* MOBILE FIXES ONLY         */
 /* ========================= */
+
 @media (max-width: 768px) {
-
- /* ========================= */
-  /* STICKY POS + TEAM MOBILE  */
-  /* ========================= */
-
-  table {
-    border-collapse: separate;
-    border-spacing: 0;
-  }
-
-  /* POSICIÓN */
-  table th:nth-child(1),
-  table td:nth-child(1) {
-    position: sticky;
-    left: 0;
-    z-index: 5;
-    background: #0f0f0f;
-  }
-
-  /* TEAM */
-  table th:nth-child(2),
-  table td:nth-child(2) {
-    position: sticky;
-    left: 55px;
-    z-index: 4;
-    background: #0f0f0f;
-
-    min-width: 120px;
-    white-space: nowrap;
-  }
-
-  /* HEADER FIX */
-  table thead th {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: #111;
-  }
-
-  td, th {
-    background-clip: padding-box;
-  }
   
   /* 1. QUITAR SOMBRA NARANJA DE UNCLE DREW */
   .highlight-team td {
