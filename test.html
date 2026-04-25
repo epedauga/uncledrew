@@ -437,13 +437,15 @@ load();
 
 let timer = setInterval(load, 30000);
 
-// pausa cuando el usuario no está viendo la pestaña
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     clearInterval(timer);
+    timer = null;
   } else {
-    load();
-    timer = setInterval(load, 30000);
+    if (!timer) {
+      load();
+      timer = setInterval(load, 30000);
+    }
   }
 });
 
