@@ -208,7 +208,7 @@ th.sorted-active {
 
   .table-wrap {
     overflow-x: auto;
-    position: relative;
+    -webkit-overflow-scrolling: touch;
   }
 
   table {
@@ -216,48 +216,47 @@ th.sorted-active {
     border-spacing: 0;
   }
 
-  /* BASE CELDAS = BLOQUES OPACOS REALES */
+  /* 🔥 base sólida para TODAS las celdas */
   table th,
   table td {
-    position: relative;
     background: #0f0f0f;
-    z-index: 1;
   }
 
   /* HEADER */
   table th {
     background: #111;
-    z-index: 50;
+    position: relative;
+    z-index: 10;
   }
 
-  /* POS STICKY */
+  /* 🧷 POS (1ra columna fija) */
   table th:first-child,
   table td:first-child {
     position: sticky;
     left: 0;
-    z-index: 100;
+    z-index: 30;
     background: #0f0f0f;
   }
 
-  /* TEAM STICKY */
+  /* 🧷 TEAM (2da columna fija) */
   table th:nth-child(2),
   table td:nth-child(2) {
     position: sticky;
     left: 45px;
-    z-index: 100;
+    z-index: 30;
     background: #0f0f0f;
 
     min-width: 120px;
     white-space: nowrap;
   }
 
-  /* 🔥 FIX CLAVE: evita “ver pasar texto detrás” */
+  /* 🔥 evita efecto “texto pasando por detrás” */
   table td:first-child,
   table td:nth-child(2) {
-    box-shadow: 8px 0 10px rgba(0,0,0,0.6);
+    box-shadow: 8px 0 12px rgba(0,0,0,0.7);
   }
 
-  /* 🟠 BAR NARANJA RESTAURADA (CORRECTA) */
+  /* 🟠 barra lateral UNCLE DREW (RESTAURADA) */
   .highlight-team td:first-child::before {
     content: "";
     position: absolute;
@@ -266,18 +265,14 @@ th.sorted-active {
     bottom: 0;
     width: 3px;
     background: #ff8c42;
-    z-index: 2;
+    z-index: 5;
   }
 
-  /* 🧼 FIX: asegurar que highlight no rompa sticky */
-  .highlight-team td {
-    background: #0f0f0f !important;
-  }
-
+  /* TOP 10 (lo dejamos igual, limpio) */
   .top10 {
-  background: rgba(255,255,255,0.06) !important;
-  border-left: 3px solid #C21E56 !important;
-}
+    background: rgba(255,255,255,0.07);
+    border-left: 3px solid #C21E56;
+  }
 }
   
 </style>
