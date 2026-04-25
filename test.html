@@ -207,7 +207,7 @@ th.sorted-active {
 @media (max-width: 768px) {
 
   /* =========================
-     BASE SEGURA
+     BASE STABLE PARA SCROLL
   ========================= */
 
   table {
@@ -227,23 +227,36 @@ th.sorted-active {
   }
 
   /* =========================
-     SOLO POSICIÓN FIJA
-     (NO TEAM aún para evitar ruptura)
+     POSICIÓN (COL 1)
   ========================= */
-
   table th:nth-child(1),
   table td:nth-child(1) {
     position: sticky;
     left: 0;
-    z-index: 5;
     width: 45px;
+    min-width: 45px;
+    max-width: 45px;
+    z-index: 5;
     background: #0f0f0f !important;
   }
 
   /* =========================
-     TOP 10 FIX (NO SE PIERDE ROSA)
+     TEAM (COL 2) ← FIJA
   ========================= */
+  table th:nth-child(2),
+  table td:nth-child(2) {
+    position: sticky;
+    left: 45px;
+    z-index: 6;
+    background: #0f0f0f !important;
 
+    min-width: 140px;
+    white-space: nowrap;
+  }
+
+  /* =========================
+     TOP 10 (NO SE ROMPE ROSA)
+  ========================= */
   .top10 {
     background: #0f0f0f !important;
     border-left: 3px solid #C21E56 !important;
@@ -252,7 +265,6 @@ th.sorted-active {
   /* =========================
      UNCLE DREW SOLO BARRA
   ========================= */
-
   .highlight-team td {
     background: #0f0f0f !important;
   }
