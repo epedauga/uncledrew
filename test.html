@@ -249,7 +249,7 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
-/* LAST5 (PRO VERSION NUMÉRICA) */
+/* LAST5 */
 function calculateLast5(team, games) {
   let res = [];
 
@@ -346,7 +346,12 @@ async function load() {
   let html = "<table><thead><tr>";
 
   headers.concat(["STREAK", "LAST5"]).forEach(h => {
-    html += `<th onclick="sortTable('${h}')">${h}</th>`;
+
+    let label = h;
+
+    if (h === "LAST5") label = "LAST 5";
+
+    html += `<th onclick="sortTable('${h}')">${label}</th>`;
   });
 
   html += "</tr></thead><tbody>";
@@ -361,6 +366,7 @@ async function load() {
     html += `<tr class="${cls}">`;
 
     headers.concat(["STREAK", "LAST5"]).forEach(h => {
+
       let value = row[h] || "";
 
       if (h === "STREAK") {
