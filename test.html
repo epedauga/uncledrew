@@ -220,7 +220,10 @@ th.sorted-active {
     border-spacing: 0;
   }
 
+  /* ===================== */
   /* BASE CELDAS */
+  /* ===================== */
+
   table th,
   table td {
     background: #0f0f0f;
@@ -228,54 +231,53 @@ th.sorted-active {
 
   table th {
     background: #111;
-    position: relative;
-    z-index: 2;
   }
 
   /* ===================== */
-  /* POS (NUMEROS) FIJOS */
+  /* POS (FIJA + BLOQUE SOLIDO) */
   /* ===================== */
 
   table th:first-child,
   table td:first-child {
     position: sticky;
     left: 0;
-    z-index: 50;
-    background: #0f0f0f;
+    z-index: 60;
+
+    background: #0a0a0a;
   }
 
   /* ===================== */
-  /* TEAM FIJO */
+  /* TEAM (FIJA + BLOQUE SOLIDO) */
   /* ===================== */
 
   table th:nth-child(2),
   table td:nth-child(2) {
     position: sticky;
     left: 45px;
-    z-index: 50;
-    background: #0f0f0f;
+    z-index: 60;
 
+    background: #0a0a0a;
     min-width: 120px;
     white-space: nowrap;
   }
 
-  /* evita “texto pasando por atrás” */
+  /* separación real entre columnas (sin “ver fondo”) */
   table td:first-child,
   table td:nth-child(2) {
-    box-shadow: 10px 0 14px rgba(0,0,0,0.65);
+    box-shadow: 12px 0 18px rgba(0,0,0,0.8);
   }
 
   /* ===================== */
-  /* TOP 10 ROSA (NO SE PIERDE) */
+  /* TOP 10 (ROSAAAA FIX REAL) */
   /* ===================== */
 
   .top10 {
-    background: rgba(255,255,255,0.07) !important;
+    background: #141414 !important;
     border-left: 3px solid #C21E56 !important;
   }
 
   /* ===================== */
-  /* UNCLE DREW (NO PIERDE NARANJA) */
+  /* UNCLE DREW (NARANJA SIEMPRE VISIBLE) */
   /* ===================== */
 
   .highlight-team td {
@@ -285,7 +287,7 @@ th.sorted-active {
   .highlight-team td:first-child {
     position: sticky;
     left: 0;
-    z-index: 80;
+    z-index: 90;
   }
 
   .highlight-team td:first-child::before {
