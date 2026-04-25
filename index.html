@@ -32,7 +32,6 @@ body {
   margin-top: 4px;
   font-size: 11px;
   opacity: 0.4;
-  letter-spacing: 0.2px;
 }
 
 /* LIVE */
@@ -72,7 +71,6 @@ body {
 #ticker-text {
   margin-top: 10px;
   overflow: hidden;
-  position: relative;
   padding: 10px 0;
   border-top: 1px solid #1c1c1c;
 }
@@ -93,9 +91,8 @@ body {
   min-width: 220px;
   background: #151515;
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 10px;
   font-size: 12px;
-  line-height: 1.4;
   box-shadow: 0 0 0 1px rgba(194, 30, 86, 0.35);
 }
 
@@ -117,8 +114,6 @@ table {
   min-width: 520px;
   background: #0f0f0f;
   border: 1px solid #222;
-  border-radius: 10px;
-  overflow: hidden;
   table-layout: auto;
 }
 
@@ -129,12 +124,11 @@ thead {
 th {
   padding: 6px 8px;
   font-size: 12px;
-  text-align: center;
   text-transform: uppercase;
   letter-spacing: 1px;
-  background: rgba(255,255,255,0.04);
   color: #aaa;
   cursor: pointer;
+  background: rgba(255,255,255,0.04);
 }
 
 td {
@@ -159,20 +153,30 @@ tbody tr:hover {
   background: rgba(255, 140, 66, 0.14) !important;
 }
 
-.highlight-team td:first-child {
-  border-left: 4px solid #ff8c42;
-}
-
-/* ========================= */
-/* FIX TEAM COLUMN (FINAL)   */
-/* ========================= */
-
+/* TEAM COLUMN */
 table th:nth-child(2),
 table td:nth-child(2) {
   min-width: 120px;
   white-space: nowrap;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding: 0 10px;
+}
+
+/* ===================== */
+/* SORT VISUAL (NEW)     */
+/* ===================== */
+
+th.sorted-asc {
+  color: #fff;
+  border-bottom: 2px solid #22c55e;
+}
+
+th.sorted-desc {
+  color: #fff;
+  border-top: 2px solid #ef4444;
+}
+
+th.sorted-active {
+  color: #fff;
 }
 
 </style>
@@ -182,20 +186,14 @@ table td:nth-child(2) {
 
 <div class="header">
   <h1>STANDINGS</h1>
-
   <div class="data-source">Data source: Google Sheets</div>
-
   <div class="live-indicator">LIVE</div>
-
   <button class="reset-btn" onclick="resetSort()">Reset order</button>
-
   <div id="ticker-text">Cargando resultados...</div>
 </div>
 
 <div class="container">
-  <div class="table-wrap" id="app">
-    <div class="loading">Cargando standings...</div>
-  </div>
+  <div class="table-wrap" id="app"></div>
 </div>
 
 <script>
@@ -209,12 +207,14 @@ const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_
 let sortColumn = null;
 let sortDir = "desc";
 
+/* RESET */
 function resetSort() {
   sortColumn = null;
   sortDir = "desc";
   load();
 }
 
+/* SORT */
 function sortTable(col) {
   if (sortColumn === col) {
     sortDir = sortDir === "asc" ? "desc" : "asc";
@@ -222,9 +222,27 @@ function sortTable(col) {
     sortColumn = col;
     sortDir = "desc";
   }
+
   load();
+
+  setTimeout(updateSortUI, 50);
 }
 
+/* SORT UI */
+function updateSortUI() {
+  document.querySelectorAll("th").forEach(th => {
+    th.classList.remove("sorted-asc", "sorted-desc", "sorted-active");
+
+    const key = th.textContent.trim();
+
+    if (key === sortColumn) {
+      th.classList.add("sorted-active");
+      th.classList.add(sortDir === "asc" ? "sorted-asc" : "sorted-desc");
+    }
+  });
+}
+
+/* STREAK */
 function calculateStreak(team, games) {
   let type = null;
   let count = 0;
@@ -255,16 +273,11 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
-function smartValue(v) {
-  if (!isNaN(v)) return Number(v);
-  return v || "";
-}
-
+/* LOAD */
 async function load() {
 
   const text = await (await fetch(URL)).text();
   const rows = text.trim().split("\n").map(r => r.split(","));
-
   const headers = rows[0].map(h => h.trim());
 
   let data = rows.slice(1).map(r => {
@@ -275,7 +288,6 @@ async function load() {
 
   const textG = await (await fetch(GAMES_URL)).text();
   const rowsG = textG.trim().split("\n").map(r => r.split(","));
-
   const headersG = rowsG[0].map(h => h.trim());
 
   const games = rowsG.slice(1).map(r => {
@@ -287,6 +299,7 @@ async function load() {
   const textR = await (await fetch(RESULTS_URL)).text();
   const results = textR.trim().split("\n").slice(1);
 
+  /* TICKER */
   const ticker = document.getElementById("ticker-text");
 
   const cards = results.map(r => {
@@ -300,13 +313,9 @@ async function load() {
     `;
   }).join("");
 
-  ticker.innerHTML = `
-    <div class="feed-wrapper">
-      ${cards}
-      ${cards}
-    </div>
-  `;
+  ticker.innerHTML = `<div class="feed-wrapper">${cards}${cards}</div>`;
 
+  /* STREAK */
   const posKey = headers[0];
   const teamKey = headers.find(h => h.includes("TEAM"));
 
@@ -314,17 +323,18 @@ async function load() {
     row["STREAK"] = calculateStreak(row[teamKey], games);
   });
 
+  /* SORT */
   if (sortColumn) {
     data.sort((a, b) => {
-      let A = smartValue(a[sortColumn]);
-      let B = smartValue(b[sortColumn]);
-
+      let A = isNaN(a[sortColumn]) ? a[sortColumn] : Number(a[sortColumn]);
+      let B = isNaN(b[sortColumn]) ? b[sortColumn] : Number(b[sortColumn]);
       return sortDir === "asc" ? A - B : B - A;
     });
   } else {
     data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
   }
 
+  /* TABLE */
   const app = document.getElementById("app");
 
   let html = "<table><thead><tr>";
@@ -338,7 +348,6 @@ async function load() {
   data.forEach((row, i) => {
 
     const team = row[teamKey];
-
     let cls = i < 10 ? "top10" : "";
 
     if (team?.toLowerCase() === "uncle drew") {
@@ -364,13 +373,12 @@ async function load() {
   html += "</tbody></table>";
 
   app.innerHTML = html;
+
+  updateSortUI();
 }
 
 load();
-
-setInterval(() => {
-  load();
-}, 30000);
+setInterval(load, 30000);
 
 </script>
 
