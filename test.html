@@ -208,57 +208,61 @@ th.sorted-active {
 @media (max-width: 768px) {
 
   /* ========================= */
-  /* HEADER (FIJO ARRIBA) */
+  /* HEADER */
   /* ========================= */
   thead th {
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 20;
     background: #111;
   }
 
-  /* columnas fijas del header por encima */
-  thead th:first-child,
-  thead th:nth-child(2) {
-    z-index: 12;
+  /* ========================= */
+  /* FIJAR ANCHOS (CLAVE REAL) */
+  /* ========================= */
+
+  /* columna posición */
+  th:first-child,
+  td:first-child {
+    width: 56px;
+    min-width: 56px;
+    max-width: 56px;
+  }
+
+  /* columna TEAM */
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 140px;
+    min-width: 140px;
+    max-width: 140px;
   }
 
   /* ========================= */
-  /* COLUMNA POSICIÓN */
+  /* STICKY REAL */
   /* ========================= */
+
   th:first-child,
   td:first-child {
     position: sticky;
     left: 0;
-    z-index: 8;
+    z-index: 15;
     background: #0f0f0f;
-
   }
 
-  /* ========================= */
-  /* COLUMNA TEAM */
-  /* ========================= */
   th:nth-child(2),
   td:nth-child(2) {
     position: sticky;
-    left: 48px; /* ajustar si hace falta */
-    z-index: 8;
+    left: 56px; /* EXACTO = ancho columna 1 */
+    z-index: 15;
     background: #0f0f0f;
-  
   }
 
   /* ========================= */
-  /* TOP 10 (sin fondo, con barra) */
+  /* TOP 10 */
   /* ========================= */
+
   .top10 {
     background: transparent !important;
-  }
-
-  .top10 td:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 9;
-    background: #0f0f0f;
   }
 
   .top10 td:first-child::before {
@@ -269,68 +273,29 @@ th.sorted-active {
     bottom: 0;
     width: 3px;
     background: #C21E56;
-    z-index: 11;
   }
 
- /* UNCLE DREW LIMPIO Y ESTABLE */
-.highlight-team td {
-  background: transparent !important;
-}
+  /* ========================= */
+  /* UNCLE DREW (SIN BUGS) */
+  /* ========================= */
 
-.highlight-team td:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 9;
-  background: #0f0f0f;
-}
-
-.highlight-team td:first-child::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: #ff8c42;
-}
-
-/* 🔥 SIN pseudo elementos raros */
-.highlight-team td:nth-child(2) {
-  position: sticky;
-  left: 52px;
-  z-index: 9;
-  background: rgba(255, 140, 66, 0.18); /* directo */
-  font-weight: 600;
-}
-
-  /* TEAM (clave anti-bleed) */
-  .highlight-team td:nth-child(2) {
-    position: sticky;
-    left: 52px;
-    z-index: 9;
-
-    /* fondo sólido real */
-    background: #0f0f0f;
-
-    /* evita que contenido se meta */
-    overflow: hidden;
+  .highlight-team td {
+    background: transparent !important;
   }
 
-  /* highlight naranja limpio */
-  .highlight-team td:nth-child(2)::before {
+  .highlight-team td:first-child::before {
     content: "";
     position: absolute;
-    inset: 2px;
-    background: rgba(255, 140, 66, 0.18);
-    border-radius: 6px;
-    z-index: 1;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #ff8c42;
   }
 
-  /* texto siempre arriba */
-  .highlight-team td:nth-child(2),
-  .highlight-team td:nth-child(2) * {
-    position: relative;
-    z-index: 2;
+  .highlight-team td:nth-child(2) {
+    background: rgba(255, 140, 66, 0.18);
+    font-weight: 600;
   }
 
 }
