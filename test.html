@@ -208,7 +208,7 @@ th.sorted-active {
 @media (max-width: 768px) {
 
   /* ========================= */
-  /* HEADER (SIEMPRE ARRIBA DE TODO) */
+  /* HEADER (SIEMPRE ARRIBA) */
   /* ========================= */
   thead th {
     position: sticky;
@@ -217,7 +217,6 @@ th.sorted-active {
     background: #111;
   }
 
-  /* HEADER DE COLUMNAS FIJAS (más arriba que el resto) */
   thead th:first-child,
   thead th:nth-child(2) {
     z-index: 12;
@@ -232,6 +231,9 @@ th.sorted-active {
     left: 0;
     z-index: 8;
     background: #0f0f0f;
+
+    /* 🔥 elimina gap visual */
+    box-shadow: 6px 0 0 #0f0f0f;
   }
 
   /* ========================= */
@@ -240,20 +242,12 @@ th.sorted-active {
   th:nth-child(2),
   td:nth-child(2) {
     position: sticky;
-    left: 48px;
+    left: 48px; /* ajustar si hace falta */
     z-index: 8;
     background: #0f0f0f;
-  }
 
-  /* 🔥 ESTO SOLUCIONA EL “ESPACIO TRANSPARENTE” ENTRE COLUMNAS */
-  th:first-child,
-  td:first-child {
-    box-shadow: 3px 0 0 #0f0f0f;
-  }
-
-  th:nth-child(2),
-  td:nth-child(2) {
-    box-shadow: 3px 0 0 #0f0f0f;
+    /* 🔥 elimina gap visual */
+    box-shadow: 6px 0 0 #0f0f0f;
   }
 
   /* ========================= */
@@ -282,20 +276,19 @@ th.sorted-active {
   }
 
   /* ========================= */
-  /* UNCLE DREW (FIX COMPLETO) */
+  /* UNCLE DREW (FIX FINAL REAL) */
   /* ========================= */
 
-  /* ❌ eliminamos transparencia */
   .highlight-team td {
     background: transparent !important;
   }
 
-  /* ✅ fondo sólido en columnas sticky */
+  /* columna posición (naranja) */
   .highlight-team td:first-child {
     position: sticky;
     left: 0;
     z-index: 9;
-    background: #0f0f0f; /* 🔥 CLAVE */
+    background: #0f0f0f;
   }
 
   .highlight-team td:first-child::before {
@@ -309,24 +302,30 @@ th.sorted-active {
     z-index: 11;
   }
 
-  /* 🔥 ESTE ERA TU BUG PRINCIPAL */
+  /* 🔥 TEAM SIN BLEED */
   .highlight-team td:nth-child(2) {
     position: sticky;
     left: 48px;
     z-index: 9;
 
-    /* fondo sólido + highlight */
+    /* capa sólida REAL */
     background: #0f0f0f;
   }
 
-  /* capa interna para el highlight (sin romper sticky) */
+  /* capa naranja encima (visual) */
   .highlight-team td:nth-child(2)::after {
     content: "";
     position: absolute;
-    inset: 2px;
-    background: rgba(255, 140, 66, 0.15);
+    inset: 0;
+    background: rgba(255, 140, 66, 0.18);
     border-radius: 6px;
-    z-index: -1;
+    z-index: 1;
+  }
+
+  /* texto siempre limpio arriba */
+  .highlight-team td:nth-child(2) * {
+    position: relative;
+    z-index: 2;
   }
 
 }
