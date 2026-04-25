@@ -309,32 +309,30 @@ th.sorted-active {
     z-index: 11;
   }
 
- .highlight-team td:nth-child(2) {
+.highlight-team td:nth-child(2) {
   position: sticky;
   left: 48px;
   z-index: 9;
 
-  /* 🔥 FONDO REAL (bloquea lo de atrás) */
   background: #0f0f0f;
-
   font-weight: 600;
-  position: sticky;
+
+  overflow: hidden; /* 🔥 FIX CLAVE */
 }
 
-/* 🟧 CAPA NARANJA ARRIBA (sin romper fondo) */
+/* capa naranja */
 .highlight-team td:nth-child(2)::after {
   content: "";
   position: absolute;
-  inset: 2px;
-  background: rgba(255, 140, 66, 0.25); /* más visible */
-  border-radius: 6px;
-  z-index: 1;
+  inset: 0; /* 🔥 cubre todo */
+  background: rgba(255, 140, 66, 0.25);
+  z-index: 0; /* 🔥 debajo del texto pero dentro */
 }
 
-/* 🔥 TEXTO SIEMPRE ARRIBA */
+/* texto arriba */
 .highlight-team td:nth-child(2) * {
   position: relative;
-  z-index: 2;
+  z-index: 1;
 }
 
 
