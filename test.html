@@ -249,7 +249,7 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
-/* ⭐ LAST 5 */
+/* ⭐ LAST5 MEJOR VERSION */
 function calculateLast5(team, games) {
   let res = [];
 
@@ -272,7 +272,9 @@ function calculateLast5(team, games) {
     if (res.length === 5) break;
   }
 
-  return res.join("");
+  const wins = res.filter(r => r === "W").length;
+
+  return `${wins}-${res.length - wins} (${res.join("")})`;
 }
 
 /* LOAD */
@@ -323,7 +325,7 @@ async function load() {
 
   data.forEach(row => {
     row["STREAK"] = calculateStreak(row[teamKey], games);
-    row["LAST 5"] = calculateLast5(row[teamKey], games);
+    row["LAST5"] = calculateLast5(row[teamKey], games);
   });
 
   /* SORT */
@@ -342,7 +344,7 @@ async function load() {
 
   let html = "<table><thead><tr>";
 
-  headers.concat(["STREAK", "LAST 5"]).forEach(h => {
+  headers.concat(["STREAK", "LAST5"]).forEach(h => {
     html += `<th onclick="sortTable('${h}')">${h}</th>`;
   });
 
@@ -357,7 +359,7 @@ async function load() {
 
     html += `<tr class="${cls}">`;
 
-    headers.concat(["STREAK", "LAST 5"]).forEach(h => {
+    headers.concat(["STREAK", "LAST5"]).forEach(h => {
       let value = row[h] || "";
 
       if (h === "STREAK") {
@@ -366,9 +368,7 @@ async function load() {
       }
 
       if (h === "LAST5") {
-        value = value.split("").map(r =>
-          `<span style="color:${r === "W" ? "#22c55e" : "#ef4444"}">${r}</span>`
-        ).join(" ");
+        value = `<span>${value}</span>`;
       }
 
       html += `<td>${value}</td>`;
@@ -383,10 +383,7 @@ async function load() {
 }
 
 load();
-
-setInterval(() => {
-  load();
-}, 30000);
+setInterval(load, 30000);
 
 </script>
 
