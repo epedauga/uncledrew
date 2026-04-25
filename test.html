@@ -34,6 +34,7 @@ body {
   opacity: 0.4;
 }
 
+/* LIVE */
 .live-indicator {
   margin-top: 6px;
   font-size: 12px;
@@ -41,6 +42,20 @@ body {
   color: #C21E56;
 }
 
+.live-indicator::before {
+  content: "●";
+  color: #C21E56;
+  margin-right: 6px;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+/* RESET */
 .reset-btn {
   margin-top: 10px;
   background: #151515;
@@ -50,6 +65,35 @@ body {
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
+}
+
+/* TICKER */
+#ticker-text {
+  margin-top: 10px;
+  overflow: hidden;
+  padding: 10px 0;
+  border-top: 1px solid #1c1c1c;
+}
+
+.feed-wrapper {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  animation: scrollX 80s linear infinite;
+}
+
+@keyframes scrollX {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.game-card {
+  min-width: 220px;
+  background: #151515;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 12px;
+  box-shadow: 0 0 0 1px rgba(194, 30, 86, 0.35);
 }
 
 /* TABLE */
@@ -81,6 +125,7 @@ th {
   padding: 6px 8px;
   font-size: 12px;
   text-transform: uppercase;
+  letter-spacing: 1px;
   color: #aaa;
   cursor: pointer;
   background: rgba(255,255,255,0.04);
@@ -98,12 +143,40 @@ tbody tr:hover {
   background: rgba(255,255,255,0.03);
 }
 
+/* TOP 10 */
 .top10 {
   background: rgba(255,255,255,0.07);
+  border-left: 3px solid #C21E56;
 }
 
+/* UNCLE DREW */
 .highlight-team td {
   background: rgba(255, 140, 66, 0.14) !important;
+}
+
+/* TEAM COLUMN */
+table th:nth-child(2),
+table td:nth-child(2) {
+  min-width: 120px;
+  white-space: nowrap;
+  padding: 0 10px;
+}
+
+/* STATS STYLE */
+.last5 {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* SORT */
+th.sorted-asc {
+  border-bottom: 2px solid #ef4444;
+  color: #fff;
+}
+
+th.sorted-desc {
+  border-top: 2px solid #ef4444;
+  color: #fff;
 }
 
 </style>
@@ -116,10 +189,11 @@ tbody tr:hover {
   <div class="data-source">Data source: Google Sheets</div>
   <div class="live-indicator">LIVE</div>
   <button class="reset-btn" onclick="resetSort()">Reset order</button>
+  <div id="ticker-text">Cargando resultados...</div>
 </div>
 
 <div class="container">
-  <div class="table-wrap" id="app">Cargando...</div>
+  <div class="table-wrap" id="app"></div>
 </div>
 
 <script>
@@ -128,21 +202,26 @@ const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOi
 
 const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
 
+const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=868310309&single=true&output=csv";
+
 let sortColumn = null;
 let sortDir = "desc";
-
-/* FIX CSV (ESTO ES LO QUE TE ROMPÍA TODO) */
-function parseCSV(text) {
-  return text
-    .trim()
-    .split("\n")
-    .map(row => row.split(",").map(v => v.trim()));
-}
 
 /* RESET */
 function resetSort() {
   sortColumn = null;
   sortDir = "desc";
+  load();
+}
+
+/* SORT */
+function sortTable(col) {
+  if (sortColumn === col) {
+    sortDir = sortDir === "asc" ? "desc" : "asc";
+  } else {
+    sortColumn = col;
+    sortDir = "desc";
+  }
   load();
 }
 
@@ -177,7 +256,7 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
-/* LAST 5 SIMPLE (SIN COLORES) */
+/* LAST 5 */
 function calculateLast5(team, games) {
   let res = [];
 
@@ -210,24 +289,22 @@ function calculateLast5(team, games) {
 async function load() {
 
   const text = await (await fetch(URL)).text();
-  const rows = parseCSV(text);
-
-  const headers = rows[0];
+  const rows = text.trim().split("\n").map(r => r.split(","));
+  const headers = rows[0].map(h => h.trim());
 
   let data = rows.slice(1).map(r => {
     let obj = {};
-    headers.forEach((h, i) => obj[h] = r[i] || "");
+    headers.forEach((h, i) => obj[h] = r[i]?.trim());
     return obj;
   });
 
   const textG = await (await fetch(GAMES_URL)).text();
-  const rowsG = parseCSV(textG);
-
-  const headersG = rowsG[0];
+  const rowsG = textG.trim().split("\n").map(r => r.split(","));
+  const headersG = rowsG[0].map(h => h.trim());
 
   const games = rowsG.slice(1).map(r => {
     let obj = {};
-    headersG.forEach((h, i) => obj[h] = r[i] || "");
+    headersG.forEach((h, i) => obj[h] = r[i]?.trim());
     return obj;
   });
 
@@ -271,6 +348,22 @@ async function load() {
 
     headers.concat(["STREAK", "LAST5"]).forEach(h => {
       let value = row[h] || "";
+
+      if (h === "STREAK") {
+        const color = value.startsWith("W") ? "#22c55e" : "#ef4444";
+        value = `<span style="color:${color}">${value}</span>`;
+      }
+
+      if (h === "LAST5") {
+        const wins = Number(value.split("-")[0]);
+        let color = "#ef4444";
+
+        if (wins >= 4) color = "#22c55e";
+        else if (wins === 3) color = "#facc15";
+
+        value = `<span class="last5" style="color:${color}">${value}</span>`;
+      }
+
       html += `<td>${value}</td>`;
     });
 
