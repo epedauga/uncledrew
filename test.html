@@ -240,18 +240,26 @@ th.sorted-active {
   /* ========================= */
   /* COLUMNA TEAM */
   /* ========================= */
-  th:nth-child(2),
-  td:nth-child(2) {
-    position: sticky;
-    left: 45px;
-    z-index: 11;
-    background: #0f0f0f;
-  }
+ td:nth-child(2),
+th:nth-child(2) {
+  position: sticky;
+  left: 45px;
+  z-index: 11;
+  background: #0f0f0f;
+}
 
-  /* HEADER GAP FIX */
-  th:first-child {
-    box-shadow: 6px 0 0 #111;
-  }
+/* 🔥 ESTE ES EL FIX REAL */
+td:nth-child(2)::before,
+th:nth-child(2)::before {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #0f0f0f;
+  z-index: 12;
+}
 
   /* ========================= */
   /* TOP 10 */
