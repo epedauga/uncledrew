@@ -301,16 +301,17 @@ th:nth-child(2)::before {
     background: #0f0f0f;
   }
 
-  .highlight-team td:first-child::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: #ff8c42;
-    z-index: 14;
-  }
+ /* 🔥 GAP FIX SOLO PARA UNCLE DREW */
+.highlight-team td:nth-child(2)::before {
+  content: "";
+  position: absolute;
+  left: -7px;   /* mismo valor que ya encontraste */
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: rgba(255, 140, 66, 0.25); /* MISMO naranja */
+  z-index: 1;
+}
 
   .highlight-team td:nth-child(2) {
     position: sticky;
