@@ -203,8 +203,9 @@ th.sorted-active {
 }
 
 /* =========================
-   MOBILE FIX REAL
+   MOBILE FIX REAL (ESTABLE)
 ========================= */
+
 @media (max-width: 768px) {
 
   table {
@@ -221,7 +222,7 @@ th.sorted-active {
   table td:nth-child(1) {
     position: sticky;
     left: 0;
-    z-index: 30;
+    z-index: 50;
     width: 45px;
     min-width: 45px;
     max-width: 45px;
@@ -232,31 +233,40 @@ th.sorted-active {
   table td:nth-child(2) {
     position: sticky;
     left: 45px;
-    z-index: 31;
+    z-index: 60;
     min-width: 140px;
     white-space: nowrap;
     background: #0f0f0f !important;
-    box-shadow: 10px 0 15px rgba(0,0,0,0.35);
+    box-shadow: 8px 0 10px rgba(0,0,0,0.6);
   }
 
-  /* EVITA TEXTO POR DEBAJO */
+  /* evita que el scroll “se vea por debajo” */
   tbody td {
     position: relative;
   }
 
-  /* TOP 10 BAR ROSA FORZADA */
+  /* TOP 10 BAR ROSA SIEMPRE VISIBLE */
   .top10 td:first-child {
     position: relative;
   }
 
-  .top10 td:first-child::before {
-    z-index: 50;
+  .top10 td:first-child::before,
+  .top10 td:first-child::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #C21E56;
+    z-index: 100;
   }
 
-  /* UNCLE SIN SOMBRA EXTRA */
+  /* UNCLE DREW SIN SOMBRA EXTRA */
   .highlight-team td {
     box-shadow: none !important;
   }
+
 }
 
 </style>
@@ -278,7 +288,7 @@ th.sorted-active {
 
 <script>
 
-/* ====== TU JS SIN TOCAR ====== */
+/* ===== TU JS SIN TOCAR ===== */
 
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
@@ -305,28 +315,28 @@ function sortTable(col){
   load();
 }
 
-function calculateStreak(team, games){
-  let type=null,count=0;
+function calculateStreak(team,games){
+  let t=null,c=0;
   for(let g of games){
-    const A=g["TEAM_A"],B=g["TEAM_B"];
-    const SA=+g["SCORE_A"]||0,SB=+g["SCORE_B"]||0;
+    const A=g.TEAM_A,B=g.TEAM_B;
+    const SA=+g.SCORE_A||0,SB=+g.SCORE_B||0;
     if(!A||!B) continue;
     let r=null;
     if(team===A) r=SA>SB?"W":"L";
     else if(team===B) r=SB>SA?"W":"L";
     else continue;
-    if(!type){type=r;count=1;}
-    else if(r===type) count++;
+    if(!t){t=r;c=1;}
+    else if(r===t)c++;
     else break;
   }
-  return type?`${type}${count}`:"";
+  return t?`${t}${c}`:"";
 }
 
 function calculateLast5(team,games){
   let r=[];
   for(let g of games){
-    const A=g["TEAM_A"],B=g["TEAM_B"];
-    const SA=+g["SCORE_A"]||0,SB=+g["SCORE_B"]||0;
+    const A=g.TEAM_A,B=g.TEAM_B;
+    const SA=+g.SCORE_A||0,SB=+g.SCORE_B||0;
     if(!A||!B) continue;
     let res=null;
     if(team===A) res=SA>SB?"W":"L";
@@ -357,13 +367,10 @@ async function load(){
       return {TEAM_A:s[0],TEAM_B:s[1],SCORE_A:s[2],SCORE_B:s[3]};
     });
 
-  const results = (await (await fetch(RESULTS_URL)).text())
-    .trim().split("\n").slice(1);
-
   const teamKey=headers.find(h=>h.includes("TEAM"));
 
   data.forEach(r=>{
-    r["STREAK"]=calculateStreak(r[teamKey],games);
+    r.STREAK=calculateStreak(r[teamKey],games);
     r["LAST 5"]=calculateLast5(r[teamKey],games);
   });
 
@@ -378,7 +385,6 @@ async function load(){
   html+="</tr></thead><tbody>";
 
   data.forEach((r,i)=>{
-
     const team=r[teamKey];
     let cls=i<10?"top10":"";
     if(team?.toLowerCase()==="uncle drew") cls+=" highlight-team";
