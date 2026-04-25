@@ -32,16 +32,14 @@ body {
   margin-top: 4px;
   font-size: 11px;
   opacity: 0.4;
-  letter-spacing: 0.2px;
 }
 
-/* 🔴 LIVE INDICATOR (PRO) */
+/* LIVE */
 .live-indicator {
   margin-top: 6px;
   font-size: 12px;
   font-weight: 600;
   color: #C21E56;
-  letter-spacing: 0.5px;
 }
 
 .live-indicator::before {
@@ -57,7 +55,7 @@ body {
   100% { opacity: 1; }
 }
 
-/* RESET BUTTON */
+/* RESET */
 .reset-btn {
   margin-top: 10px;
   background: #151515;
@@ -69,16 +67,10 @@ body {
   font-size: 12px;
 }
 
-.reset-btn:hover {
-  color: #fff;
-  border-color: #333;
-}
-
 /* TICKER */
 #ticker-text {
   margin-top: 10px;
   overflow: hidden;
-  position: relative;
   padding: 10px 0;
   border-top: 1px solid #1c1c1c;
 }
@@ -95,36 +87,22 @@ body {
   100% { transform: translateX(-50%); }
 }
 
-/* GAME CARD */
 .game-card {
   min-width: 220px;
   background: #151515;
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 10px;
   font-size: 12px;
-  line-height: 1.4;
-
   box-shadow: 0 0 0 1px rgba(194, 30, 86, 0.35);
 }
 
-.game-card:hover {
-  background: #1c1c1c;
-  box-shadow: 0 0 0 1px rgba(194, 30, 86, 0.6);
-}
-
-.game-card div:first-child {
-  opacity: 0.6;
-  font-size: 11px;
-}
-
-/* CONTAINER */
+/* TABLE */
 .container {
   padding: 12px;
   max-width: 1000px;
   margin: auto;
 }
 
-/* TABLE */
 .table-wrap {
   overflow-x: auto;
   border-radius: 12px;
@@ -136,8 +114,7 @@ table {
   min-width: 520px;
   background: #0f0f0f;
   border: 1px solid #222;
-  border-radius: 10px;
-  overflow: hidden;
+  table-layout: auto;
 }
 
 thead {
@@ -147,17 +124,11 @@ thead {
 th {
   padding: 6px 8px;
   font-size: 12px;
-  text-align: center;
   text-transform: uppercase;
   letter-spacing: 1px;
-  background: rgba(255,255,255,0.04);
   color: #aaa;
   cursor: pointer;
-}
-
-th:hover {
-  background: rgba(255,255,255,0.06);
-  color: #fff;
+  background: rgba(255,255,255,0.04);
 }
 
 td {
@@ -182,17 +153,30 @@ tbody tr:hover {
   background: rgba(255, 140, 66, 0.14) !important;
 }
 
-.highlight-team td:first-child {
-  border-left: 4px solid #ff8c42;
+/* TEAM COLUMN */
+table th:nth-child(2),
+table td:nth-child(2) {
+  min-width: 120px;
+  white-space: nowrap;
+  padding: 0 10px;
 }
 
-.highlight-team td:nth-child(2) {
-  font-weight: 700;
+/* ===================== */
+/* SORT VISUAL (NEW)     */
+/* ===================== */
+
+th.sorted-asc {
   color: #fff;
+  border-bottom: 2px solid #ef4444;
 }
 
-.highlight-team {
-  box-shadow: inset 0 0 0 1px rgba(255, 140, 66, 0.35);
+th.sorted-desc {
+  color: #fff;
+  border-top: 2px solid #ef4444;
+}
+
+th.sorted-active {
+  color: #fff;
 }
 
 </style>
@@ -202,28 +186,18 @@ tbody tr:hover {
 
 <div class="header">
   <h1>STANDINGS</h1>
-
-  <div class="data-source">
-  Data source: Google Sheets
-</div>
-
-  <!-- 🔴 LIVE INDICATOR -->
+  <div class="data-source">Data source: Google Sheets</div>
   <div class="live-indicator">LIVE</div>
-
   <button class="reset-btn" onclick="resetSort()">Reset order</button>
-
   <div id="ticker-text">Cargando resultados...</div>
 </div>
 
 <div class="container">
-  <div class="table-wrap" id="app">
-    <div class="loading">Cargando standings...</div>
-  </div>
+  <div class="table-wrap" id="app"></div>
 </div>
 
 <script>
 
-/* LINKS */
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
 const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
@@ -248,7 +222,24 @@ function sortTable(col) {
     sortColumn = col;
     sortDir = "desc";
   }
+
   load();
+
+  setTimeout(updateSortUI, 50);
+}
+
+/* SORT UI */
+function updateSortUI() {
+  document.querySelectorAll("th").forEach(th => {
+    th.classList.remove("sorted-asc", "sorted-desc", "sorted-active");
+
+    const key = th.textContent.trim();
+
+    if (key === sortColumn) {
+      th.classList.add("sorted-active");
+      th.classList.add(sortDir === "asc" ? "sorted-asc" : "sorted-desc");
+    }
+  });
 }
 
 /* STREAK */
@@ -257,7 +248,6 @@ function calculateStreak(team, games) {
   let count = 0;
 
   for (let g of games) {
-
     const teamA = g["TEAM_A"];
     const teamB = g["TEAM_B"];
 
@@ -283,122 +273,95 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
-function smartValue(v) {
-  if (v === undefined || v === null) return 0;
-  if (!isNaN(v)) return Number(v);
-  return v;
-}
-
+/* LOAD */
 async function load() {
-  try {
 
-    const text = await (await fetch(URL)).text();
-    const rows = text.trim().split("\n").map(r => r.split(","));
+  const text = await (await fetch(URL)).text();
+  const rows = text.trim().split("\n").map(r => r.split(","));
+  const headers = rows[0].map(h => h.trim());
 
-    const headers = rows[0].map(h => h.trim());
+  let data = rows.slice(1).map(r => {
+    let obj = {};
+    headers.forEach((h, i) => obj[h] = r[i]?.trim());
+    return obj;
+  });
 
-    let data = rows.slice(1).map(r => {
-      let obj = {};
-      headers.forEach((h, i) => obj[h] = r[i]?.trim());
-      return obj;
-    });
+  const textG = await (await fetch(GAMES_URL)).text();
+  const rowsG = textG.trim().split("\n").map(r => r.split(","));
+  const headersG = rowsG[0].map(h => h.trim());
 
-    const textG = await (await fetch(GAMES_URL)).text();
-    const rowsG = textG.trim().split("\n").map(r => r.split(","));
+  const games = rowsG.slice(1).map(r => {
+    let obj = {};
+    headersG.forEach((h, i) => obj[h] = r[i]?.trim());
+    return obj;
+  });
 
-    const headersG = rowsG[0].map(h => h.trim());
+  const textR = await (await fetch(RESULTS_URL)).text();
+  const results = textR.trim().split("\n").slice(1);
 
-    const games = rowsG.slice(1).map(r => {
-      let obj = {};
-      headersG.forEach((h, i) => obj[h] = r[i]?.trim());
-      return obj;
-    });
+  /* TICKER */
+  const ticker = document.getElementById("ticker-text");
 
-    const textR = await (await fetch(RESULTS_URL)).text();
-    const results = textR.trim().split("\n").slice(1).filter(r => r.length > 3);
-
-    const ticker = document.getElementById("ticker-text");
-
-    const cards = results.map(r => {
-      const p = r.split(",");
-
-      return `
-        <div class="game-card">
-          <div>${p[0] || ""}</div>
-          <div><b>${p[1] || ""}</b> ${p[2] || ""}</div>
-          <div>${p[3] || ""}</div>
-        </div>
-      `;
-    }).join("");
-
-    ticker.innerHTML = `
-      <div class="feed-wrapper">
-        ${cards}
-        ${cards}
+  const cards = results.map(r => {
+    const p = r.split(",");
+    return `
+      <div class="game-card">
+        <div>${p[0] || ""}</div>
+        <div><b>${p[1] || ""}</b> ${p[2] || ""}</div>
+        <div>${p[3] || ""}</div>
       </div>
     `;
+  }).join("");
 
-    const posKey = headers[0];
-    const teamKey = headers.find(h => h.includes("TEAM"));
+  ticker.innerHTML = `<div class="feed-wrapper">${cards}${cards}</div>`;
 
-    data.forEach(row => {
-      row["STREAK"] = calculateStreak(row[teamKey], games);
+  /* STREAK */
+  const posKey = headers[0];
+  const teamKey = headers.find(h => h.includes("TEAM"));
+
+  data.forEach(row => {
+    row["STREAK"] = calculateStreak(row[teamKey], games);
+  });
+
+  /* SORT */
+  if (sortColumn) {
+    data.sort((a, b) => {
+      let A = isNaN(a[sortColumn]) ? a[sortColumn] : Number(a[sortColumn]);
+      let B = isNaN(b[sortColumn]) ? b[sortColumn] : Number(b[sortColumn]);
+      return sortDir === "asc" ? A - B : B - A;
     });
-
-    if (sortColumn) {
-      data.sort((a, b) => {
-        let A = smartValue(a[sortColumn]);
-        let B = smartValue(b[sortColumn]);
-
-        if (typeof A === "number" && typeof B === "number") {
-          return sortDir === "asc" ? A - B : B - A;
-        }
-
-        return sortDir === "asc"
-          ? String(A).localeCompare(String(B))
-          : String(B).localeCompare(String(A));
-      });
-    } else {
-      data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
-    }
-
-    render([...headers, "STREAK"], data, teamKey);
-
-  } catch (e) {
-    console.error(e);
+  } else {
+    data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
   }
-}
 
-function render(headers, data, teamKey) {
+  /* TABLE */
   const app = document.getElementById("app");
 
   let html = "<table><thead><tr>";
 
-  headers.forEach(h => {
-    html += `<th onclick="sortTable('${h}')" ondblclick="resetSort()">${h}</th>`;
+  headers.concat("STREAK").forEach(h => {
+    html += `<th onclick="sortTable('${h}')">${h}</th>`;
   });
 
   html += "</tr></thead><tbody>";
 
   data.forEach((row, i) => {
 
+    const team = row[teamKey];
     let cls = i < 10 ? "top10" : "";
-    const team = row[teamKey] || "";
 
-    if (team.toLowerCase() === "uncle drew") {
+    if (team?.toLowerCase() === "uncle drew") {
       cls += " highlight-team";
     }
 
     html += `<tr class="${cls}">`;
 
-    headers.forEach(h => {
+    headers.concat("STREAK").forEach(h => {
       let value = row[h] || "";
 
       if (h === "STREAK") {
-        const isWin = value.startsWith("W");
-        const color = isWin ? "#22c55e" : "#ef4444";
-
-        value = `<span style="color:${color};font-weight:400;">${value}</span>`;
+        const color = value.startsWith("W") ? "#22c55e" : "#ef4444";
+        value = `<span style="color:${color}">${value}</span>`;
       }
 
       html += `<td>${value}</td>`;
@@ -408,11 +371,17 @@ function render(headers, data, teamKey) {
   });
 
   html += "</tbody></table>";
+
   app.innerHTML = html;
+
+  updateSortUI();
 }
 
 load();
-setInterval(load, 30000);
+
+setInterval(() => {
+  load();
+}, 30000);
 
 </script>
 
