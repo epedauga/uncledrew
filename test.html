@@ -218,27 +218,27 @@ th.sorted-active {
   }
 
   /* ========================= */
-  /* FIJAR ANCHOS (CLAVE REAL) */
+  /* LAYOUT FIJO */
   /* ========================= */
+
+  table {
+    table-layout: fixed;
+  }
 
   /* columna posición */
   th:first-child,
   td:first-child {
-    width: 56px;
-    min-width: 56px;
-    max-width: 56px;
+    width: 60px;
   }
 
   /* columna TEAM */
   th:nth-child(2),
   td:nth-child(2) {
-    width: 140px;
-    min-width: 140px;
-    max-width: 140px;
+    width: 160px;
   }
 
   /* ========================= */
-  /* STICKY REAL */
+  /* STICKY LIMPIO */
   /* ========================= */
 
   th:first-child,
@@ -252,9 +252,15 @@ th.sorted-active {
   th:nth-child(2),
   td:nth-child(2) {
     position: sticky;
-    left: 56px; /* EXACTO = ancho columna 1 */
+    left: 60px;
     z-index: 15;
     background: #0f0f0f;
+  }
+
+  /* 🔥 CLAVE: evita que se mezclen textos */
+  td, th {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* ========================= */
@@ -276,7 +282,7 @@ th.sorted-active {
   }
 
   /* ========================= */
-  /* UNCLE DREW (SIN BUGS) */
+  /* UNCLE DREW (ESTABLE) */
   /* ========================= */
 
   .highlight-team td {
@@ -294,12 +300,11 @@ th.sorted-active {
   }
 
   .highlight-team td:nth-child(2) {
-    background: rgba(255, 140, 66, 0.18);
+    background: rgba(255, 140, 66, 0.2);
     font-weight: 600;
   }
 
 }
-
 
 </style>
 </head>
