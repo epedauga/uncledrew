@@ -434,7 +434,20 @@ async function load() {
 }
 
 load();
-setInterval(load, 30000);
+
+let timer = setInterval(load, 30000);
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    clearInterval(timer);
+    timer = null;
+  } else {
+    if (!timer) {
+      load();
+      timer = setInterval(load, 30000);
+    }
+  }
+});
 
 </script>
 
