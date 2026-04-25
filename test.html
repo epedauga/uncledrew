@@ -209,36 +209,82 @@ th.sorted-active {
 /* ========================= */
 
 @media (max-width: 768px) {
-  
-  /* 1. QUITAR SOMBRA NARANJA DE UNCLE DREW */
-  .highlight-team td {
-    background: transparent !important;
+
+  /* =========================
+     FIX BASE TABLE MOBILE
+  ========================= */
+
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
   }
 
-  /* 2. MANTENER SOLO LA BARRA LATERAL NARANJA */
-  .highlight-team td:first-child {
-    position: relative;
-    background: transparent !important;
+  /* IMPORTANTE: evitar transparencia que deja ver “debajo” */
+  td, th {
+    background: #0f0f0f;
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: #111 !important;
+  }
+
+  /* =========================
+     COL 1: POSITION
+  ========================= */
+  table th:nth-child(1),
+  table td:nth-child(1) {
+    position: sticky;
+    left: 0;
+    width: 45px;
+    min-width: 45px;
+    max-width: 45px;
+    z-index: 40;
+    background: #0f0f0f !important;
+  }
+
+  /* =========================
+     COL 2: TEAM
+  ========================= */
+  table th:nth-child(2),
+  table td:nth-child(2) {
+    position: sticky;
+    left: 45px;
+    z-index: 39;
+    background: #0f0f0f !important;
+    min-width: 130px;
+    white-space: nowrap;
+  }
+
+  /* =========================
+     TOP 10 (FIX BAR ROSA)
+  ========================= */
+  .top10 {
+    background: #0f0f0f !important;
+    border-left: 3px solid #C21E56 !important;
+  }
+
+  /* =========================
+     UNCLE DREW
+     (solo barra, SIN sombra)
+  ========================= */
+  .highlight-team td {
+    background: #0f0f0f !important;
   }
 
   .highlight-team td:first-child::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: #ff8c42;
-    z-index: 2;
+    z-index: 60;
   }
 
-  /* 3. ASEGURAR QUE TOP10 ROSA SIGA VISIBLE */
-  .top10 {
-    background: transparent;
-    border-left: 3px solid #C21E56 !important;
+  /* evita “ghost scroll detrás” */
+  tbody tr td {
+    position: relative;
+    z-index: 1;
   }
 }
-
+  
 </style>
 </head>
 
