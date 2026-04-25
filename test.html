@@ -129,6 +129,7 @@ th {
   color: #aaa;
   cursor: pointer;
   background: rgba(255,255,255,0.04);
+  white-space: nowrap;
 }
 
 td {
@@ -161,6 +162,23 @@ table td:nth-child(2) {
   padding: 0 10px;
 }
 
+/* STATS STYLE */
+.last5 {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* SORT */
+th.sorted-asc {
+  border-bottom: 2px solid #ef4444;
+  color: #fff;
+}
+
+th.sorted-desc {
+  border-top: 2px solid #ef4444;
+  color: #fff;
+}
+
 </style>
 </head>
 
@@ -184,16 +202,10 @@ const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOi
 
 const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
 
+const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=868310309&single=true&output=csv";
+
 let sortColumn = null;
 let sortDir = "desc";
-
-/* ✅ FIX CSV (IMPORTANTE) */
-function parseCSV(text) {
-  return text
-    .trim()
-    .split("\n")
-    .map(r => r.split(","));
-}
 
 /* RESET */
 function resetSort() {
@@ -221,8 +233,11 @@ function calculateStreak(team, games) {
   for (let g of games) {
     const teamA = g["TEAM_A"];
     const teamB = g["TEAM_B"];
+
     const scoreA = Number(g["SCORE_A"]) || 0;
     const scoreB = Number(g["SCORE_B"]) || 0;
+
+    if (!teamA || !teamB) continue;
 
     let result = null;
 
@@ -241,89 +256,127 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
+/* LAST 5 */
+function calculateLast5(team, games) {
+  let res = [];
+
+  for (let g of games) {
+    const teamA = g["TEAM_A"];
+    const teamB = g["TEAM_B"];
+
+    const scoreA = Number(g["SCORE_A"]) || 0;
+    const scoreB = Number(g["SCORE_B"]) || 0;
+
+    if (!teamA || !teamB) continue;
+
+    let result = null;
+
+    if (team === teamA) result = scoreA > scoreB ? "W" : "L";
+    else if (team === teamB) result = scoreB > scoreA ? "W" : "L";
+    else continue;
+
+    res.push(result);
+    if (res.length === 5) break;
+  }
+
+  const wins = res.filter(r => r === "W").length;
+  const losses = res.length - wins;
+
+  return `${wins}-${losses}`;
+}
+
 /* LOAD */
 async function load() {
 
-  try {
+  const text = await (await fetch(URL)).text();
+  const rows = text.trim().split("\n").map(r => r.split(","));
+  const headers = rows[0].map(h => h.trim());
 
-    const text = await (await fetch(URL)).text();
-    const rows = parseCSV(text);
+  let data = rows.slice(1).map(r => {
+    let obj = {};
+    headers.forEach((h, i) => obj[h] = r[i]?.trim());
+    return obj;
+  });
 
-    const headers = rows[0].map(h => h.trim());
+  const textG = await (await fetch(GAMES_URL)).text();
+  const rowsG = textG.trim().split("\n").map(r => r.split(","));
+  const headersG = rowsG[0].map(h => h.trim());
 
-    let data = rows.slice(1).map(r => {
-      let obj = {};
-      headers.forEach((h, i) => obj[h] = r[i]?.trim());
-      return obj;
+  const games = rowsG.slice(1).map(r => {
+    let obj = {};
+    headersG.forEach((h, i) => obj[h] = r[i]?.trim());
+    return obj;
+  });
+
+  const posKey = headers[0];
+  const teamKey = headers.find(h => h.includes("TEAM"));
+
+  data.forEach(row => {
+    row["STREAK"] = calculateStreak(row[teamKey], games);
+    row["LAST5"] = calculateLast5(row[teamKey], games);
+  });
+
+  if (sortColumn) {
+    data.sort((a, b) => {
+      let A = isNaN(a[sortColumn]) ? a[sortColumn] : Number(a[sortColumn]);
+      let B = isNaN(b[sortColumn]) ? b[sortColumn] : Number(b[sortColumn]);
+      return sortDir === "asc" ? A - B : B - A;
     });
-
-    const textG = await (await fetch(GAMES_URL)).text();
-    const rowsG = parseCSV(textG);
-
-    const headersG = rowsG[0];
-
-    const games = rowsG.slice(1).map(r => {
-      let obj = {};
-      headersG.forEach((h, i) => obj[h] = r[i]?.trim());
-      return obj;
-    });
-
-    const posKey = headers[0];
-    const teamKey = headers.find(h => h.includes("TEAM"));
-
-    data.forEach(row => {
-      row["STREAK"] = calculateStreak(row[teamKey], games);
-    });
-
-    if (sortColumn) {
-      data.sort((a, b) => {
-        let A = isNaN(a[sortColumn]) ? a[sortColumn] : Number(a[sortColumn]);
-        let B = isNaN(b[sortColumn]) ? b[sortColumn] : Number(b[sortColumn]);
-        return sortDir === "asc" ? A - B : B - A;
-      });
-    } else {
-      data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
-    }
-
-    const app = document.getElementById("app");
-
-    let html = "<table><thead><tr>";
-
-    headers.concat("STREAK").forEach(h => {
-      html += `<th onclick="sortTable('${h}')">${h}</th>`;
-    });
-
-    html += "</tr></thead><tbody>";
-
-    data.forEach((row, i) => {
-
-      const team = row[teamKey];
-      let cls = i < 10 ? "top10" : "";
-
-      if (team?.toLowerCase() === "uncle drew") cls += " highlight-team";
-
-      html += `<tr class="${cls}">`;
-
-      headers.concat("STREAK").forEach(h => {
-        let value = row[h] || "";
-        html += `<td>${value}</td>`;
-      });
-
-      html += "</tr>";
-    });
-
-    html += "</tbody></table>";
-
-    app.innerHTML = html;
-
-  } catch (err) {
-    console.log("ERROR LOAD:", err);
+  } else {
+    data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
   }
+
+  const app = document.getElementById("app");
+
+  let html = "<table><thead><tr>";
+
+  headers.concat(["STREAK", "LAST5"]).forEach(h => {
+    const title = h === "LAST5" ? "LAST 5" : h;
+    html += `<th onclick="sortTable('${h}')">${title}</th>`;
+  });
+
+  html += "</tr></thead><tbody>";
+
+  data.forEach((row, i) => {
+
+    const team = row[teamKey];
+    let cls = i < 10 ? "top10" : "";
+
+    if (team?.toLowerCase() === "uncle drew") cls += " highlight-team";
+
+    html += `<tr class="${cls}">`;
+
+    headers.concat(["STREAK", "LAST5"]).forEach(h => {
+      let value = row[h] || "";
+
+      if (h === "STREAK") {
+        const color = value.startsWith("W") ? "#22c55e" : "#ef4444";
+        value = `<span style="color:${color}">${value}</span>`;
+      }
+
+      if (h === "LAST5") {
+        const wins = Number(value.split("-")[0]);
+        let color = "#ef4444";
+
+        if (wins >= 4) color = "#22c55e";
+        else if (wins === 3) color = "#facc15";
+
+        value = `<span class="last5" style="color:${color}">${value}</span>`;
+      }
+
+      html += `<td>${value}</td>`;
+    });
+
+    html += "</tr>";
+  });
+
+  html += "</tbody></table>";
+
+  app.innerHTML = html;
 }
 
 load();
 
-/* 🔥 TU REQUEST EXACTA */
 setInterval(() => {
   load();
 }, 30000);
