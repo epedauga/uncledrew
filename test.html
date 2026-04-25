@@ -208,67 +208,66 @@ th.sorted-active {
 @media (max-width: 768px) {
 
   /* ========================= */
-  /* HEADER */
+  /* HEADER (SIEMPRE ARRIBA DE TODO) */
   /* ========================= */
   thead th {
     position: sticky;
     top: 0;
-    z-index: 20;
+    z-index: 10;
     background: #111;
   }
 
-  /* ========================= */
-  /* LAYOUT FIJO */
-  /* ========================= */
-
-  table {
-    table-layout: fixed;
-  }
-
-  /* columna posición */
-  th:first-child,
-  td:first-child {
-    width: 60px;
-  }
-
-  /* columna TEAM */
-  th:nth-child(2),
-  td:nth-child(2) {
-    width: 160px;
+  /* HEADER DE COLUMNAS FIJAS (más arriba que el resto) */
+  thead th:first-child,
+  thead th:nth-child(2) {
+    z-index: 12;
   }
 
   /* ========================= */
-  /* STICKY LIMPIO */
+  /* COLUMNA POSICIÓN */
   /* ========================= */
-
   th:first-child,
   td:first-child {
     position: sticky;
     left: 0;
-    z-index: 15;
+    z-index: 8;
     background: #0f0f0f;
+  }
+
+  /* ========================= */
+  /* COLUMNA TEAM */
+  /* ========================= */
+  th:nth-child(2),
+  td:nth-child(2) {
+    position: sticky;
+    left: 48px;
+    z-index: 8;
+    background: #0f0f0f;
+  }
+
+  /* 🔥 ESTO SOLUCIONA EL “ESPACIO TRANSPARENTE” ENTRE COLUMNAS */
+  th:first-child,
+  td:first-child {
+    box-shadow: 3px 0 0 #0f0f0f;
   }
 
   th:nth-child(2),
   td:nth-child(2) {
-    position: sticky;
-    left: 60px;
-    z-index: 15;
-    background: #0f0f0f;
-  }
-
-  /* 🔥 CLAVE: evita que se mezclen textos */
-  td, th {
-    overflow: hidden;
-    text-overflow: ellipsis;
+    box-shadow: 3px 0 0 #0f0f0f;
   }
 
   /* ========================= */
   /* TOP 10 */
   /* ========================= */
-
   .top10 {
     background: transparent !important;
+  }
+
+  .top10 td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 9;
+    background: #0f0f0f;
   }
 
   .top10 td:first-child::before {
@@ -279,14 +278,24 @@ th.sorted-active {
     bottom: 0;
     width: 3px;
     background: #C21E56;
+    z-index: 11;
   }
 
   /* ========================= */
-  /* UNCLE DREW (ESTABLE) */
+  /* UNCLE DREW (FIX COMPLETO) */
   /* ========================= */
 
+  /* ❌ eliminamos transparencia */
   .highlight-team td {
     background: transparent !important;
+  }
+
+  /* ✅ fondo sólido en columnas sticky */
+  .highlight-team td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 9;
+    background: #0f0f0f; /* 🔥 CLAVE */
   }
 
   .highlight-team td:first-child::before {
@@ -297,11 +306,27 @@ th.sorted-active {
     bottom: 0;
     width: 3px;
     background: #ff8c42;
+    z-index: 11;
   }
 
+  /* 🔥 ESTE ERA TU BUG PRINCIPAL */
   .highlight-team td:nth-child(2) {
-    background: rgba(255, 140, 66, 0.2);
-    font-weight: 600;
+    position: sticky;
+    left: 48px;
+    z-index: 9;
+
+    /* fondo sólido + highlight */
+    background: #0f0f0f;
+  }
+
+  /* capa interna para el highlight (sin romper sticky) */
+  .highlight-team td:nth-child(2)::after {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    background: rgba(255, 140, 66, 0.15);
+    border-radius: 6px;
+    z-index: -1;
   }
 
 }
