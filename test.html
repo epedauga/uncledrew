@@ -267,14 +267,31 @@ th.sorted-active {
     box-shadow: 12px 0 18px rgba(0,0,0,0.8);
   }
 
-  /* ===================== */
-  /* TOP 10 (ROSAAAA FIX REAL) */
-  /* ===================== */
-
+ /* TOP 10 (VISIBLE SIEMPRE EN MOBILE) */
   .top10 {
+    position: relative;
     background: #141414 !important;
-    border-left: 3px solid #C21E56 !important;
   }
+
+  /* barra rosa REAL visible encima del sticky */
+  .top10::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #C21E56;
+    z-index: 200;
+    pointer-events: none;
+  }
+
+  /* aseguramos que sticky no la tape */
+  table td:first-child,
+  table th:first-child {
+    z-index: 70;
+  }
+}
 
   /* ===================== */
   /* UNCLE DREW (NARANJA SIEMPRE VISIBLE) */
