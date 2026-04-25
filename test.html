@@ -204,6 +204,102 @@ th.sorted-active {
   color: #fff;
 }
 
+/* ===================== */
+/* MOBILE FIX REAL (STICKY SAFE) */
+/* ===================== */
+
+@media (max-width: 768px) {
+
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  /* BASE CELDAS */
+  table th,
+  table td {
+    background: #0f0f0f;
+  }
+
+  table th {
+    background: #111;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ===================== */
+  /* POS (NUMEROS) FIJOS */
+  /* ===================== */
+
+  table th:first-child,
+  table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 50;
+    background: #0f0f0f;
+  }
+
+  /* ===================== */
+  /* TEAM FIJO */
+  /* ===================== */
+
+  table th:nth-child(2),
+  table td:nth-child(2) {
+    position: sticky;
+    left: 45px;
+    z-index: 50;
+    background: #0f0f0f;
+
+    min-width: 120px;
+    white-space: nowrap;
+  }
+
+  /* evita “texto pasando por atrás” */
+  table td:first-child,
+  table td:nth-child(2) {
+    box-shadow: 10px 0 14px rgba(0,0,0,0.65);
+  }
+
+  /* ===================== */
+  /* TOP 10 ROSA (NO SE PIERDE) */
+  /* ===================== */
+
+  .top10 {
+    background: rgba(255,255,255,0.07) !important;
+    border-left: 3px solid #C21E56 !important;
+  }
+
+  /* ===================== */
+  /* UNCLE DREW (NO PIERDE NARANJA) */
+  /* ===================== */
+
+  .highlight-team td {
+    background: rgba(255, 140, 66, 0.08) !important;
+  }
+
+  .highlight-team td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 80;
+  }
+
+  .highlight-team td:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #ff8c42;
+    z-index: 999;
+  }
+}
+
 </style>
 </head>
 
