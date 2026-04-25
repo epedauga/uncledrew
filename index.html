@@ -35,13 +35,12 @@ body {
   letter-spacing: 0.2px;
 }
 
-/* 🔴 LIVE INDICATOR (PRO) */
+/* LIVE */
 .live-indicator {
   margin-top: 6px;
   font-size: 12px;
   font-weight: 600;
   color: #C21E56;
-  letter-spacing: 0.5px;
 }
 
 .live-indicator::before {
@@ -57,7 +56,7 @@ body {
   100% { opacity: 1; }
 }
 
-/* RESET BUTTON */
+/* RESET */
 .reset-btn {
   margin-top: 10px;
   background: #151515;
@@ -67,11 +66,6 @@ body {
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
-}
-
-.reset-btn:hover {
-  color: #fff;
-  border-color: #333;
 }
 
 /* TICKER */
@@ -95,7 +89,6 @@ body {
   100% { transform: translateX(-50%); }
 }
 
-/* GAME CARD */
 .game-card {
   min-width: 220px;
   background: #151515;
@@ -103,28 +96,16 @@ body {
   padding: 10px 12px;
   font-size: 12px;
   line-height: 1.4;
-
   box-shadow: 0 0 0 1px rgba(194, 30, 86, 0.35);
 }
 
-.game-card:hover {
-  background: #1c1c1c;
-  box-shadow: 0 0 0 1px rgba(194, 30, 86, 0.6);
-}
-
-.game-card div:first-child {
-  opacity: 0.6;
-  font-size: 11px;
-}
-
-/* CONTAINER */
+/* TABLE */
 .container {
   padding: 12px;
   max-width: 1000px;
   margin: auto;
 }
 
-/* TABLE */
 .table-wrap {
   overflow-x: auto;
   border-radius: 12px;
@@ -138,6 +119,7 @@ table {
   border: 1px solid #222;
   border-radius: 10px;
   overflow: hidden;
+  table-layout: auto;
 }
 
 thead {
@@ -153,11 +135,6 @@ th {
   background: rgba(255,255,255,0.04);
   color: #aaa;
   cursor: pointer;
-}
-
-th:hover {
-  background: rgba(255,255,255,0.06);
-  color: #fff;
 }
 
 td {
@@ -186,13 +163,16 @@ tbody tr:hover {
   border-left: 4px solid #ff8c42;
 }
 
-.highlight-team td:nth-child(2) {
-  font-weight: 700;
-  color: #fff;
-}
+/* ========================= */
+/* FIX TEAM COLUMN (FINAL)   */
+/* ========================= */
 
-.highlight-team {
-  box-shadow: inset 0 0 0 1px rgba(255, 140, 66, 0.35);
+table th:nth-child(2),
+table td:nth-child(2) {
+  min-width: 160px;
+  white-space: nowrap;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 </style>
@@ -203,11 +183,8 @@ tbody tr:hover {
 <div class="header">
   <h1>STANDINGS</h1>
 
-  <div class="data-source">
-  Data source: Google Sheets
-</div>
+  <div class="data-source">Data source: Google Sheets</div>
 
-  <!-- 🔴 LIVE INDICATOR -->
   <div class="live-indicator">LIVE</div>
 
   <button class="reset-btn" onclick="resetSort()">Reset order</button>
@@ -223,7 +200,6 @@ tbody tr:hover {
 
 <script>
 
-/* LINKS */
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
 
 const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
@@ -233,14 +209,12 @@ const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_
 let sortColumn = null;
 let sortDir = "desc";
 
-/* RESET */
 function resetSort() {
   sortColumn = null;
   sortDir = "desc";
   load();
 }
 
-/* SORT */
 function sortTable(col) {
   if (sortColumn === col) {
     sortDir = sortDir === "asc" ? "desc" : "asc";
@@ -251,13 +225,11 @@ function sortTable(col) {
   load();
 }
 
-/* STREAK */
 function calculateStreak(team, games) {
   let type = null;
   let count = 0;
 
   for (let g of games) {
-
     const teamA = g["TEAM_A"];
     const teamB = g["TEAM_B"];
 
@@ -284,121 +256,103 @@ function calculateStreak(team, games) {
 }
 
 function smartValue(v) {
-  if (v === undefined || v === null) return 0;
   if (!isNaN(v)) return Number(v);
-  return v;
+  return v || "";
 }
 
 async function load() {
-  try {
 
-    const text = await (await fetch(URL)).text();
-    const rows = text.trim().split("\n").map(r => r.split(","));
+  const text = await (await fetch(URL)).text();
+  const rows = text.trim().split("\n").map(r => r.split(","));
 
-    const headers = rows[0].map(h => h.trim());
+  const headers = rows[0].map(h => h.trim());
 
-    let data = rows.slice(1).map(r => {
-      let obj = {};
-      headers.forEach((h, i) => obj[h] = r[i]?.trim());
-      return obj;
-    });
+  let data = rows.slice(1).map(r => {
+    let obj = {};
+    headers.forEach((h, i) => obj[h] = r[i]?.trim());
+    return obj;
+  });
 
-    const textG = await (await fetch(GAMES_URL)).text();
-    const rowsG = textG.trim().split("\n").map(r => r.split(","));
+  const textG = await (await fetch(GAMES_URL)).text();
+  const rowsG = textG.trim().split("\n").map(r => r.split(","));
 
-    const headersG = rowsG[0].map(h => h.trim());
+  const headersG = rowsG[0].map(h => h.trim());
 
-    const games = rowsG.slice(1).map(r => {
-      let obj = {};
-      headersG.forEach((h, i) => obj[h] = r[i]?.trim());
-      return obj;
-    });
+  const games = rowsG.slice(1).map(r => {
+    let obj = {};
+    headersG.forEach((h, i) => obj[h] = r[i]?.trim());
+    return obj;
+  });
 
-    const textR = await (await fetch(RESULTS_URL)).text();
-    const results = textR.trim().split("\n").slice(1).filter(r => r.length > 3);
+  const textR = await (await fetch(RESULTS_URL)).text();
+  const results = textR.trim().split("\n").slice(1);
 
-    const ticker = document.getElementById("ticker-text");
+  const ticker = document.getElementById("ticker-text");
 
-    const cards = results.map(r => {
-      const p = r.split(",");
-
-      return `
-        <div class="game-card">
-          <div>${p[0] || ""}</div>
-          <div><b>${p[1] || ""}</b> ${p[2] || ""}</div>
-          <div>${p[3] || ""}</div>
-        </div>
-      `;
-    }).join("");
-
-    ticker.innerHTML = `
-      <div class="feed-wrapper">
-        ${cards}
-        ${cards}
+  const cards = results.map(r => {
+    const p = r.split(",");
+    return `
+      <div class="game-card">
+        <div>${p[0] || ""}</div>
+        <div><b>${p[1] || ""}</b> ${p[2] || ""}</div>
+        <div>${p[3] || ""}</div>
       </div>
     `;
+  }).join("");
 
-    const posKey = headers[0];
-    const teamKey = headers.find(h => h.includes("TEAM"));
+  ticker.innerHTML = `
+    <div class="feed-wrapper">
+      ${cards}
+      ${cards}
+    </div>
+  `;
 
-    data.forEach(row => {
-      row["STREAK"] = calculateStreak(row[teamKey], games);
+  const posKey = headers[0];
+  const teamKey = headers.find(h => h.includes("TEAM"));
+
+  data.forEach(row => {
+    row["STREAK"] = calculateStreak(row[teamKey], games);
+  });
+
+  if (sortColumn) {
+    data.sort((a, b) => {
+      let A = smartValue(a[sortColumn]);
+      let B = smartValue(b[sortColumn]);
+
+      return sortDir === "asc" ? A - B : B - A;
     });
-
-    if (sortColumn) {
-      data.sort((a, b) => {
-        let A = smartValue(a[sortColumn]);
-        let B = smartValue(b[sortColumn]);
-
-        if (typeof A === "number" && typeof B === "number") {
-          return sortDir === "asc" ? A - B : B - A;
-        }
-
-        return sortDir === "asc"
-          ? String(A).localeCompare(String(B))
-          : String(B).localeCompare(String(A));
-      });
-    } else {
-      data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
-    }
-
-    render([...headers, "STREAK"], data, teamKey);
-
-  } catch (e) {
-    console.error(e);
+  } else {
+    data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
   }
-}
 
-function render(headers, data, teamKey) {
   const app = document.getElementById("app");
 
   let html = "<table><thead><tr>";
 
-  headers.forEach(h => {
-    html += `<th onclick="sortTable('${h}')" ondblclick="resetSort()">${h}</th>`;
+  headers.concat("STREAK").forEach(h => {
+    html += `<th onclick="sortTable('${h}')">${h}</th>`;
   });
 
   html += "</tr></thead><tbody>";
 
   data.forEach((row, i) => {
 
-    let cls = i < 10 ? "top10" : "";
-    const team = row[teamKey] || "";
+    const team = row[teamKey];
 
-    if (team.toLowerCase() === "uncle drew") {
+    let cls = i < 10 ? "top10" : "";
+
+    if (team?.toLowerCase() === "uncle drew") {
       cls += " highlight-team";
     }
 
     html += `<tr class="${cls}">`;
 
-    headers.forEach(h => {
+    headers.concat("STREAK").forEach(h => {
       let value = row[h] || "";
 
       if (h === "STREAK") {
-        const isWin = value.startsWith("W");
-        const color = isWin ? "#22c55e" : "#ef4444";
-
-        value = `<span style="color:${color};font-weight:400;">${value}</span>`;
+        const color = value.startsWith("W") ? "#22c55e" : "#ef4444";
+        value = `<span style="color:${color}">${value}</span>`;
       }
 
       html += `<td>${value}</td>`;
@@ -408,6 +362,7 @@ function render(headers, data, teamKey) {
   });
 
   html += "</tbody></table>";
+
   app.innerHTML = html;
 }
 
