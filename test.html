@@ -105,16 +105,14 @@ body {
 
 .table-wrap {
   overflow-x: auto;
-  border-radius: 12px;
+  position: relative;
 }
 
 table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 520px;
-  background: #0f0f0f;
-  border: 1px solid #222;
-  table-layout: auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content; /* clave para sticky estable */
+  min-width: 100%;
 }
 
 thead {
@@ -207,27 +205,18 @@ th.sorted-active {
 @media (max-width: 768px) {
 
   /* =========================
-     BASE FIX SCROLL
+     BASE FIX STACKING
   ========================= */
-
-  .table-wrap {
-    overflow-x: auto;
-  }
-
-  table {
-    border-collapse: separate;
-    border-spacing: 0;
-  }
 
   th, td {
     background: #0f0f0f;
   }
 
-  /* HEADER STICKY */
+  /* HEADER */
   thead th {
     position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 100;
     background: #111 !important;
   }
 
@@ -242,7 +231,7 @@ th.sorted-active {
     width: 45px;
     min-width: 45px;
     max-width: 45px;
-    z-index: 40;
+    z-index: 90;
     background: #0f0f0f !important;
   }
 
@@ -254,7 +243,7 @@ th.sorted-active {
   table td:nth-child(2) {
     position: sticky;
     left: 45px;
-    z-index: 41;
+    z-index: 91;
     background: #0f0f0f !important;
 
     min-width: 140px;
@@ -262,7 +251,7 @@ th.sorted-active {
   }
 
   /* =========================
-     TOP 10 (BARRA ROSA FIX)
+     TOP 10 (BARRA ROSA FIJA REAL)
   ========================= */
 
   .top10 td:first-child {
@@ -277,15 +266,15 @@ th.sorted-active {
     bottom: 0;
     width: 3px;
     background: #C21E56;
-    z-index: 100;
+    z-index: 999;
   }
 
   /* =========================
-     UNCLE DREW (BARRA NARANJA FIX)
+     UNCLE DREW
   ========================= */
 
   .highlight-team td {
-    background: #0f0f0f !important; /* elimina sombra naranja */
+    background: #0f0f0f !important; /* elimina sombra */
   }
 
   .highlight-team td:first-child {
@@ -300,7 +289,7 @@ th.sorted-active {
     bottom: 0;
     width: 3px;
     background: #ff8c42;
-    z-index: 100;
+    z-index: 999;
   }
 
 }
