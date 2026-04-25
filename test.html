@@ -211,42 +211,53 @@ th.sorted-active {
     position: relative;
   }
 
-  /* IMPORTANTE: crea “bloques sólidos” */
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  /* BASE CELDAS = BLOQUES OPACOS REALES */
   table th,
   table td {
     position: relative;
     background: #0f0f0f;
-    background-clip: padding-box;
+    z-index: 1;
   }
 
-  /* HEADER FIX */
+  /* HEADER */
   table th {
     background: #111;
     z-index: 50;
   }
 
-  /* POS FIXED */
+  /* POS STICKY */
   table th:first-child,
   table td:first-child {
     position: sticky;
     left: 0;
-    z-index: 60;
+    z-index: 100;
     background: #0f0f0f;
   }
 
-  /* TEAM FIXED */
+  /* TEAM STICKY */
   table th:nth-child(2),
   table td:nth-child(2) {
     position: sticky;
     left: 45px;
-    z-index: 60;
+    z-index: 100;
     background: #0f0f0f;
 
     min-width: 120px;
     white-space: nowrap;
   }
 
-  /* BAR NARANJA (bien dentro del layer) */
+  /* 🔥 FIX CLAVE: evita “ver pasar texto detrás” */
+  table td:first-child,
+  table td:nth-child(2) {
+    box-shadow: 8px 0 10px rgba(0,0,0,0.6);
+  }
+
+  /* 🟠 BAR NARANJA RESTAURADA (CORRECTA) */
   .highlight-team td:first-child::before {
     content: "";
     position: absolute;
@@ -255,16 +266,15 @@ th.sorted-active {
     bottom: 0;
     width: 3px;
     background: #ff8c42;
-    z-index: 1;
+    z-index: 2;
   }
 
-  /* 🔥 FIX CRÍTICO: evita “ver pasar cosas detrás” */
-  .highlight-team td:first-child,
-  .highlight-team td:nth-child(2) {
+  /* 🧼 FIX: asegurar que highlight no rompa sticky */
+  .highlight-team td {
     background: #0f0f0f !important;
   }
 
-  /* 🧨 ELIMINAR EFECTO TOP 10 (como pediste) */
+  /* ❌ quitar TOP10 visual si lo quieres limpio */
   .top10 {
     background: transparent !important;
     border-left: none !important;
