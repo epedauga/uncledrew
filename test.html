@@ -208,7 +208,7 @@ th.sorted-active {
 @media (max-width: 768px) {
 
   /* ========================= */
-  /* HEADER (SIEMPRE ARRIBA) */
+  /* HEADER (FIJO ARRIBA) */
   /* ========================= */
   thead th {
     position: sticky;
@@ -217,6 +217,7 @@ th.sorted-active {
     background: #111;
   }
 
+  /* columnas fijas del header por encima */
   thead th:first-child,
   thead th:nth-child(2) {
     z-index: 12;
@@ -232,8 +233,8 @@ th.sorted-active {
     z-index: 8;
     background: #0f0f0f;
 
-    /* 🔥 elimina gap visual */
-    box-shadow: 6px 0 0 #0f0f0f;
+    /* elimina gap visual */
+    box-shadow: 8px 0 0 #0f0f0f;
   }
 
   /* ========================= */
@@ -246,12 +247,12 @@ th.sorted-active {
     z-index: 8;
     background: #0f0f0f;
 
-    /* 🔥 elimina gap visual */
-    box-shadow: 6px 0 0 #0f0f0f;
+    /* elimina gap visual */
+    box-shadow: 8px 0 0 #0f0f0f;
   }
 
   /* ========================= */
-  /* TOP 10 */
+  /* TOP 10 (sin fondo, con barra) */
   /* ========================= */
   .top10 {
     background: transparent !important;
@@ -276,14 +277,15 @@ th.sorted-active {
   }
 
   /* ========================= */
-  /* UNCLE DREW (FIX FINAL REAL) */
+  /* UNCLE DREW (FIX FINAL) */
   /* ========================= */
 
+  /* eliminar fondos globales */
   .highlight-team td {
     background: transparent !important;
   }
 
-  /* columna posición (naranja) */
+  /* columna posición */
   .highlight-team td:first-child {
     position: sticky;
     left: 0;
@@ -302,27 +304,31 @@ th.sorted-active {
     z-index: 11;
   }
 
-  /* 🔥 TEAM SIN BLEED */
+  /* TEAM (clave anti-bleed) */
   .highlight-team td:nth-child(2) {
     position: sticky;
     left: 48px;
     z-index: 9;
 
-    /* capa sólida REAL */
+    /* fondo sólido real */
     background: #0f0f0f;
+
+    /* evita que contenido se meta */
+    overflow: hidden;
   }
 
-  /* capa naranja encima (visual) */
-  .highlight-team td:nth-child(2)::after {
+  /* highlight naranja limpio */
+  .highlight-team td:nth-child(2)::before {
     content: "";
     position: absolute;
-    inset: 0;
+    inset: 2px;
     background: rgba(255, 140, 66, 0.18);
     border-radius: 6px;
     z-index: 1;
   }
 
-  /* texto siempre limpio arriba */
+  /* texto siempre arriba */
+  .highlight-team td:nth-child(2),
   .highlight-team td:nth-child(2) * {
     position: relative;
     z-index: 2;
