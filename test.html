@@ -211,32 +211,49 @@ th.sorted-active {
     position: relative;
   }
 
-  /* POS FIXED (mobile only) */
+  /* BASE para evitar “ghosting” */
+  table th,
+  table td {
+    background-clip: padding-box;
+  }
+
+  /* POS FIXED */
   table th:first-child,
   table td:first-child {
     position: sticky;
     left: 0;
-    z-index: 15;
+    z-index: 30;
     background: #0f0f0f;
   }
 
-  /* TEAM FIXED (mobile only) */
+  /* TEAM FIXED */
   table th:nth-child(2),
   table td:nth-child(2) {
     position: sticky;
     left: 45px;
-    z-index: 15;
+    z-index: 30;
     background: #0f0f0f;
 
     min-width: 120px;
     white-space: nowrap;
   }
 
-  /* headers encima */
+  /* HEADERS siempre arriba */
   table th:first-child,
   table th:nth-child(2) {
     background: #111;
-    z-index: 20;
+    z-index: 40;
+  }
+
+  /* FIX CRÍTICO: evita que highlight + sticky se mezclen */
+  .highlight-team td:first-child,
+  .highlight-team td:nth-child(2) {
+    background: #0f0f0f !important;
+  }
+
+  /* BAR NARANJA no se “corta” */
+  .highlight-team td:first-child::before {
+    z-index: 5;
   }
 }
 
