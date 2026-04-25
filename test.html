@@ -161,21 +161,14 @@ table td:nth-child(2) {
   padding: 0 10px;
 }
 
-/* ===================== */
-/* SORT VISUAL (NEW)     */
-/* ===================== */
-
+/* SORT VISUAL */
 th.sorted-asc {
-  color: #fff;
   border-bottom: 2px solid #ef4444;
+  color: #fff;
 }
 
 th.sorted-desc {
-  color: #fff;
   border-top: 2px solid #ef4444;
-}
-
-th.sorted-active {
   color: #fff;
 }
 
@@ -222,24 +215,7 @@ function sortTable(col) {
     sortColumn = col;
     sortDir = "desc";
   }
-
   load();
-
-  setTimeout(updateSortUI, 50);
-}
-
-/* SORT UI */
-function updateSortUI() {
-  document.querySelectorAll("th").forEach(th => {
-    th.classList.remove("sorted-asc", "sorted-desc", "sorted-active");
-
-    const key = th.textContent.trim();
-
-    if (key === sortColumn) {
-      th.classList.add("sorted-active");
-      th.classList.add(sortDir === "asc" ? "sorted-asc" : "sorted-desc");
-    }
-  });
 }
 
 /* STREAK */
@@ -271,6 +247,32 @@ function calculateStreak(team, games) {
   }
 
   return type ? `${type}${count}` : "";
+}
+
+/* ⭐ LAST 5 */
+function calculateLast5(team, games) {
+  let res = [];
+
+  for (let g of games) {
+    const teamA = g["TEAM_A"];
+    const teamB = g["TEAM_B"];
+
+    const scoreA = Number(g["SCORE_A"]) || 0;
+    const scoreB = Number(g["SCORE_B"]) || 0;
+
+    if (!teamA || !teamB) continue;
+
+    let result = null;
+
+    if (team === teamA) result = scoreA > scoreB ? "W" : "L";
+    else if (team === teamB) result = scoreB > scoreA ? "W" : "L";
+    else continue;
+
+    res.push(result);
+    if (res.length === 5) break;
+  }
+
+  return res.join("");
 }
 
 /* LOAD */
@@ -315,12 +317,13 @@ async function load() {
 
   ticker.innerHTML = `<div class="feed-wrapper">${cards}${cards}</div>`;
 
-  /* STREAK */
+  /* STATS */
   const posKey = headers[0];
   const teamKey = headers.find(h => h.includes("TEAM"));
 
   data.forEach(row => {
     row["STREAK"] = calculateStreak(row[teamKey], games);
+    row["LAST5"] = calculateLast5(row[teamKey], games);
   });
 
   /* SORT */
@@ -339,7 +342,7 @@ async function load() {
 
   let html = "<table><thead><tr>";
 
-  headers.concat("STREAK").forEach(h => {
+  headers.concat(["STREAK", "LAST5"]).forEach(h => {
     html += `<th onclick="sortTable('${h}')">${h}</th>`;
   });
 
@@ -350,18 +353,22 @@ async function load() {
     const team = row[teamKey];
     let cls = i < 10 ? "top10" : "";
 
-    if (team?.toLowerCase() === "uncle drew") {
-      cls += " highlight-team";
-    }
+    if (team?.toLowerCase() === "uncle drew") cls += " highlight-team";
 
     html += `<tr class="${cls}">`;
 
-    headers.concat("STREAK").forEach(h => {
+    headers.concat(["STREAK", "LAST5"]).forEach(h => {
       let value = row[h] || "";
 
       if (h === "STREAK") {
         const color = value.startsWith("W") ? "#22c55e" : "#ef4444";
         value = `<span style="color:${color}">${value}</span>`;
+      }
+
+      if (h === "LAST5") {
+        value = value.split("").map(r =>
+          `<span style="color:${r === "W" ? "#22c55e" : "#ef4444"}">${r}</span>`
+        ).join(" ");
       }
 
       html += `<td>${value}</td>`;
@@ -373,15 +380,10 @@ async function load() {
   html += "</tbody></table>";
 
   app.innerHTML = html;
-
-  updateSortUI();
 }
 
 load();
-
-setInterval(() => {
-  load();
-}, 30000);
+setInterval(load, 30000);
 
 </script>
 
