@@ -14,6 +14,7 @@ body {
   color: #fff;
 }
 
+/* HEADER */
 .header {
   padding: 18px;
   text-align: center;
@@ -24,6 +25,7 @@ body {
 .header h1 {
   margin: 0;
   font-size: 22px;
+  letter-spacing: 1px;
 }
 
 .data-source {
@@ -50,34 +52,7 @@ body {
   font-size: 12px;
 }
 
-#ticker-text {
-  margin-top: 10px;
-  overflow: hidden;
-  padding: 10px 0;
-  border-top: 1px solid #1c1c1c;
-}
-
-.feed-wrapper {
-  display: flex;
-  gap: 12px;
-  width: max-content;
-  animation: scrollX 80s linear infinite;
-}
-
-@keyframes scrollX {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.game-card {
-  min-width: 220px;
-  background: #151515;
-  border-radius: 10px;
-  padding: 10px;
-  font-size: 12px;
-  box-shadow: 0 0 0 1px rgba(194, 30, 86, 0.35);
-}
-
+/* TABLE */
 .container {
   padding: 12px;
   max-width: 1000px;
@@ -125,24 +100,10 @@ tbody tr:hover {
 
 .top10 {
   background: rgba(255,255,255,0.07);
-  border-left: 3px solid #C21E56;
 }
 
 .highlight-team td {
   background: rgba(255, 140, 66, 0.14) !important;
-}
-
-table th:nth-child(2),
-table td:nth-child(2) {
-  min-width: 120px;
-  white-space: nowrap;
-  padding: 0 10px;
-}
-
-/* LAST5 ahora neutral */
-.last5 {
-  font-weight: normal;
-  white-space: nowrap;
 }
 
 </style>
@@ -155,11 +116,10 @@ table td:nth-child(2) {
   <div class="data-source">Data source: Google Sheets</div>
   <div class="live-indicator">LIVE</div>
   <button class="reset-btn" onclick="resetSort()">Reset order</button>
-  <div id="ticker-text">Cargando resultados...</div>
 </div>
 
 <div class="container">
-  <div class="table-wrap" id="app"></div>
+  <div class="table-wrap" id="app">Cargando...</div>
 </div>
 
 <script>
@@ -171,30 +131,22 @@ const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AO
 let sortColumn = null;
 let sortDir = "desc";
 
-/* 🔥 FIX CSV (ESTO ARREGLA QUE NO CARGUE) */
+/* FIX CSV (ESTO ES LO QUE TE ROMPÍA TODO) */
 function parseCSV(text) {
   return text
     .trim()
     .split("\n")
-    .map(r => r.split(","));
+    .map(row => row.split(",").map(v => v.trim()));
 }
 
+/* RESET */
 function resetSort() {
   sortColumn = null;
   sortDir = "desc";
   load();
 }
 
-function sortTable(col) {
-  if (sortColumn === col) {
-    sortDir = sortDir === "asc" ? "desc" : "asc";
-  } else {
-    sortColumn = col;
-    sortDir = "desc";
-  }
-  load();
-}
-
+/* STREAK */
 function calculateStreak(team, games) {
   let type = null;
   let count = 0;
@@ -202,8 +154,11 @@ function calculateStreak(team, games) {
   for (let g of games) {
     const teamA = g["TEAM_A"];
     const teamB = g["TEAM_B"];
+
     const scoreA = Number(g["SCORE_A"]) || 0;
     const scoreB = Number(g["SCORE_B"]) || 0;
+
+    if (!teamA || !teamB) continue;
 
     let result = null;
 
@@ -222,14 +177,18 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
+/* LAST 5 SIMPLE (SIN COLORES) */
 function calculateLast5(team, games) {
   let res = [];
 
   for (let g of games) {
     const teamA = g["TEAM_A"];
     const teamB = g["TEAM_B"];
+
     const scoreA = Number(g["SCORE_A"]) || 0;
     const scoreB = Number(g["SCORE_B"]) || 0;
+
+    if (!teamA || !teamB) continue;
 
     let result = null;
 
@@ -241,84 +200,90 @@ function calculateLast5(team, games) {
     if (res.length === 5) break;
   }
 
-  return res.join("-");
+  const wins = res.filter(r => r === "W").length;
+  const losses = res.length - wins;
+
+  return `${wins}-${losses}`;
 }
 
+/* LOAD */
 async function load() {
 
-  try {
+  const text = await (await fetch(URL)).text();
+  const rows = parseCSV(text);
 
-    const text = await (await fetch(URL)).text();
-    const rows = parseCSV(text);
-    const headers = rows[0].map(h => h.trim());
+  const headers = rows[0];
 
-    let data = rows.slice(1).map(r => {
-      let obj = {};
-      headers.forEach((h, i) => obj[h] = r[i]);
-      return obj;
+  let data = rows.slice(1).map(r => {
+    let obj = {};
+    headers.forEach((h, i) => obj[h] = r[i] || "");
+    return obj;
+  });
+
+  const textG = await (await fetch(GAMES_URL)).text();
+  const rowsG = parseCSV(textG);
+
+  const headersG = rowsG[0];
+
+  const games = rowsG.slice(1).map(r => {
+    let obj = {};
+    headersG.forEach((h, i) => obj[h] = r[i] || "");
+    return obj;
+  });
+
+  const posKey = headers[0];
+  const teamKey = headers.find(h => h.includes("TEAM"));
+
+  data.forEach(row => {
+    row["STREAK"] = calculateStreak(row[teamKey], games);
+    row["LAST5"] = calculateLast5(row[teamKey], games);
+  });
+
+  if (sortColumn) {
+    data.sort((a, b) => {
+      let A = isNaN(a[sortColumn]) ? a[sortColumn] : Number(a[sortColumn]);
+      let B = isNaN(b[sortColumn]) ? b[sortColumn] : Number(b[sortColumn]);
+      return sortDir === "asc" ? A - B : B - A;
     });
+  } else {
+    data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
+  }
 
-    const textG = await (await fetch(GAMES_URL)).text();
-    const rowsG = parseCSV(textG);
-    const headersG = rowsG[0];
+  const app = document.getElementById("app");
 
-    const games = rowsG.slice(1).map(r => {
-      let obj = {};
-      headersG.forEach((h, i) => obj[h] = r[i]);
-      return obj;
-    });
+  let html = "<table><thead><tr>";
 
-    const teamKey = headers.find(h => h.includes("TEAM"));
+  headers.concat(["STREAK", "LAST5"]).forEach(h => {
+    const title = h === "LAST5" ? "LAST 5" : h;
+    html += `<th onclick="sortTable('${h}')">${title}</th>`;
+  });
 
-    data.forEach(row => {
-      row["STREAK"] = calculateStreak(row[teamKey], games);
-      row["LAST5"] = calculateLast5(row[teamKey], games);
-    });
+  html += "</tr></thead><tbody>";
 
-    const app = document.getElementById("app");
+  data.forEach((row, i) => {
 
-    let html = "<table><thead><tr>";
+    const team = row[teamKey];
+    let cls = i < 10 ? "top10" : "";
+
+    if (team?.toLowerCase() === "uncle drew") cls += " highlight-team";
+
+    html += `<tr class="${cls}">`;
 
     headers.concat(["STREAK", "LAST5"]).forEach(h => {
-      const title = h === "LAST5" ? "LAST 5" : h;
-      html += `<th onclick="sortTable('${h}')">${title}</th>`;
+      let value = row[h] || "";
+      html += `<td>${value}</td>`;
     });
 
-    html += "</tr></thead><tbody>";
+    html += "</tr>";
+  });
 
-    data.forEach((row, i) => {
+  html += "</tbody></table>";
 
-      let cls = i < 10 ? "top10" : "";
-
-      html += `<tr class="${cls}">`;
-
-      headers.concat(["STREAK", "LAST5"]).forEach(h => {
-
-        let value = row[h] || "";
-
-        /* ❌ LAST5 SIN COLORES NI NEGRITAS */
-        if (h === "LAST5") {
-          value = `<span>${value}</span>`;
-        }
-
-        html += `<td>${value}</td>`;
-      });
-
-      html += "</tr>";
-    });
-
-    html += "</tbody></table>";
-
-    app.innerHTML = html;
-
-  } catch (e) {
-    console.log("ERROR LOAD:", e);
-  }
+  app.innerHTML = html;
 }
 
 load();
 
-/* 🔥 TU SET INTERVAL ORIGINAL */
 setInterval(() => {
   load();
 }, 30000);
