@@ -207,6 +207,26 @@ th.sorted-active {
 
 @media (max-width: 768px) {
 
+   /* quitar fondo del top 10 */
+  .top10 {
+    background: transparent !important;
+  }
+
+  /* mantener la barra lateral rosa */
+  .top10 td:first-child {
+    position: relative;
+  }
+
+  .top10 td:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #C21E56;
+  }
+
   /* quitar el fondo de toda la fila */
   .highlight-team td {
     background: transparent !important;
