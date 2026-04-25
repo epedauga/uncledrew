@@ -204,6 +204,24 @@ th.sorted-active {
   color: #fff;
 }
 
+
+@media (max-width: 768px) {
+
+  /* quitar el fondo de toda la fila */
+  .highlight-team td {
+    background: transparent !important;
+  }
+
+  /* dejar highlight SOLO en el nombre del equipo (columna 2) */
+  .highlight-team td:nth-child(2) {
+    background: rgba(255, 140, 66, 0.15);
+    border-radius: 6px;
+    font-weight: 600;
+  }
+
+}
+
+
 </style>
 </head>
 
