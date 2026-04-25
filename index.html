@@ -44,7 +44,6 @@ body {
 
 .live-indicator::before {
   content: "●";
-  color: #C21E56;
   margin-right: 6px;
   animation: pulse 1.2s infinite;
 }
@@ -114,7 +113,6 @@ table {
   min-width: 520px;
   background: #0f0f0f;
   border: 1px solid #222;
-  table-layout: auto;
 }
 
 thead {
@@ -129,7 +127,6 @@ th {
   color: #aaa;
   cursor: pointer;
   background: rgba(255,255,255,0.04);
-  white-space: nowrap;
 }
 
 td {
@@ -162,21 +159,10 @@ table td:nth-child(2) {
   padding: 0 10px;
 }
 
-/* STATS STYLE */
-.last5 {
-  font-weight: 600;
+/* LAST 5 */
+.last5-col {
+  min-width: 70px;
   white-space: nowrap;
-}
-
-/* SORT */
-th.sorted-asc {
-  border-bottom: 2px solid #ef4444;
-  color: #fff;
-}
-
-th.sorted-desc {
-  border-top: 2px solid #ef4444;
-  color: #fff;
 }
 
 </style>
@@ -207,14 +193,12 @@ const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_
 let sortColumn = null;
 let sortDir = "desc";
 
-/* RESET */
 function resetSort() {
   sortColumn = null;
   sortDir = "desc";
   load();
 }
 
-/* SORT */
 function sortTable(col) {
   if (sortColumn === col) {
     sortDir = sortDir === "asc" ? "desc" : "asc";
@@ -233,7 +217,6 @@ function calculateStreak(team, games) {
   for (let g of games) {
     const teamA = g["TEAM_A"];
     const teamB = g["TEAM_B"];
-
     const scoreA = Number(g["SCORE_A"]) || 0;
     const scoreB = Number(g["SCORE_B"]) || 0;
 
@@ -256,14 +239,13 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
-/* LAST 5 */
+/* LAST 5 (SIN ESTILO) */
 function calculateLast5(team, games) {
   let res = [];
 
   for (let g of games) {
     const teamA = g["TEAM_A"];
     const teamB = g["TEAM_B"];
-
     const scoreA = Number(g["SCORE_A"]) || 0;
     const scoreB = Number(g["SCORE_B"]) || 0;
 
@@ -279,10 +261,7 @@ function calculateLast5(team, games) {
     if (res.length === 5) break;
   }
 
-  const wins = res.filter(r => r === "W").length;
-  const losses = res.length - wins;
-
-  return `${wins}-${losses}`;
+  return res.join(""); // WWLWL
 }
 
 /* LOAD */
@@ -307,6 +286,24 @@ async function load() {
     headersG.forEach((h, i) => obj[h] = r[i]?.trim());
     return obj;
   });
+
+  const textR = await (await fetch(RESULTS_URL)).text();
+  const results = textR.trim().split("\n").slice(1);
+
+  const ticker = document.getElementById("ticker-text");
+
+  const cards = results.map(r => {
+    const p = r.split(",");
+    return `
+      <div class="game-card">
+        <div>${p[0] || ""}</div>
+        <div><b>${p[1] || ""}</b> ${p[2] || ""}</div>
+        <div>${p[3] || ""}</div>
+      </div>
+    `;
+  }).join("");
+
+  ticker.innerHTML = `<div class="feed-wrapper">${cards}${cards}</div>`;
 
   const posKey = headers[0];
   const teamKey = headers.find(h => h.includes("TEAM"));
@@ -348,23 +345,7 @@ async function load() {
 
     headers.concat(["STREAK", "LAST5"]).forEach(h => {
       let value = row[h] || "";
-
-      if (h === "STREAK") {
-        const color = value.startsWith("W") ? "#22c55e" : "#ef4444";
-        value = `<span style="color:${color}">${value}</span>`;
-      }
-
-      if (h === "LAST5") {
-        const wins = Number(value.split("-")[0]);
-        let color = "#ef4444";
-
-        if (wins >= 4) color = "#22c55e";
-        else if (wins === 3) color = "#facc15";
-
-        value = `<span class="last5" style="color:${color}">${value}</span>`;
-      }
-
-      html += `<td>${value}</td>`;
+      html += `<td class="${h === 'LAST5' ? 'last5-col' : ''}">${value}</td>`;
     });
 
     html += "</tr>";
