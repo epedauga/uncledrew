@@ -207,6 +207,32 @@ th.sorted-active {
 @media (max-width: 768px) {
 
   /* =========================
+     HEADERS PASAN POR DETRÁS
+  ========================= */
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2; /* BAJAMOS z-index */
+    background: rgba(17,17,17,0.85) !important;
+    backdrop-filter: blur(6px);
+  }
+
+  /* TEAM SIEMPRE ENCIMA */
+  table th:nth-child(2),
+  table td:nth-child(2) {
+    z-index: 20 !important;
+  }
+
+  table th:nth-child(1),
+  table td:nth-child(1) {
+    z-index: 21 !important;
+  }
+
+}
+  
+  
+  /* =========================
      BASE STABLE PARA SCROLL
   ========================= */
 
@@ -255,12 +281,30 @@ th.sorted-active {
   }
 
   /* =========================
-     TOP 10 (NO SE ROMPE ROSA)
+     FIX TOP 10 VISIBILITY
   ========================= */
+
+  .top10 td:first-child {
+    position: relative;
+    overflow: visible;
+  }
+
+  .top10 td:first-child::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #C21E56;
+    z-index: 999;
+  }
+
+  /* refuerzo visual por si sticky lo pisa */
   .top10 {
     background: #0f0f0f !important;
-    border-left: 3px solid #C21E56 !important;
   }
+}
 
   /* =========================
      UNCLE DREW SOLO BARRA
