@@ -204,35 +204,31 @@ th.sorted-active {
   color: #fff;
 }
 
-/* ========================= */
-/* MOBILE FIXES ONLY         */
-/* ========================= */
-
 @media (max-width: 768px) {
 
   /* =========================
-     FIX BASE TABLE MOBILE
+     BASE PARA STICKY CORRECTO
   ========================= */
 
   table {
     border-collapse: separate;
     border-spacing: 0;
-  }
-
-  /* IMPORTANTE: evitar transparencia que deja ver “debajo” */
-  td, th {
-    background: #0f0f0f;
+    table-layout: fixed; /* CLAVE para que NO se muevan columnas */
   }
 
   thead th {
     position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 100;
     background: #111 !important;
   }
 
+  td, th {
+    background: #0f0f0f;
+  }
+
   /* =========================
-     COL 1: POSITION
+     COL 1 - POSICIÓN
   ========================= */
   table th:nth-child(1),
   table td:nth-child(1) {
@@ -241,25 +237,25 @@ th.sorted-active {
     width: 45px;
     min-width: 45px;
     max-width: 45px;
-    z-index: 40;
+    z-index: 60;
     background: #0f0f0f !important;
   }
 
   /* =========================
-     COL 2: TEAM
+     COL 2 - TEAM
   ========================= */
   table th:nth-child(2),
   table td:nth-child(2) {
     position: sticky;
     left: 45px;
-    z-index: 39;
+    z-index: 59;
     background: #0f0f0f !important;
-    min-width: 130px;
+    min-width: 140px;
     white-space: nowrap;
   }
 
   /* =========================
-     TOP 10 (FIX BAR ROSA)
+     TOP 10 (BARRA ROSA FIJA)
   ========================= */
   .top10 {
     background: #0f0f0f !important;
@@ -267,22 +263,16 @@ th.sorted-active {
   }
 
   /* =========================
-     UNCLE DREW
-     (solo barra, SIN sombra)
+     UNCLE DREW (SOLO BARRA)
   ========================= */
   .highlight-team td {
     background: #0f0f0f !important;
   }
 
   .highlight-team td:first-child::before {
-    z-index: 60;
+    z-index: 120;
   }
 
-  /* evita “ghost scroll detrás” */
-  tbody tr td {
-    position: relative;
-    z-index: 1;
-  }
 }
   
 </style>
