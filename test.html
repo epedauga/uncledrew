@@ -204,38 +204,40 @@ th.sorted-active {
   color: #fff;
 }
 
-.table-wrap {
-  overflow-x: auto;
-  border-radius: 12px;
-  position: relative;
-}
+@media (max-width: 768px) {
 
-/* POS FIXED */
-table th:first-child,
-table td:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 10;
-  background: #0f0f0f;
-}
+  .table-wrap {
+    overflow-x: auto;
+    position: relative;
+  }
 
-/* TEAM FIXED */
-table th:nth-child(2),
-table td:nth-child(2) {
-  position: sticky;
-  left: 45px;
-  z-index: 10;
-  background: #0f0f0f;
+  /* POS FIXED (mobile only) */
+  table th:first-child,
+  table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 15;
+    background: #0f0f0f;
+  }
 
-  min-width: 120px;
-  white-space: nowrap;
-}
+  /* TEAM FIXED (mobile only) */
+  table th:nth-child(2),
+  table td:nth-child(2) {
+    position: sticky;
+    left: 45px;
+    z-index: 15;
+    background: #0f0f0f;
 
-/* HEADERS FIX (evita transparencia fea) */
-table th:first-child,
-table th:nth-child(2) {
-  background: #111;
-  z-index: 20;
+    min-width: 120px;
+    white-space: nowrap;
+  }
+
+  /* headers encima */
+  table th:first-child,
+  table th:nth-child(2) {
+    background: #111;
+    z-index: 20;
+  }
 }
 
 </style>
