@@ -211,10 +211,18 @@ th.sorted-active {
     position: relative;
   }
 
-  /* BASE para evitar “ghosting” */
+  /* IMPORTANTE: crea “bloques sólidos” */
   table th,
   table td {
+    position: relative;
+    background: #0f0f0f;
     background-clip: padding-box;
+  }
+
+  /* HEADER FIX */
+  table th {
+    background: #111;
+    z-index: 50;
   }
 
   /* POS FIXED */
@@ -222,7 +230,7 @@ th.sorted-active {
   table td:first-child {
     position: sticky;
     left: 0;
-    z-index: 30;
+    z-index: 60;
     background: #0f0f0f;
   }
 
@@ -231,32 +239,38 @@ th.sorted-active {
   table td:nth-child(2) {
     position: sticky;
     left: 45px;
-    z-index: 30;
+    z-index: 60;
     background: #0f0f0f;
 
     min-width: 120px;
     white-space: nowrap;
   }
 
-  /* HEADERS siempre arriba */
-  table th:first-child,
-  table th:nth-child(2) {
-    background: #111;
-    z-index: 40;
+  /* BAR NARANJA (bien dentro del layer) */
+  .highlight-team td:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #ff8c42;
+    z-index: 1;
   }
 
-  /* FIX CRÍTICO: evita que highlight + sticky se mezclen */
+  /* 🔥 FIX CRÍTICO: evita “ver pasar cosas detrás” */
   .highlight-team td:first-child,
   .highlight-team td:nth-child(2) {
     background: #0f0f0f !important;
   }
 
-  /* BAR NARANJA no se “corta” */
-  .highlight-team td:first-child::before {
-    z-index: 5;
+  /* 🧨 ELIMINAR EFECTO TOP 10 (como pediste) */
+  .top10 {
+    background: transparent !important;
+    border-left: none !important;
   }
 }
-
+  
 </style>
 </head>
 
