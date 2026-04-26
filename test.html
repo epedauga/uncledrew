@@ -546,9 +546,13 @@ async function load() {
     const team = row[teamKey];
     let cls = i < 10 ? "top10" : "";
 
-    if (team?.toLowerCase() === "uncle drew") {
-      cls += " highlight-team";
-    }
+// 👉 true = activa highlight automático
+// 👉 false = solo highlight manual (click usuario)
+   const AUTO_HIGHLIGHT = false;
+
+if (AUTO_HIGHLIGHT && team?.toLowerCase() === "uncle drew") {
+  cls += " highlight-team";
+}
 
     html += `<tr class="${cls}">`;
 
