@@ -204,6 +204,146 @@ th.sorted-active {
   color: #fff;
 }
 
+
+@media (max-width: 768px) {
+
+  /* ========================= */
+  /* HEADER (SIEMPRE ARRIBA DE TODO) */
+  /* ========================= */
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #111;
+  }
+
+  /* HEADER DE COLUMNAS FIJAS */
+  thead th:first-child,
+  thead th:nth-child(2) {
+    z-index: 13;
+  }
+
+  /* ========================= */
+  /* COLUMNA POSICIÓN */
+  /* ========================= */
+  th:first-child,
+  td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: #0f0f0f;
+
+    /* 🔥 SELLADO DEL GAP */
+    box-shadow: 10px 0 0 #0f0f0f;
+  }
+
+  /* ========================= */
+  /* COLUMNA TEAM */
+  /* ========================= */
+ td:nth-child(2),
+th:nth-child(2) {
+  position: sticky;
+  left: 45px;
+  z-index: 11;
+  background: #0f0f0f;
+}
+
+/* 🔥 ESTE ES EL FIX REAL */
+td:nth-child(2)::before,
+th:nth-child(2)::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: #0f0f0f;
+  z-index: 12;
+}
+
+  /* ========================= */
+  /* TOP 10 */
+  /* ========================= */
+  .top10 {
+    background: transparent !important;
+  }
+
+  .top10 td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 12;
+    background: #0f0f0f;
+  }
+
+  .top10 td:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #C21E56;
+    z-index: 14;
+  }
+
+  /* ========================= */
+  /* UNCLE DREW */
+  /* ========================= */
+
+  .highlight-team td {
+    background: transparent;
+  }
+
+  .highlight-team td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 12;
+    background: #0f0f0f;
+  }
+
+ /* 🔥 GAP FIX SOLO PARA UNCLE DREW */
+.highlight-team td:nth-child(2)::before {
+  content: "";
+  position: absolute;
+  left: -10px;   /* 🔥 más a la izquierda */
+  top: 0;
+  bottom: 0;
+  width: 12px;  /* 🔥 más ancho */
+  background: rgba(255, 140, 66, 0.25);
+  z-index: 1;
+}
+
+  .highlight-team td:nth-child(2) {
+    position: sticky;
+    left: 48px;
+    z-index: 13;
+
+    background: #0f0f0f;
+    font-weight: 600;
+
+    overflow: hidden;
+  }
+
+  /* capa naranja */
+  .highlight-team td:nth-child(2)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 140, 66, 0.25);
+    z-index: 0;
+  }
+
+  /* texto arriba */
+  .highlight-team td:nth-child(2) * {
+    position: relative;
+    z-index: 1;
+  }
+
+}
+
+  
+
+
 </style>
 </head>
 
