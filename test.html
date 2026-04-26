@@ -25,9 +25,11 @@ body {
 .header h1 {
   margin: 0;
   font-size: 22px;
+  letter-spacing: 1px;
 }
 
 .data-source {
+  margin-top: 4px;
   font-size: 11px;
   opacity: 0.4;
 }
@@ -42,12 +44,15 @@ body {
 
 .live-indicator::before {
   content: "●";
+  color: #C21E56;
   margin-right: 6px;
   animation: pulse 1.2s infinite;
 }
 
 @keyframes pulse {
+  0% { opacity: 1; }
   50% { opacity: 0.3; }
+  100% { opacity: 1; }
 }
 
 /* RESET */
@@ -78,6 +83,7 @@ body {
 }
 
 @keyframes scrollX {
+  0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 
@@ -90,96 +96,253 @@ body {
   box-shadow: 0 0 0 1px rgba(194, 30, 86, 0.35);
 }
 
-/* CONTAINER */
+/* TABLE */
 .container {
   padding: 12px;
   max-width: 1000px;
   margin: auto;
 }
 
-/* GRID */
-.grid-wrap {
+.table-wrap {
   overflow-x: auto;
+  border-radius: 12px;
 }
 
-.grid-row {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(70px, auto);
-  min-width: max-content;
-}
-
-.cell {
-  padding: 8px;
-  border-bottom: 1px solid #1c1c1c;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 520px;
   background: #0f0f0f;
-  text-align: center;
+  border: 1px solid #222;
+  table-layout: auto;
 }
 
-/* HEADER */
-.grid-header .cell {
-  position: sticky;
-  top: 0;
-  z-index: 5;
+thead {
   background: #111;
+}
+
+th {
+  padding: 6px 8px;
   font-size: 12px;
   text-transform: uppercase;
+  letter-spacing: 1px;
   color: #aaa;
   cursor: pointer;
+  background: rgba(255,255,255,0.04);
 }
 
-/* COLUMNAS FIJAS */
-.pos {
-  position: sticky;
-  left: 0;
-  z-index: 6;
-  background: #0f0f0f;
+td {
+  padding: 6px 8px;
+  font-size: 14px;
+  text-align: center;
+  border-top: 1px solid #1c1c1c;
 }
 
-.team {
-  position: sticky;
-  left: 60px;
-  z-index: 7;
-  background: #0f0f0f;
-  text-align: left;
-  padding-left: 10px;
+tbody tr:hover {
+  background: rgba(255,255,255,0.03);
 }
 
 /* TOP 10 */
-.top10 .pos::before {
+.top10 {
+  background: rgba(255,255,255,0.07);
+  border-left: 3px solid #C21E56;
+}
+
+/* UNCLE DREW */
+.highlight-team {
+  position: relative;
+}
+
+.highlight-team td {
+  background: rgba(255, 140, 66, 0.08);
+}
+
+/* BAR LATERAL */
+.highlight-team td:first-child {
+  position: relative;
+}
+
+.highlight-team td:first-child::before {
   content: "";
   position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
   width: 3px;
-  background: #C21E56;
-}
-
-/* UNCLE DREW */
-.highlight-team .team {
-  background: rgba(255, 140, 66, 0.2);
-  font-weight: 600;
-}
-
-.highlight-team .pos::before {
   background: #ff8c42;
 }
 
+/* TEAM COLUMN */
+table th:nth-child(2),
+table td:nth-child(2) {
+  min-width: 120px;
+  white-space: nowrap;
+  padding: 0 10px;
+}
+
+/* LAST 5 FIX (COMPACTO) */
+table th:last-child,
+table td:last-child {
+  white-space: nowrap;
+  width: 55px;
+  max-width: 55px;
+  padding: 6px 4px;
+}
+
 /* SORT */
-.header-cell.sorted-asc {
+th.sorted-asc {
+  color: #fff;
   border-bottom: 2px solid #ef4444;
-  color: #fff;
 }
 
-.header-cell.sorted-desc {
+th.sorted-desc {
+  color: #fff;
   border-top: 2px solid #ef4444;
+}
+
+th.sorted-active {
   color: #fff;
 }
 
-.header-cell.sorted-active {
-  color: #fff;
+
+@media (max-width: 768px) {
+
+  /* ========================= */
+  /* HEADER (SIEMPRE ARRIBA DE TODO) */
+  /* ========================= */
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #111;
+  }
+
+  /* HEADER DE COLUMNAS FIJAS */
+  thead th:first-child,
+  thead th:nth-child(2) {
+    z-index: 13;
+  }
+
+  /* ========================= */
+  /* COLUMNA POSICIÓN */
+  /* ========================= */
+  th:first-child,
+  td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: #0f0f0f;
+
+    /* 🔥 SELLADO DEL GAP */
+    box-shadow: 10px 0 0 #0f0f0f;
+  }
+
+  /* ========================= */
+  /* COLUMNA TEAM */
+  /* ========================= */
+ td:nth-child(2),
+th:nth-child(2) {
+  position: sticky;
+  left: 45px;
+  z-index: 11;
+  background: #0f0f0f;
 }
+
+/* 🔥 ESTE ES EL FIX REAL */
+td:nth-child(2)::before,
+th:nth-child(2)::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  background: #0f0f0f;
+  z-index: 1; /* 🔥 BAJO */
+}
+
+  /* ========================= */
+  /* TOP 10 */
+  /* ========================= */
+  .top10 {
+    background: transparent !important;
+  }
+
+  .top10 td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 12;
+    background: #0f0f0f;
+  }
+
+  .top10 td:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #C21E56;
+    z-index: 14;
+  }
+
+  /* ========================= */
+  /* UNCLE DREW */
+  /* ========================= */
+
+  .highlight-team td {
+    background: transparent;
+  }
+
+  .highlight-team td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 12;
+    background: #0f0f0f;
+  }
+
+ /* 🔥 GAP FIX SOLO PARA UNCLE DREW */
+.highlight-team td:nth-child(2)::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: 0;
+  bottom: 0;
+  width: 14px;
+  background: rgba(255, 140, 66, 0.25);
+  z-index: 3; /* 🔥 MÁS ALTO */
+}
+
+  .highlight-team td:nth-child(2) {
+    position: sticky;
+    left: 48px;
+    z-index: 13;
+
+    background: #0f0f0f;
+    font-weight: 600;
+
+    overflow: hidden;
+  }
+
+  /* capa naranja */
+  .highlight-team td:nth-child(2)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 140, 66, 0.25);
+    z-index: 2;
+  }
+
+  /* texto arriba */
+  .highlight-team td:nth-child(2) * {
+    position: relative;
+    z-index: 1;
+  }
+
+}
+
+  
+
 
 </style>
 </head>
@@ -195,13 +358,15 @@ body {
 </div>
 
 <div class="container">
-  <div id="app"></div>
+  <div class="table-wrap" id="app"></div>
 </div>
 
 <script>
 
 const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
+
 const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
+
 const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=868310309&single=true&output=csv";
 
 let sortColumn = null;
@@ -222,15 +387,19 @@ function sortTable(col) {
     sortColumn = col;
     sortDir = "desc";
   }
+
   load();
   setTimeout(updateSortUI, 50);
 }
 
 /* SORT UI */
 function updateSortUI() {
-  document.querySelectorAll(".header-cell").forEach(th => {
+  document.querySelectorAll("th").forEach(th => {
     th.classList.remove("sorted-asc", "sorted-desc", "sorted-active");
-    if (th.textContent.trim() === sortColumn) {
+
+    const key = th.textContent.trim();
+
+    if (key === sortColumn) {
       th.classList.add("sorted-active");
       th.classList.add(sortDir === "asc" ? "sorted-asc" : "sorted-desc");
     }
@@ -239,43 +408,63 @@ function updateSortUI() {
 
 /* STREAK */
 function calculateStreak(team, games) {
-  let type = null, count = 0;
-  for (let g of games) {
-    const a = g["TEAM_A"], b = g["TEAM_B"];
-    const sa = Number(g["SCORE_A"]) || 0;
-    const sb = Number(g["SCORE_B"]) || 0;
-    if (!a || !b) continue;
+  let type = null;
+  let count = 0;
 
-    let r = null;
-    if (team === a) r = sa > sb ? "W" : "L";
-    else if (team === b) r = sb > sa ? "W" : "L";
+  for (let g of games) {
+    const teamA = g["TEAM_A"];
+    const teamB = g["TEAM_B"];
+
+    const scoreA = Number(g["SCORE_A"]) || 0;
+    const scoreB = Number(g["SCORE_B"]) || 0;
+
+    if (!teamA || !teamB) continue;
+
+    let result = null;
+
+    if (team === teamA) result = scoreA > scoreB ? "W" : "L";
+    else if (team === teamB) result = scoreB > scoreA ? "W" : "L";
     else continue;
 
-    if (!type) { type = r; count = 1; }
-    else if (r === type) count++;
-    else break;
+    if (!type) {
+      type = result;
+      count = 1;
+    } else if (result === type) {
+      count++;
+    } else break;
   }
+
   return type ? `${type}${count}` : "";
 }
 
 /* LAST 5 */
 function calculateLast5(team, games) {
-  let res = [];
-  for (let g of games) {
-    const a = g["TEAM_A"], b = g["TEAM_B"];
-    const sa = Number(g["SCORE_A"]) || 0;
-    const sb = Number(g["SCORE_B"]) || 0;
-    if (!a || !b) continue;
+  let results = [];
 
-    let r = null;
-    if (team === a) r = sa > sb ? "W" : "L";
-    else if (team === b) r = sb > sa ? "W" : "L";
+  for (let g of games) {
+    const teamA = g["TEAM_A"];
+    const teamB = g["TEAM_B"];
+
+    const scoreA = Number(g["SCORE_A"]) || 0;
+    const scoreB = Number(g["SCORE_B"]) || 0;
+
+    if (!teamA || !teamB) continue;
+
+    let result = null;
+
+    if (team === teamA) result = scoreA > scoreB ? "W" : "L";
+    else if (team === teamB) result = scoreB > scoreA ? "W" : "L";
     else continue;
 
-    res.push(r);
-    if (res.length === 5) break;
+    results.push(result);
+
+    if (results.length === 5) break;
   }
-  return `${res.filter(x=>x==="W").length}-${res.filter(x=>x==="L").length}`;
+
+  const wins = results.filter(r => r === "W").length;
+  const losses = results.filter(r => r === "L").length;
+
+  return `${wins}-${losses}`;
 }
 
 /* LOAD */
@@ -287,7 +476,7 @@ async function load() {
 
   let data = rows.slice(1).map(r => {
     let obj = {};
-    headers.forEach((h,i)=>obj[h]=r[i]?.trim());
+    headers.forEach((h, i) => obj[h] = r[i]?.trim());
     return obj;
   });
 
@@ -297,81 +486,88 @@ async function load() {
 
   const games = rowsG.slice(1).map(r => {
     let obj = {};
-    headersG.forEach((h,i)=>obj[h]=r[i]?.trim());
+    headersG.forEach((h, i) => obj[h] = r[i]?.trim());
     return obj;
   });
 
   const textR = await (await fetch(RESULTS_URL)).text();
   const results = textR.trim().split("\n").slice(1);
 
-  /* ticker */
+  /* TICKER */
   const ticker = document.getElementById("ticker-text");
-  const cards = results.map(r=>{
-    const p=r.split(",");
-    return `<div class="game-card">
-      <div>${p[0]||""}</div>
-      <div><b>${p[1]||""}</b> ${p[2]||""}</div>
-      <div>${p[3]||""}</div>
-    </div>`;
+
+  const cards = results.map(r => {
+    const p = r.split(",");
+    return `
+      <div class="game-card">
+        <div>${p[0] || ""}</div>
+        <div><b>${p[1] || ""}</b> ${p[2] || ""}</div>
+        <div>${p[3] || ""}</div>
+      </div>
+    `;
   }).join("");
+
   ticker.innerHTML = `<div class="feed-wrapper">${cards}${cards}</div>`;
 
+  /* DATA */
   const posKey = headers[0];
-  const teamKey = headers.find(h=>h.includes("TEAM"));
+  const teamKey = headers.find(h => h.includes("TEAM"));
 
-  data.forEach(row=>{
-    const t=row[teamKey];
-    row["STREAK"]=calculateStreak(t,games);
-    row["LAST 5"]=calculateLast5(t,games);
+  data.forEach(row => {
+    const team = row[teamKey];
+    row["STREAK"] = calculateStreak(team, games);
+    row["LAST 5"] = calculateLast5(team, games);
   });
 
+  /* SORT */
   if (sortColumn) {
-    data.sort((a,b)=>{
-      let A=isNaN(a[sortColumn])?a[sortColumn]:Number(a[sortColumn]);
-      let B=isNaN(b[sortColumn])?b[sortColumn]:Number(b[sortColumn]);
-      return sortDir==="asc"?A-B:B-A;
+    data.sort((a, b) => {
+      let A = isNaN(a[sortColumn]) ? a[sortColumn] : Number(a[sortColumn]);
+      let B = isNaN(b[sortColumn]) ? b[sortColumn] : Number(b[sortColumn]);
+      return sortDir === "asc" ? A - B : B - A;
     });
   } else {
-    data.sort((a,b)=>Number(a[posKey])-Number(b[posKey]));
+    data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
   }
 
+  /* TABLE */
   const app = document.getElementById("app");
-  let cols = headers.concat(["STREAK","LAST 5"]);
 
-  let html = `<div class="grid-wrap">`;
+  let html = "<table><thead><tr>";
 
-  html += `<div class="grid-row grid-header">`;
-  cols.forEach(h=>{
-    html += `<div class="cell header-cell" onclick="sortTable('${h}')">${h}</div>`;
+  headers.concat(["STREAK", "LAST 5"]).forEach(h => {
+    html += `<th onclick="sortTable('${h}')">${h}</th>`;
   });
-  html += `</div>`;
 
-  data.forEach((row,i)=>{
-    const team=row[teamKey];
-    let cls="grid-row";
-    if(i<10) cls+=" top10";
-    if(team?.toLowerCase()==="uncle drew") cls+=" highlight-team";
+  html += "</tr></thead><tbody>";
 
-    html += `<div class="${cls}">`;
+  data.forEach((row, i) => {
 
-    cols.forEach((h,index)=>{
-      let val=row[h]||"";
-      if(h==="STREAK"){
-        const c=val.startsWith("W")?"#22c55e":"#ef4444";
-        val=`<span style="color:${c};font-weight:600">${val}</span>`;
+    const team = row[teamKey];
+    let cls = i < 10 ? "top10" : "";
+
+    if (team?.toLowerCase() === "uncle drew") {
+      cls += " highlight-team";
+    }
+
+    html += `<tr class="${cls}">`;
+
+    headers.concat(["STREAK", "LAST 5"]).forEach(h => {
+      let value = row[h] || "";
+
+      if (h === "STREAK") {
+        const color = value.startsWith("W") ? "#22c55e" : "#ef4444";
+        value = `<span style="color:${color}; font-weight:600">${value}</span>`;
       }
 
-      let extra="";
-      if(index===0) extra="pos";
-      if(index===1) extra="team";
-
-      html += `<div class="cell ${extra}">${val}</div>`;
+      html += `<td>${value}</td>`;
     });
 
-    html += `</div>`;
+    html += "</tr>";
   });
 
-  html += `</div>`;
+  html += "</tbody></table>";
+
   app.innerHTML = html;
 
   updateSortUI();
@@ -397,3 +593,4 @@ document.addEventListener("visibilitychange", () => {
 
 </body>
 </html>
+
