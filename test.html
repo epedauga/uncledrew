@@ -258,7 +258,7 @@ th:nth-child(2)::before {
   bottom: 0;
   width: 12px;
   background: #0f0f0f;
-  z-index: 12;
+  z-index: 1; /* 🔥 BAJO */
 }
 
   /* ========================= */
@@ -305,12 +305,12 @@ th:nth-child(2)::before {
 .highlight-team td:nth-child(2)::before {
   content: "";
   position: absolute;
-  left: -12px;   /* 🔥 más a la izquierda */
+  left: -12px;
   top: 0;
   bottom: 0;
-  width: 14px;  /* 🔥 más ancho */
+  width: 14px;
   background: rgba(255, 140, 66, 0.25);
-  z-index: 1;
+  z-index: 3; /* 🔥 MÁS ALTO */
 }
 
   .highlight-team td:nth-child(2) {
@@ -330,7 +330,7 @@ th:nth-child(2)::before {
     position: absolute;
     inset: 0;
     background: rgba(255, 140, 66, 0.25);
-    z-index: 0;
+    z-index: 2;
   }
 
   /* texto arriba */
