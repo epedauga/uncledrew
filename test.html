@@ -1,279 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏀 Standings - Uncle Drew’s season</title>
-
-<style>
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
-  background: #0a0a0a;
-  color: #fff;
-}
-
-/* HEADER */
-.header {
-  padding: 18px;
-  text-align: center;
-  background: #111;
-  border-bottom: 1px solid #222;
-}
-
-.header h1 {
-  margin: 0;
-  font-size: 22px;
-  letter-spacing: 1px;
-}
-
-.data-source {
-  margin-top: 4px;
-  font-size: 11px;
-  opacity: 0.4;
-}
-
-/* LIVE */
-.live-indicator {
-  margin-top: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #C21E56;
-}
-
-.live-indicator::before {
-  content: "●";
-  color: #C21E56;
-  margin-right: 6px;
-  animation: pulse 1.2s infinite;
-}
-
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.3; }
-  100% { opacity: 1; }
-}
-
-/* RESET */
-.reset-btn {
-  margin-top: 10px;
-  background: #151515;
-  color: #aaa;
-  border: 1px solid #222;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-/* TICKER */
-#ticker-text {
-  margin-top: 10px;
-  overflow: hidden;
-  padding: 10px 0;
-  border-top: 1px solid #1c1c1c;
-}
-
-.feed-wrapper {
-  display: flex;
-  gap: 12px;
-  width: max-content;
-  animation: scrollX 80s linear infinite;
-}
-
-@keyframes scrollX {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.game-card {
-  min-width: 220px;
-  background: #151515;
-  border-radius: 10px;
-  padding: 10px;
-  font-size: 12px;
-  box-shadow: 0 0 0 1px rgba(194, 30, 86, 0.35);
-}
-
-/* TABLE */
-.container {
-  padding: 12px;
-  max-width: 1000px;
-  margin: auto;
-}
-
-.table-wrap {
-  overflow-x: auto;
-  border-radius: 12px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 520px;
-  background: #0f0f0f;
-  border: 1px solid #222;
-}
-
-thead {
-  background: #111;
-}
-
-th {
-  padding: 6px 8px;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #aaa;
-  cursor: pointer;
-  background: rgba(255,255,255,0.04);
-}
-
-td {
-  padding: 6px 8px;
-  font-size: 14px;
-  text-align: center;
-  border-top: 1px solid #1c1c1c;
-}
-
-tbody tr {
-  transition: background 0.25s ease;
-}
-
-tbody tr:hover {
-  background: rgba(255,255,255,0.03);
-}
-
-/* TOP 10 */
-.top10 {
-  background: rgba(255,255,255,0.07);
-  border-left: 3px solid #C21E56;
-}
-
-/* HIGHLIGHT (dinámico + Uncle Drew) */
-.highlight-team td {
-  background: rgba(255, 140, 66, 0.12);
-  transition: all 0.25s ease;
-}
-
-/* barra lateral */
-.highlight-team td:first-child::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: #ff8c42;
-}
-
-/* TEAM CLICKABLE */
-td.team-cell {
-  cursor: pointer;
-}
-
-/* TEAM COLUMN */
-table th:nth-child(2),
-table td:nth-child(2) {
-  min-width: 120px;
-  white-space: nowrap;
-  padding: 0 10px;
-}
-
-/* LAST 5 */
-table th:last-child,
-table td:last-child {
-  white-space: nowrap;
-  width: 55px;
-}
-
-/* SORT */
-th.sorted-asc { color:#fff;border-bottom:2px solid #ef4444; }
-th.sorted-desc { color:#fff;border-top:2px solid #ef4444; }
-th.sorted-active { color:#fff; }
-
-/* ================= MOBILE ================= */
-@media (max-width:768px){
-
-thead th{
-  position:sticky;
-  top:0;
-  z-index:10;
-  background:#111;
-}
-
-thead th:first-child,
-thead th:nth-child(2){
-  z-index:13;
-}
-
-th:first-child, td:first-child{
-  position:sticky;
-  left:0;
-  z-index:10;
-  background:#0f0f0f;
-  box-shadow:10px 0 0 #0f0f0f;
-}
-
-th:nth-child(2), td:nth-child(2){
-  position:sticky;
-  left:45px;
-  z-index:11;
-  background:#0f0f0f;
-}
-
-/* FIX GAP */
-td:nth-child(2)::before,
-th:nth-child(2)::before{
-  content:"";
-  position:absolute;
-  left:-10px;
-  top:0;
-  bottom:0;
-  width:12px;
-  background:#0f0f0f;
-  z-index:1;
-}
-
-/* Uncle Drew + seleccionado */
-.highlight-team td:nth-child(2){
-  background:#0f0f0f;
-  font-weight:600;
-}
-
-.highlight-team td:nth-child(2)::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(255,140,66,0.25);
-  z-index:0;
-}
-
-.highlight-team td:nth-child(2) *{
-  position:relative;
-  z-index:1;
-}
-
-}
-
-</style>
-</head>
-
-<body>
-
-<div class="header">
-  <h1>STANDINGS</h1>
-  <div class="data-source">Data source: Google Sheets</div>
-  <div class="live-indicator">LIVE</div>
-  <button class="reset-btn" onclick="resetSort()">Reset order</button>
-  <div id="ticker-text">Cargando resultados...</div>
-</div>
-
-<div class="container">
-  <div class="table-wrap" id="app"></div>
-</div>
-
 <script>
 
 const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
@@ -283,10 +7,10 @@ const RESULTS_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AO
 let sortColumn=null;
 let sortDir="desc";
 
-/* 🔥 NUEVO */
+/* 🔥 SOLO selección del usuario */
 let selectedTeam=localStorage.getItem("team");
 
-/* SELECCIÓN */
+/* CLICK */
 function selectTeam(team){
   selectedTeam=team;
   localStorage.setItem("team",team);
@@ -411,8 +135,8 @@ data.forEach((row,i)=>{
 let team=row[teamKey];
 let cls=i<10?"top10":"";
 
-/* 🔥 NUEVO */
-if(team?.toLowerCase()==="uncle drew" || team===selectedTeam){
+/* 🔥 SOLO seleccionado */
+if(team===selectedTeam){
 cls+=" highlight-team";
 }
 
@@ -426,7 +150,7 @@ let c=val.startsWith("W")?"#22c55e":"#ef4444";
 val=`<span style="color:${c};font-weight:600">${val}</span>`;
 }
 
-/* 🔥 CLICK */
+/* CLICK */
 if(h===teamKey){
 html+=`<td class="team-cell" onclick="selectTeam('${val}')">${val}</td>`;
 }else{
@@ -453,6 +177,3 @@ else if(!timer){load();timer=setInterval(load,30000);}
 });
 
 </script>
-
-</body>
-</html>
