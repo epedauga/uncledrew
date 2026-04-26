@@ -114,7 +114,6 @@ table {
   min-width: 520px;
   background: #0f0f0f;
   border: 1px solid #222;
-  table-layout: auto;
 }
 
 thead {
@@ -138,6 +137,10 @@ td {
   border-top: 1px solid #1c1c1c;
 }
 
+tbody tr {
+  transition: background 0.25s ease;
+}
+
 tbody tr:hover {
   background: rgba(255,255,255,0.03);
 }
@@ -148,20 +151,13 @@ tbody tr:hover {
   border-left: 3px solid #C21E56;
 }
 
-/* UNCLE DREW */
-.highlight-team {
-  position: relative;
-}
-
+/* HIGHLIGHT (dinámico + Uncle Drew) */
 .highlight-team td {
-  background: rgba(255, 140, 66, 0.08);
+  background: rgba(255, 140, 66, 0.12);
+  transition: all 0.25s ease;
 }
 
-/* BAR LATERAL */
-.highlight-team td:first-child {
-  position: relative;
-}
-
+/* barra lateral */
 .highlight-team td:first-child::before {
   content: "";
   position: absolute;
@@ -172,6 +168,11 @@ tbody tr:hover {
   background: #ff8c42;
 }
 
+/* TEAM CLICKABLE */
+td.team-cell {
+  cursor: pointer;
+}
+
 /* TEAM COLUMN */
 table th:nth-child(2),
 table td:nth-child(2) {
@@ -180,169 +181,81 @@ table td:nth-child(2) {
   padding: 0 10px;
 }
 
-/* LAST 5 FIX (COMPACTO) */
+/* LAST 5 */
 table th:last-child,
 table td:last-child {
   white-space: nowrap;
   width: 55px;
-  max-width: 55px;
-  padding: 6px 4px;
 }
 
 /* SORT */
-th.sorted-asc {
-  color: #fff;
-  border-bottom: 2px solid #ef4444;
+th.sorted-asc { color:#fff;border-bottom:2px solid #ef4444; }
+th.sorted-desc { color:#fff;border-top:2px solid #ef4444; }
+th.sorted-active { color:#fff; }
+
+/* ================= MOBILE ================= */
+@media (max-width:768px){
+
+thead th{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#111;
 }
 
-th.sorted-desc {
-  color: #fff;
-  border-top: 2px solid #ef4444;
+thead th:first-child,
+thead th:nth-child(2){
+  z-index:13;
 }
 
-th.sorted-active {
-  color: #fff;
+th:first-child, td:first-child{
+  position:sticky;
+  left:0;
+  z-index:10;
+  background:#0f0f0f;
+  box-shadow:10px 0 0 #0f0f0f;
 }
 
-
-@media (max-width: 768px) {
-
-  /* ========================= */
-  /* HEADER (SIEMPRE ARRIBA DE TODO) */
-  /* ========================= */
-  thead th {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: #111;
-  }
-
-  /* HEADER DE COLUMNAS FIJAS */
-  thead th:first-child,
-  thead th:nth-child(2) {
-    z-index: 13;
-  }
-
-  /* ========================= */
-  /* COLUMNA POSICIÓN */
-  /* ========================= */
-  th:first-child,
-  td:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 10;
-    background: #0f0f0f;
-
-    /* 🔥 SELLADO DEL GAP */
-    box-shadow: 10px 0 0 #0f0f0f;
-  }
-
-  /* ========================= */
-  /* COLUMNA TEAM */
-  /* ========================= */
- td:nth-child(2),
-th:nth-child(2) {
-  position: sticky;
-  left: 45px;
-  z-index: 11;
-  background: #0f0f0f;
+th:nth-child(2), td:nth-child(2){
+  position:sticky;
+  left:45px;
+  z-index:11;
+  background:#0f0f0f;
 }
 
-/* 🔥 ESTE ES EL FIX REAL */
+/* FIX GAP */
 td:nth-child(2)::before,
-th:nth-child(2)::before {
-  content: "";
-  position: absolute;
-  left: -10px;
-  top: 0;
-  bottom: 0;
-  width: 12px;
-  background: #0f0f0f;
-  z-index: 1; /* 🔥 BAJO */
+th:nth-child(2)::before{
+  content:"";
+  position:absolute;
+  left:-10px;
+  top:0;
+  bottom:0;
+  width:12px;
+  background:#0f0f0f;
+  z-index:1;
 }
 
-  /* ========================= */
-  /* TOP 10 */
-  /* ========================= */
-  .top10 {
-    background: transparent !important;
-  }
-
-  .top10 td:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 12;
-    background: #0f0f0f;
-  }
-
-  .top10 td:first-child::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: #C21E56;
-    z-index: 14;
-  }
-
-  /* ========================= */
-  /* UNCLE DREW */
-  /* ========================= */
-
-  .highlight-team td {
-    background: transparent;
-  }
-
-  .highlight-team td:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 12;
-    background: #0f0f0f;
-  }
-
- /* 🔥 GAP FIX SOLO PARA UNCLE DREW */
-.highlight-team td:nth-child(2)::before {
-  content: "";
-  position: absolute;
-  left: -12px;
-  top: 0;
-  bottom: 0;
-  width: 14px;
-  background: rgba(255, 140, 66, 0.25);
-  z-index: 3; /* 🔥 MÁS ALTO */
+/* Uncle Drew + seleccionado */
+.highlight-team td:nth-child(2){
+  background:#0f0f0f;
+  font-weight:600;
 }
 
-  .highlight-team td:nth-child(2) {
-    position: sticky;
-    left: 48px;
-    z-index: 13;
-
-    background: #0f0f0f;
-    font-weight: 600;
-
-    overflow: hidden;
-  }
-
-  /* capa naranja */
-  .highlight-team td:nth-child(2)::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 140, 66, 0.25);
-    z-index: 2;
-  }
-
-  /* texto arriba */
-  .highlight-team td:nth-child(2) * {
-    position: relative;
-    z-index: 1;
-  }
-
+.highlight-team td:nth-child(2)::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(255,140,66,0.25);
+  z-index:0;
 }
 
-  
+.highlight-team td:nth-child(2) *{
+  position:relative;
+  z-index:1;
+}
 
+}
 
 </style>
 </head>
@@ -363,234 +276,183 @@ th:nth-child(2)::before {
 
 <script>
 
-const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
+const URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
+const GAMES_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
+const RESULTS_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=868310309&single=true&output=csv";
 
-const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
+let sortColumn=null;
+let sortDir="desc";
 
-const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=868310309&single=true&output=csv";
+/* 🔥 NUEVO */
+let selectedTeam=localStorage.getItem("team");
 
-let sortColumn = null;
-let sortDir = "desc";
-
-/* RESET */
-function resetSort() {
-  sortColumn = null;
-  sortDir = "desc";
+/* SELECCIÓN */
+function selectTeam(team){
+  selectedTeam=team;
+  localStorage.setItem("team",team);
   load();
 }
 
-/* SORT */
-function sortTable(col) {
-  if (sortColumn === col) {
-    sortDir = sortDir === "asc" ? "desc" : "asc";
-  } else {
-    sortColumn = col;
-    sortDir = "desc";
-  }
+/* RESET */
+function resetSort(){sortColumn=null;sortDir="desc";load();}
 
+/* SORT */
+function sortTable(col){
+  if(sortColumn===col){sortDir=sortDir==="asc"?"desc":"asc";}
+  else{sortColumn=col;sortDir="desc";}
   load();
-  setTimeout(updateSortUI, 50);
+  setTimeout(updateSortUI,50);
 }
 
 /* SORT UI */
-function updateSortUI() {
-  document.querySelectorAll("th").forEach(th => {
-    th.classList.remove("sorted-asc", "sorted-desc", "sorted-active");
-
-    const key = th.textContent.trim();
-
-    if (key === sortColumn) {
+function updateSortUI(){
+  document.querySelectorAll("th").forEach(th=>{
+    th.classList.remove("sorted-asc","sorted-desc","sorted-active");
+    if(th.textContent.trim()===sortColumn){
       th.classList.add("sorted-active");
-      th.classList.add(sortDir === "asc" ? "sorted-asc" : "sorted-desc");
+      th.classList.add(sortDir==="asc"?"sorted-asc":"sorted-desc");
     }
   });
 }
 
 /* STREAK */
-function calculateStreak(team, games) {
-  let type = null;
-  let count = 0;
-
-  for (let g of games) {
-    const teamA = g["TEAM_A"];
-    const teamB = g["TEAM_B"];
-
-    const scoreA = Number(g["SCORE_A"]) || 0;
-    const scoreB = Number(g["SCORE_B"]) || 0;
-
-    if (!teamA || !teamB) continue;
-
-    let result = null;
-
-    if (team === teamA) result = scoreA > scoreB ? "W" : "L";
-    else if (team === teamB) result = scoreB > scoreA ? "W" : "L";
-    else continue;
-
-    if (!type) {
-      type = result;
-      count = 1;
-    } else if (result === type) {
-      count++;
-    } else break;
+function calculateStreak(team,games){
+  let type=null,count=0;
+  for(let g of games){
+    let A=g["TEAM_A"],B=g["TEAM_B"];
+    let sA=+g["SCORE_A"]||0,sB=+g["SCORE_B"]||0;
+    if(!A||!B)continue;
+    let r=team===A?(sA>sB?"W":"L"):team===B?(sB>sA?"W":"L"):null;
+    if(!r)continue;
+    if(!type){type=r;count=1;}
+    else if(r===type)count++; else break;
   }
-
-  return type ? `${type}${count}` : "";
+  return type?`${type}${count}`:"";
 }
 
-/* LAST 5 */
-function calculateLast5(team, games) {
-  let results = [];
-
-  for (let g of games) {
-    const teamA = g["TEAM_A"];
-    const teamB = g["TEAM_B"];
-
-    const scoreA = Number(g["SCORE_A"]) || 0;
-    const scoreB = Number(g["SCORE_B"]) || 0;
-
-    if (!teamA || !teamB) continue;
-
-    let result = null;
-
-    if (team === teamA) result = scoreA > scoreB ? "W" : "L";
-    else if (team === teamB) result = scoreB > scoreA ? "W" : "L";
-    else continue;
-
-    results.push(result);
-
-    if (results.length === 5) break;
+/* LAST5 */
+function calculateLast5(team,games){
+  let res=[];
+  for(let g of games){
+    let A=g["TEAM_A"],B=g["TEAM_B"];
+    let sA=+g["SCORE_A"]||0,sB=+g["SCORE_B"]||0;
+    if(!A||!B)continue;
+    let r=team===A?(sA>sB?"W":"L"):team===B?(sB>sA?"W":"L"):null;
+    if(!r)continue;
+    res.push(r);
+    if(res.length===5)break;
   }
-
-  const wins = results.filter(r => r === "W").length;
-  const losses = results.filter(r => r === "L").length;
-
-  return `${wins}-${losses}`;
+  return `${res.filter(x=>x==="W").length}-${res.filter(x=>x==="L").length}`;
 }
 
 /* LOAD */
-async function load() {
+async function load(){
 
-  const text = await (await fetch(URL)).text();
-  const rows = text.trim().split("\n").map(r => r.split(","));
-  const headers = rows[0].map(h => h.trim());
+const text=await(await fetch(URL)).text();
+const rows=text.trim().split("\n").map(r=>r.split(","));
+const headers=rows[0].map(h=>h.trim());
 
-  let data = rows.slice(1).map(r => {
-    let obj = {};
-    headers.forEach((h, i) => obj[h] = r[i]?.trim());
-    return obj;
-  });
+let data=rows.slice(1).map(r=>{
+  let o={};headers.forEach((h,i)=>o[h]=r[i]?.trim());return o;
+});
 
-  const textG = await (await fetch(GAMES_URL)).text();
-  const rowsG = textG.trim().split("\n").map(r => r.split(","));
-  const headersG = rowsG[0].map(h => h.trim());
+const textG=await(await fetch(GAMES_URL)).text();
+const rowsG=textG.trim().split("\n").map(r=>r.split(","));
+const headersG=rowsG[0].map(h=>h.trim());
 
-  const games = rowsG.slice(1).map(r => {
-    let obj = {};
-    headersG.forEach((h, i) => obj[h] = r[i]?.trim());
-    return obj;
-  });
+const games=rowsG.slice(1).map(r=>{
+  let o={};headersG.forEach((h,i)=>o[h]=r[i]?.trim());return o;
+});
 
-  const textR = await (await fetch(RESULTS_URL)).text();
-  const results = textR.trim().split("\n").slice(1);
+const textR=await(await fetch(RESULTS_URL)).text();
+const results=textR.trim().split("\n").slice(1);
 
-  /* TICKER */
-  const ticker = document.getElementById("ticker-text");
+/* ticker */
+const ticker=document.getElementById("ticker-text");
+ticker.innerHTML=`<div class="feed-wrapper">${
+results.map(r=>{
+let p=r.split(",");
+return `<div class="game-card">
+<div>${p[0]||""}</div>
+<div><b>${p[1]||""}</b> ${p[2]||""}</div>
+<div>${p[3]||""}</div>
+</div>`;
+}).join("")}</div>`;
 
-  const cards = results.map(r => {
-    const p = r.split(",");
-    return `
-      <div class="game-card">
-        <div>${p[0] || ""}</div>
-        <div><b>${p[1] || ""}</b> ${p[2] || ""}</div>
-        <div>${p[3] || ""}</div>
-      </div>
-    `;
-  }).join("");
+/* data */
+const posKey=headers[0];
+const teamKey=headers.find(h=>h.includes("TEAM"));
 
-  ticker.innerHTML = `<div class="feed-wrapper">${cards}${cards}</div>`;
+data.forEach(r=>{
+  let t=r[teamKey];
+  r["STREAK"]=calculateStreak(t,games);
+  r["LAST 5"]=calculateLast5(t,games);
+});
 
-  /* DATA */
-  const posKey = headers[0];
-  const teamKey = headers.find(h => h.includes("TEAM"));
+/* sort */
+if(sortColumn){
+data.sort((a,b)=>{
+let A=isNaN(a[sortColumn])?a[sortColumn]:+a[sortColumn];
+let B=isNaN(b[sortColumn])?b[sortColumn]:+b[sortColumn];
+return sortDir==="asc"?A-B:B-A;
+});
+}else{
+data.sort((a,b)=>+a[posKey]-+b[posKey]);
+}
 
-  data.forEach(row => {
-    const team = row[teamKey];
-    row["STREAK"] = calculateStreak(team, games);
-    row["LAST 5"] = calculateLast5(team, games);
-  });
+/* table */
+let html="<table><thead><tr>";
+headers.concat(["STREAK","LAST 5"]).forEach(h=>{
+html+=`<th onclick="sortTable('${h}')">${h}</th>`;
+});
+html+="</tr></thead><tbody>";
 
-  /* SORT */
-  if (sortColumn) {
-    data.sort((a, b) => {
-      let A = isNaN(a[sortColumn]) ? a[sortColumn] : Number(a[sortColumn]);
-      let B = isNaN(b[sortColumn]) ? b[sortColumn] : Number(b[sortColumn]);
-      return sortDir === "asc" ? A - B : B - A;
-    });
-  } else {
-    data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
-  }
+data.forEach((row,i)=>{
+let team=row[teamKey];
+let cls=i<10?"top10":"";
 
-  /* TABLE */
-  const app = document.getElementById("app");
+/* 🔥 NUEVO */
+if(team?.toLowerCase()==="uncle drew" || team===selectedTeam){
+cls+=" highlight-team";
+}
 
-  let html = "<table><thead><tr>";
+html+=`<tr class="${cls}">`;
 
-  headers.concat(["STREAK", "LAST 5"]).forEach(h => {
-    html += `<th onclick="sortTable('${h}')">${h}</th>`;
-  });
+headers.concat(["STREAK","LAST 5"]).forEach(h=>{
+let val=row[h]||"";
 
-  html += "</tr></thead><tbody>";
+if(h==="STREAK"){
+let c=val.startsWith("W")?"#22c55e":"#ef4444";
+val=`<span style="color:${c};font-weight:600">${val}</span>`;
+}
 
-  data.forEach((row, i) => {
+/* 🔥 CLICK */
+if(h===teamKey){
+html+=`<td class="team-cell" onclick="selectTeam('${val}')">${val}</td>`;
+}else{
+html+=`<td>${val}</td>`;
+}
 
-    const team = row[teamKey];
-    let cls = i < 10 ? "top10" : "";
+});
 
-    if (team?.toLowerCase() === "uncle drew") {
-      cls += " highlight-team";
-    }
+html+="</tr>";
+});
 
-    html += `<tr class="${cls}">`;
-
-    headers.concat(["STREAK", "LAST 5"]).forEach(h => {
-      let value = row[h] || "";
-
-      if (h === "STREAK") {
-        const color = value.startsWith("W") ? "#22c55e" : "#ef4444";
-        value = `<span style="color:${color}; font-weight:600">${value}</span>`;
-      }
-
-      html += `<td>${value}</td>`;
-    });
-
-    html += "</tr>";
-  });
-
-  html += "</tbody></table>";
-
-  app.innerHTML = html;
-
-  updateSortUI();
+html+="</tbody></table>";
+document.getElementById("app").innerHTML=html;
+updateSortUI();
 }
 
 load();
 
-let timer = setInterval(load, 30000);
-
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    clearInterval(timer);
-    timer = null;
-  } else {
-    if (!timer) {
-      load();
-      timer = setInterval(load, 30000);
-    }
-  }
+/* refresh inteligente */
+let timer=setInterval(load,30000);
+document.addEventListener("visibilitychange",()=>{
+if(document.hidden){clearInterval(timer);timer=null;}
+else if(!timer){load();timer=setInterval(load,30000);}
 });
 
 </script>
 
 </body>
 </html>
-
