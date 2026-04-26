@@ -149,23 +149,27 @@ tbody tr:hover {
 }
 
 /* UNCLE DREW */
+.highlight-team {
+  position: relative;
+}
+
 .highlight-team td {
   background: rgba(255, 140, 66, 0.08);
 }
 
-/* ===================== */
-/* CLICK SELECT TEAM */
-/* ===================== */
-
-.selected-team td {
-  background: rgba(194, 30, 86, 0.14) !important;
+/* BAR LATERAL */
+.highlight-team td:first-child {
+  position: relative;
 }
 
-@media (max-width: 768px) {
-  .selected-team td:first-child,
-  .selected-team td:nth-child(2) {
-    background: rgba(194, 30, 86, 0.14) !important;
-  }
+.highlight-team td:first-child::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #ff8c42;
 }
 
 /* TEAM COLUMN */
@@ -176,7 +180,7 @@ table td:nth-child(2) {
   padding: 0 10px;
 }
 
-/* LAST 5 FIX */
+/* LAST 5 FIX (COMPACTO) */
 table th:last-child,
 table td:last-child {
   white-space: nowrap;
@@ -200,8 +204,12 @@ th.sorted-active {
   color: #fff;
 }
 
+
 @media (max-width: 768px) {
 
+  /* ========================= */
+  /* HEADER (SIEMPRE ARRIBA DE TODO) */
+  /* ========================= */
   thead th {
     position: sticky;
     top: 0;
@@ -209,24 +217,132 @@ th.sorted-active {
     background: #111;
   }
 
+  /* HEADER DE COLUMNAS FIJAS */
+  thead th:first-child,
+  thead th:nth-child(2) {
+    z-index: 13;
+  }
+
+  /* ========================= */
+  /* COLUMNA POSICIÓN */
+  /* ========================= */
   th:first-child,
   td:first-child {
     position: sticky;
     left: 0;
     z-index: 10;
     background: #0f0f0f;
+
+    /* 🔥 SELLADO DEL GAP */
     box-shadow: 10px 0 0 #0f0f0f;
   }
 
-  td:nth-child(2),
-  th:nth-child(2) {
+  /* ========================= */
+  /* COLUMNA TEAM */
+  /* ========================= */
+ td:nth-child(2),
+th:nth-child(2) {
+  position: sticky;
+  left: 45px;
+  z-index: 11;
+  background: #0f0f0f;
+}
+
+/* 🔥 ESTE ES EL FIX REAL */
+td:nth-child(2)::before,
+th:nth-child(2)::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: #0f0f0f;
+  z-index: 12;
+}
+
+  /* ========================= */
+  /* TOP 10 */
+  /* ========================= */
+  .top10 {
+    background: transparent !important;
+  }
+
+  .top10 td:first-child {
     position: sticky;
-    left: 45px;
-    z-index: 11;
+    left: 0;
+    z-index: 12;
     background: #0f0f0f;
   }
 
+  .top10 td:first-child::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #C21E56;
+    z-index: 14;
+  }
+
+  /* ========================= */
+  /* UNCLE DREW */
+  /* ========================= */
+
+  .highlight-team td {
+    background: transparent;
+  }
+
+  .highlight-team td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 12;
+    background: #0f0f0f;
+  }
+
+ /* 🔥 GAP FIX SOLO PARA UNCLE DREW */
+.highlight-team td:nth-child(2)::before {
+  content: "";
+  position: absolute;
+  left: -10px;   /* 🔥 más a la izquierda */
+  top: 0;
+  bottom: 0;
+  width: 12px;  /* 🔥 más ancho */
+  background: rgba(255, 140, 66, 0.25);
+  z-index: 1;
 }
+
+  .highlight-team td:nth-child(2) {
+    position: sticky;
+    left: 48px;
+    z-index: 13;
+
+    background: #0f0f0f;
+    font-weight: 600;
+
+    overflow: hidden;
+  }
+
+  /* capa naranja */
+  .highlight-team td:nth-child(2)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 140, 66, 0.25);
+    z-index: 0;
+  }
+
+  /* texto arriba */
+  .highlight-team td:nth-child(2) * {
+    position: relative;
+    z-index: 1;
+  }
+
+}
+
+  
+
 
 </style>
 </head>
@@ -256,12 +372,14 @@ const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_
 let sortColumn = null;
 let sortDir = "desc";
 
+/* RESET */
 function resetSort() {
   sortColumn = null;
   sortDir = "desc";
   load();
 }
 
+/* SORT */
 function sortTable(col) {
   if (sortColumn === col) {
     sortDir = sortDir === "asc" ? "desc" : "asc";
@@ -274,26 +392,21 @@ function sortTable(col) {
   setTimeout(updateSortUI, 50);
 }
 
+/* SORT UI */
 function updateSortUI() {
   document.querySelectorAll("th").forEach(th => {
     th.classList.remove("sorted-asc", "sorted-desc", "sorted-active");
 
-    if (th.textContent.trim() === sortColumn) {
+    const key = th.textContent.trim();
+
+    if (key === sortColumn) {
       th.classList.add("sorted-active");
       th.classList.add(sortDir === "asc" ? "sorted-asc" : "sorted-desc");
     }
   });
 }
 
-/* CLICK TEAM */
-function selectTeam(cell) {
-  document.querySelectorAll(".selected-team")
-    .forEach(el => el.classList.remove("selected-team"));
-
-  cell.parentElement.classList.add("selected-team");
-}
-
-/* STATS */
+/* STREAK */
 function calculateStreak(team, games) {
   let type = null;
   let count = 0;
@@ -304,6 +417,8 @@ function calculateStreak(team, games) {
 
     const scoreA = Number(g["SCORE_A"]) || 0;
     const scoreB = Number(g["SCORE_B"]) || 0;
+
+    if (!teamA || !teamB) continue;
 
     let result = null;
 
@@ -322,6 +437,7 @@ function calculateStreak(team, games) {
   return type ? `${type}${count}` : "";
 }
 
+/* LAST 5 */
 function calculateLast5(team, games) {
   let results = [];
 
@@ -332,6 +448,8 @@ function calculateLast5(team, games) {
     const scoreA = Number(g["SCORE_A"]) || 0;
     const scoreB = Number(g["SCORE_B"]) || 0;
 
+    if (!teamA || !teamB) continue;
+
     let result = null;
 
     if (team === teamA) result = scoreA > scoreB ? "W" : "L";
@@ -339,12 +457,17 @@ function calculateLast5(team, games) {
     else continue;
 
     results.push(result);
+
     if (results.length === 5) break;
   }
 
-  return `${results.filter(r => r==="W").length}-${results.filter(r => r==="L").length}`;
+  const wins = results.filter(r => r === "W").length;
+  const losses = results.filter(r => r === "L").length;
+
+  return `${wins}-${losses}`;
 }
 
+/* LOAD */
 async function load() {
 
   const text = await (await fetch(URL)).text();
@@ -353,7 +476,7 @@ async function load() {
 
   let data = rows.slice(1).map(r => {
     let obj = {};
-    headers.forEach((h,i)=>obj[h]=r[i]?.trim());
+    headers.forEach((h, i) => obj[h] = r[i]?.trim());
     return obj;
   });
 
@@ -361,81 +484,114 @@ async function load() {
   const rowsG = textG.trim().split("\n").map(r => r.split(","));
   const headersG = rowsG[0].map(h => h.trim());
 
-  const games = rowsG.slice(1).map(r=>{
-    let obj={};
-    headersG.forEach((h,i)=>obj[h]=r[i]?.trim());
+  const games = rowsG.slice(1).map(r => {
+    let obj = {};
+    headersG.forEach((h, i) => obj[h] = r[i]?.trim());
     return obj;
   });
 
   const textR = await (await fetch(RESULTS_URL)).text();
   const results = textR.trim().split("\n").slice(1);
 
+  /* TICKER */
   const ticker = document.getElementById("ticker-text");
 
-  ticker.innerHTML = `<div class="feed-wrapper">${
-    results.map(r=>{
-      const p=r.split(",");
-      return `<div class="game-card">
-        <div>${p[0]||""}</div>
-        <div><b>${p[1]||""}</b> ${p[2]||""}</div>
-        <div>${p[3]||""}</div>
-      </div>`;
-    }).join("")
-  }</div>`;
+  const cards = results.map(r => {
+    const p = r.split(",");
+    return `
+      <div class="game-card">
+        <div>${p[0] || ""}</div>
+        <div><b>${p[1] || ""}</b> ${p[2] || ""}</div>
+        <div>${p[3] || ""}</div>
+      </div>
+    `;
+  }).join("");
 
-  const teamKey = headers.find(h=>h.includes("TEAM"));
+  ticker.innerHTML = `<div class="feed-wrapper">${cards}${cards}</div>`;
 
-  data.forEach(row=>{
-    const team=row[teamKey];
-    row["STREAK"]=calculateStreak(team,games);
-    row["LAST 5"]=calculateLast5(team,games);
+  /* DATA */
+  const posKey = headers[0];
+  const teamKey = headers.find(h => h.includes("TEAM"));
+
+  data.forEach(row => {
+    const team = row[teamKey];
+    row["STREAK"] = calculateStreak(team, games);
+    row["LAST 5"] = calculateLast5(team, games);
   });
 
-  const app=document.getElementById("app");
+  /* SORT */
+  if (sortColumn) {
+    data.sort((a, b) => {
+      let A = isNaN(a[sortColumn]) ? a[sortColumn] : Number(a[sortColumn]);
+      let B = isNaN(b[sortColumn]) ? b[sortColumn] : Number(b[sortColumn]);
+      return sortDir === "asc" ? A - B : B - A;
+    });
+  } else {
+    data.sort((a, b) => Number(a[posKey]) - Number(b[posKey]));
+  }
 
-  let html="<table><thead><tr>";
+  /* TABLE */
+  const app = document.getElementById("app");
 
-  headers.concat(["STREAK","LAST 5"]).forEach(h=>{
-    html+=`<th onclick="sortTable('${h}')">${h}</th>`;
+  let html = "<table><thead><tr>";
+
+  headers.concat(["STREAK", "LAST 5"]).forEach(h => {
+    html += `<th onclick="sortTable('${h}')">${h}</th>`;
   });
 
-  html+="</tr></thead><tbody>";
+  html += "</tr></thead><tbody>";
 
-  data.forEach((row,i)=>{
+  data.forEach((row, i) => {
 
-    let cls=i<10?"top10":"";
+    const team = row[teamKey];
+    let cls = i < 10 ? "top10" : "";
 
-    html+=`<tr class="${cls}">`;
+// 👉 true = activa highlight automático
+// 👉 false = solo highlight manual (click usuario)
+   const AUTO_HIGHLIGHT = false;
 
-    headers.concat(["STREAK","LAST 5"]).forEach(h=>{
+if (AUTO_HIGHLIGHT && team?.toLowerCase() === "uncle drew") {
+  cls += " highlight-team";
+}
 
-      let value=row[h]||"";
+    html += `<tr class="${cls}">`;
 
-      if(h==="STREAK"){
-        const color=value.startsWith("W")?"#22c55e":"#ef4444";
-        value=`<span style="color:${color};font-weight:600">${value}</span>`;
+    headers.concat(["STREAK", "LAST 5"]).forEach(h => {
+      let value = row[h] || "";
+
+      if (h === "STREAK") {
+        const color = value.startsWith("W") ? "#22c55e" : "#ef4444";
+        value = `<span style="color:${color}; font-weight:600">${value}</span>`;
       }
 
-      if(h===teamKey){
-        html+=`<td onclick="selectTeam(this)">${value}</td>`;
-      } else {
-        html+=`<td>${value}</td>`;
-      }
-
+      html += `<td>${value}</td>`;
     });
 
-    html+="</tr>";
-
+    html += "</tr>";
   });
 
-  html+="</tbody></table>";
+  html += "</tbody></table>";
 
-  app.innerHTML=html;
+  app.innerHTML = html;
+
   updateSortUI();
 }
 
 load();
-setInterval(load,30000);
+
+let timer = setInterval(load, 30000);
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    clearInterval(timer);
+    timer = null;
+  } else {
+    if (!timer) {
+      load();
+      timer = setInterval(load, 30000);
+    }
+  }
+});
 
 </script>
 
