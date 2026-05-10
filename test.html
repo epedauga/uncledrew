@@ -111,7 +111,7 @@ body {
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 520px;
+  min-width: 100%;
   background: #0f0f0f;
   border: 1px solid #222;
   table-layout: auto;
@@ -207,15 +207,25 @@ th.sorted-active {
 
 @media (max-width: 768px) {
 
-    th {
+  table {
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  th {
     font-size: 14px;
+    padding: 8px 6px;
   }
 
   td {
     font-size: 16px;
+    padding: 8px 6px;
   }
 
-  td:nth-child(2) {
+  td:nth-child(2),
+  th:nth-child(2) {
+    width: 140px;
+    min-width: 140px;
     font-size: 17px;
     font-weight: 700;
   }
