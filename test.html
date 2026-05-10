@@ -98,7 +98,7 @@ body {
 
 /* TABLE */
 .container {
-  padding: 12px;
+  padding: 8px;
   max-width: 1000px;
   margin: auto;
 }
@@ -114,7 +114,6 @@ table {
   min-width: 100%;
   background: #0f0f0f;
   border: 1px solid #222;
-  table-layout: auto;
 }
 
 thead {
@@ -122,20 +121,22 @@ thead {
 }
 
 th {
-  padding: 6px 8px;
-  font-size: 12px;
+  padding: 7px 6px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: #aaa;
   cursor: pointer;
   background: rgba(255,255,255,0.04);
+  white-space: nowrap;
 }
 
 td {
-  padding: 6px 8px;
-  font-size: 14px;
+  padding: 7px 6px;
+  font-size: 13px;
   text-align: center;
   border-top: 1px solid #1c1c1c;
+  white-space: nowrap;
 }
 
 tbody tr:hover {
@@ -149,15 +150,10 @@ tbody tr:hover {
 }
 
 /* UNCLE DREW */
-.highlight-team {
-  position: relative;
-}
-
 .highlight-team td {
   background: rgba(255, 140, 66, 0.08);
 }
 
-/* BAR LATERAL */
 .highlight-team td:first-child {
   position: relative;
 }
@@ -175,18 +171,16 @@ tbody tr:hover {
 /* TEAM COLUMN */
 table th:nth-child(2),
 table td:nth-child(2) {
-  min-width: 120px;
-  white-space: nowrap;
-  padding: 0 10px;
+  min-width: 130px;
+  text-align: left;
+  padding-left: 10px;
 }
 
 /* LAST 5 */
 table th:last-child,
 table td:last-child {
-  white-space: nowrap;
   width: 55px;
   max-width: 55px;
-  padding: 6px 4px;
 }
 
 /* SORT */
@@ -208,33 +202,27 @@ th.sorted-active {
 @media (max-width: 768px) {
 
   .container {
-    padding: 4px;
-  }
-
-  .table-wrap {
-    overflow-x: auto;
+    padding: 2px;
   }
 
   table {
-    width: 100%;
-    min-width: 100%;
     table-layout: fixed;
   }
 
   th,
   td {
-    padding: 6px 4px;
-    font-size: 11px;
+    font-size: 10px;
+    padding: 6px 3px;
   }
 
   table th:nth-child(2),
   table td:nth-child(2) {
-    min-width: unset;
-    width: 115px;
-    max-width: 115px;
+    min-width: 110px;
+    width: 110px;
+    max-width: 110px;
   }
 
-  /* HEADER */
+  /* STICKY HEADER */
   thead th {
     position: sticky;
     top: 0;
@@ -244,50 +232,42 @@ th.sorted-active {
 
   thead th:first-child,
   thead th:nth-child(2) {
-    z-index: 13;
+    z-index: 15;
   }
 
-  /* POS */
+  /* POSITION */
   th:first-child,
   td:first-child {
     position: sticky;
     left: 0;
-    z-index: 10;
+    z-index: 11;
     background: #0f0f0f;
     box-shadow: 10px 0 0 #0f0f0f;
   }
 
   /* TEAM */
-  td:nth-child(2),
-  th:nth-child(2) {
+  th:nth-child(2),
+  td:nth-child(2) {
     position: sticky;
-    left: 38px;
-    z-index: 11;
+    left: 34px;
+    z-index: 12;
     background: #0f0f0f;
   }
 
-  td:nth-child(2)::before,
-  th:nth-child(2)::before {
+  th:nth-child(2)::before,
+  td:nth-child(2)::before {
     content: "";
     position: absolute;
-    left: -7px;
+    left: -6px;
     top: 0;
     bottom: 0;
-    width: 8px;
+    width: 7px;
     background: #0f0f0f;
-    z-index: 12;
   }
 
   /* TOP 10 */
-  .top10 {
-    background: transparent !important;
-  }
-
   .top10 td:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 12;
-    background: #0f0f0f;
+    z-index: 14;
   }
 
   .top10 td:first-child::before {
@@ -298,37 +278,13 @@ th.sorted-active {
     bottom: 0;
     width: 3px;
     background: #C21E56;
-    z-index: 14;
+    z-index: 20;
   }
 
-  /* UNCLE DREW */
-  .highlight-team td {
-    background: transparent;
-  }
-
-  .highlight-team td:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 12;
-    background: #0f0f0f;
-  }
-
-  .highlight-team td:nth-child(2)::before {
-    content: "";
-    position: absolute;
-    left: -10px;
-    top: 0;
-    bottom: 0;
-    width: 12px;
-    background: rgba(255, 140, 66, 0.25);
-    z-index: 1;
-  }
-
+  /* HIGHLIGHT TEAM */
   .highlight-team td:nth-child(2) {
-    position: sticky;
-    left: 38px;
-    z-index: 13;
-    background: #0f0f0f;
+    left: 34px;
+    z-index: 16;
     font-weight: 600;
     overflow: hidden;
   }
@@ -337,7 +293,7 @@ th.sorted-active {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(255, 140, 66, 0.25);
+    background: rgba(255, 140, 66, 0.22);
     z-index: 0;
   }
 
@@ -356,10 +312,22 @@ th.sorted-active {
 <div class="header">
   <h1>STANDINGS</h1>
   <h1>MASTER +40 B 2026</h1>
-  <div class="data-source">Data source: Google Sheets</div>
-  <div class="live-indicator">LIVE</div>
-  <button class="reset-btn" onclick="resetSort()">Reset order</button>
-  <div id="ticker-text">Cargando resultados...</div>
+
+  <div class="data-source">
+    Data source: Google Sheets
+  </div>
+
+  <div class="live-indicator">
+    LIVE
+  </div>
+
+  <button class="reset-btn" onclick="resetSort()">
+    Reset order
+  </button>
+
+  <div id="ticker-text">
+    Cargando resultados...
+  </div>
 </div>
 
 <div class="container">
@@ -368,7 +336,167 @@ th.sorted-active {
 
 <script>
 
-/* TU SCRIPT ORIGINAL VA ACÁ SIN CAMBIOS */
+const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1380606206&single=true&output=csv";
+
+const GAMES_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=1179427139&single=true&output=csv";
+
+const RESULTS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSc0iNd0VR_AOqMzHOiRMKnZ36aWPsiMYNBZCFbTLa15ghmjqw_2nrrhHTwFvmWLg/pub?gid=868310309&single=true&output=csv";
+
+let sortColumn = null;
+let sortDir = "desc";
+
+function resetSort() {
+  sortColumn = null;
+  sortDir = "desc";
+  load();
+}
+
+function sortTable(col) {
+  if (sortColumn === col) {
+    sortDir = sortDir === "asc" ? "desc" : "asc";
+  } else {
+    sortColumn = col;
+    sortDir = "desc";
+  }
+
+  load();
+  setTimeout(updateSortUI, 50);
+}
+
+function updateSortUI() {
+  document.querySelectorAll("th").forEach(th => {
+    th.classList.remove("sorted-asc", "sorted-desc", "sorted-active");
+
+    const key = th.textContent.trim();
+
+    if (key === sortColumn) {
+      th.classList.add("sorted-active");
+      th.classList.add(sortDir === "asc" ? "sorted-asc" : "sorted-desc");
+    }
+  });
+}
+
+async function load() {
+
+  const text = await (await fetch(URL)).text();
+  const rows = text.trim().split("\n").map(r => r.split(","));
+
+  const headers = rows[0].map(h => h.trim());
+
+  let data = rows.slice(1).map(r => {
+    let obj = {};
+    headers.forEach((h, i) => obj[h] = r[i]?.trim());
+    return obj;
+  });
+
+  const textR = await (await fetch(RESULTS_URL)).text();
+
+  const results = textR.trim().split("\n").slice(1);
+
+  const ticker = document.getElementById("ticker-text");
+
+  const cards = results.map(r => {
+
+    const p = r.split(",");
+
+    return `
+      <div class="game-card">
+        <div>${p[0] || ""}</div>
+        <div><b>${p[1] || ""}</b> ${p[2] || ""}</div>
+        <div>${p[3] || ""}</div>
+      </div>
+    `;
+  }).join("");
+
+  ticker.innerHTML =
+    `<div class="feed-wrapper">${cards}${cards}</div>`;
+
+  const posKey = headers[0];
+  const teamKey = headers.find(h => h.includes("TEAM"));
+
+  if (sortColumn) {
+
+    data.sort((a, b) => {
+
+      let A = isNaN(a[sortColumn])
+        ? a[sortColumn]
+        : Number(a[sortColumn]);
+
+      let B = isNaN(b[sortColumn])
+        ? b[sortColumn]
+        : Number(b[sortColumn]);
+
+      return sortDir === "asc"
+        ? A - B
+        : B - A;
+
+    });
+
+  } else {
+
+    data.sort((a, b) =>
+      Number(a[posKey]) - Number(b[posKey])
+    );
+
+  }
+
+  const app = document.getElementById("app");
+
+  let html = "<table><thead><tr>";
+
+  headers.forEach(h => {
+    html += `<th onclick="sortTable('${h}')">${h}</th>`;
+  });
+
+  html += "</tr></thead><tbody>";
+
+  data.forEach((row, i) => {
+
+    const team = row[teamKey];
+
+    let cls = i < 10 ? "top10" : "";
+
+    if (team?.toLowerCase() === "uncle drew") {
+      cls += " highlight-team";
+    }
+
+    html += `<tr class="${cls}">`;
+
+    headers.forEach(h => {
+      html += `<td>${row[h] || ""}</td>`;
+    });
+
+    html += "</tr>";
+  });
+
+  html += "</tbody></table>";
+
+  app.innerHTML = html;
+
+  updateSortUI();
+}
+
+load();
+
+let timer = setInterval(load, 30000);
+
+document.addEventListener("visibilitychange", () => {
+
+  if (document.hidden) {
+
+    clearInterval(timer);
+    timer = null;
+
+  } else {
+
+    if (!timer) {
+      load();
+      timer = setInterval(load, 30000);
+    }
+
+  }
+
+});
 
 </script>
 
