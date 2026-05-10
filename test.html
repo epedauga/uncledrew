@@ -180,7 +180,7 @@ table td:nth-child(2) {
   padding: 0 10px;
 }
 
-/* LAST 5 FIX */
+/* LAST 5 */
 table th:last-child,
 table td:last-child {
   white-space: nowrap;
@@ -224,14 +224,14 @@ th.sorted-active {
   th,
   td {
     padding: 6px 4px;
-    font-size: 12px;
+    font-size: 11px;
   }
 
   table th:nth-child(2),
   table td:nth-child(2) {
     min-width: unset;
-    width: 120px;
-    max-width: 120px;
+    width: 115px;
+    max-width: 115px;
   }
 
   /* HEADER */
@@ -350,6 +350,27 @@ th.sorted-active {
 
 </style>
 </head>
+
 <body>
+
+<div class="header">
+  <h1>STANDINGS</h1>
+  <h1>MASTER +40 B 2026</h1>
+  <div class="data-source">Data source: Google Sheets</div>
+  <div class="live-indicator">LIVE</div>
+  <button class="reset-btn" onclick="resetSort()">Reset order</button>
+  <div id="ticker-text">Cargando resultados...</div>
+</div>
+
+<div class="container">
+  <div class="table-wrap" id="app"></div>
+</div>
+
+<script>
+
+/* TU SCRIPT ORIGINAL VA ACÁ SIN CAMBIOS */
+
+</script>
+
 </body>
 </html>
