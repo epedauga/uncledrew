@@ -351,6 +351,7 @@ th:nth-child(2)::before {
 
 <div class="header">
   <h1>STANDINGS</h1>
+  <h1>MASTER +40 B 2026</h1>
   <div class="data-source">Data source: Google Sheets</div>
   <div class="live-indicator">LIVE</div>
   <button class="reset-btn" onclick="resetSort()">Reset order</button>
@@ -415,10 +416,11 @@ function calculateStreak(team, games) {
     const teamA = g["TEAM_A"];
     const teamB = g["TEAM_B"];
 
-    const scoreA = Number(g["SCORE_A"]) || 0;
-    const scoreB = Number(g["SCORE_B"]) || 0;
-
     if (!teamA || !teamB) continue;
+    if (g["SCORE_A"] === "" || g["SCORE_B"] === "") continue;
+
+    const scoreA = Number(g["SCORE_A"]);
+    const scoreB = Number(g["SCORE_B"]);
 
     let result = null;
 
@@ -445,10 +447,11 @@ function calculateLast5(team, games) {
     const teamA = g["TEAM_A"];
     const teamB = g["TEAM_B"];
 
-    const scoreA = Number(g["SCORE_A"]) || 0;
-    const scoreB = Number(g["SCORE_B"]) || 0;
-
     if (!teamA || !teamB) continue;
+    if (g["SCORE_A"] === "" || g["SCORE_B"] === "") continue;
+
+    const scoreA = Number(g["SCORE_A"]);
+    const scoreB = Number(g["SCORE_B"]);
 
     let result = null;
 
@@ -593,3 +596,4 @@ document.addEventListener("visibilitychange", () => {
 
 </body>
 </html>
+
